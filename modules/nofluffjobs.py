@@ -75,20 +75,26 @@ def extract_job_location(records_html, index=0):
     return job_location
 
 
-def extract_data_from_offer(index=0):
-    job_listing = nofluffjobs_search_results()
-    records = split_records(job_listing)
+def extract_company_name(records_html, index=0):
+    company_name = records_html[index].find("h4").text.strip()
+    return company_name
+
+
+def extract_data_from_offer(jobs_listing, index=0):
+    records = split_records(jobs_listing)
 
     job_name = extract_job_name(records, index)
     job_tags = extract_job_tags(records, index)
     job_salary = extract_salary(records, index)
     job_location = extract_job_location(records, index)
     job_url = extract_job_url(records, index)
+    company_name = extract_company_name(records, index)
 
-    return job_name, job_tags, job_salary, job_location, job_url
+    return job_name, job_tags, job_salary, job_location, job_url, company_name
 
 
 # Przykład użycia
-single_job_offer = extract_data_from_offer(0)
+nfj_search_results = nofluffjobs_search_results()
+single_job_offer = extract_data_from_offer(nfj_search_results)
 print(single_job_offer)
 # print(extract_data_from_offers())
