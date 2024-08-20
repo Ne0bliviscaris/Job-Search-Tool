@@ -16,8 +16,8 @@ def nofluffjobs_search_results():
     return job_listing
 
 
-# List of job offers
-def split_records(job_listing):
+def split_records():
+    job_listing = nofluffjobs_search_results()
     records_html = [
         job
         for job in job_listing.find_all(
@@ -27,74 +27,44 @@ def split_records(job_listing):
     return records_html
 
 
-def extract_job_url(records_html, index=0):
-    urls = [job["href"] for job in records_html if job.has_attr("href")]
-    if len(urls) == 1:
-        return "https://nofluffjobs.com" + urls[0]
-    return "https://nofluffjobs.com" + urls[index] if index < len(urls) else None
+def extract_data_from_offer(records_html, index=0):
+    job = records_html[index]
 
+    job_name = job.find(attrs={"data-cy": "title position on the job offer listing"}).text
+    job_tags = [tag.text for tag in job.find_all(attrs={"data-cy": "category name on the job offer listing"})]
+    salary_elements = job.find(attrs={"data-cy": "salary ranges on the job offer listing"})
+    job_location = [loc.text.strip() for loc in job.find_all(attrs={"data-cy": "location on the job offer listing"})]
+    job_url = "https://nofluffjobs.com" + job["href"]
+    company_name = job.find("h4").text.strip()
 
-# List of job offer names - fetches 2 objects with same name and returns first one
-def extract_job_name(records_html, index=0):
-    job_title = [
-        job.text for job in records_html[index].find_all(attrs={"data-cy": "title position on the job offer listing"})
-    ]
-    return job_title[0]
-
-
-# List of job offer tags
-def extract_job_tags(records_html, index=0):
-    job_tags = [
-        job.text for job in records_html[index].find_all(attrs={"data-cy": "category name on the job offer listing"})
-    ]
-    return job_tags
-
-
-def extract_salary(records_html, index=0):
-    salary_elements = records_html[index].find_all(attrs={"data-cy": "salary ranges on the job offer listing"})
-
-    # Strip salary text from unwanted characters
     if salary_elements:
-        salary_text = salary_elements[0].get_text(strip=True)
-        salary_text = salary_text.replace("PLN", "").replace("–", "-").replace("\xa0", "").replace(",", "").strip()
-        # Split salary text into min and max salary if range is provided
+        salary_text = (
+            salary_elements.get_text(strip=True)
+            .replace("PLN", "")
+            .replace("–", "-")
+            .replace("\xa0", "")
+            .replace(",", "")
+            .strip()
+        )
         if "-" in salary_text:
-            min_salary_text, max_salary_text = salary_text.split("-")
-            min_salary = int(min_salary_text.strip())
-            max_salary = int(max_salary_text.strip())
+            min_salary, max_salary = map(int, salary_text.split("-"))
         else:
-            min_salary = max_salary = int(salary_text.strip())
+            min_salary = max_salary = int(salary_text)
+    else:
+        min_salary = max_salary = None
 
-        return min_salary, max_salary
-    return None, None
-
-
-def extract_job_location(records_html, index=0):
-    job_location_elements = records_html[index].find_all(attrs={"data-cy": "location on the job offer listing"})
-    job_location = [job.text.strip() for job in job_location_elements]
-    return job_location
-
-
-def extract_company_name(records_html, index=0):
-    company_name = records_html[index].find("h4").text.strip()
-    return company_name
-
-
-def extract_data_from_offer(jobs_listing, index=0):
-    records = split_records(jobs_listing)
-
-    job_name = extract_job_name(records, index)
-    job_tags = extract_job_tags(records, index)
-    job_salary = extract_salary(records, index)
-    job_location = extract_job_location(records, index)
-    job_url = extract_job_url(records, index)
-    company_name = extract_company_name(records, index)
-
-    return job_name, job_tags, job_salary, job_location, job_url, company_name
+    return {
+        "job_name": job_name,
+        "job_tags": job_tags,
+        "job_salary": (min_salary, max_salary),
+        "job_location": job_location,
+        "job_url": job_url,
+        "company_name": company_name,
+    }
 
 
 # Przykład użycia
-nfj_search_results = nofluffjobs_search_results()
+nfj_search_results = split_records()
 single_job_offer = extract_data_from_offer(nfj_search_results)
-print(single_job_offer)
-# print(extract_data_from_offers())
+for key, value in single_job_offer.items():
+    print(f"{key}: {value}")
