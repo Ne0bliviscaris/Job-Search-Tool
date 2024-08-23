@@ -3,5 +3,5 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 
 
 
-TODO:
-Adapt NFJ functions to fetch container info from crawler_settings. Crawler_settings will conditinally assign containers for each task depending on website
+# TODO
+Records as class

@@ -3,53 +3,6 @@ import search_links
 from bs4 import BeautifulSoup
 
 
-def nofluffjobs_search_results():
-    """
-    Index offers from nofluffjobs.com and return them to file
-    """
-    response = requests.get(search_links.nofluffjobs)
-    soup = BeautifulSoup(response.content, "html.parser")
-
-    # Find block <nfj-postings-list>
-    job_listing = soup.find("nfj-postings-list")
-
-    return job_listing
-
-
-# List of job offers
-def split_records(job_listing):
-    records_html = [
-        job
-        for job in job_listing.find_all(
-            class_=lambda class_name: class_name and class_name.startswith("posting-list-item")
-        )
-    ]
-    return records_html
-
-
-def extract_job_url(records_html, index=0):
-    urls = [job["href"] for job in records_html if job.has_attr("href")]
-    if len(urls) == 1:
-        return "https://nofluffjobs.com" + urls[0]
-    return "https://nofluffjobs.com" + urls[index] if index < len(urls) else None
-
-
-# List of job offer names - fetches 2 objects with same name and returns first one
-def extract_job_name(records_html, index=0):
-    job_title = [
-        job.text for job in records_html[index].find_all(attrs={"data-cy": "title position on the job offer listing"})
-    ]
-    return job_title[0]
-
-
-# List of job offer tags
-def extract_job_tags(records_html, index=0):
-    job_tags = [
-        job.text for job in records_html[index].find_all(attrs={"data-cy": "category name on the job offer listing"})
-    ]
-    return job_tags
-
-
 def extract_salary(records_html, index=0):
     salary_elements = records_html[index].find_all(attrs={"data-cy": "salary ranges on the job offer listing"})
 
@@ -73,11 +26,6 @@ def extract_job_location(records_html, index=0):
     job_location_elements = records_html[index].find_all(attrs={"data-cy": "location on the job offer listing"})
     job_location = [job.text.strip() for job in job_location_elements]
     return job_location
-
-
-def extract_company_name(records_html, index=0):
-    company_name = records_html[index].find("h4").text.strip()
-    return company_name
 
 
 def extract_data_from_offer(jobs_listing, index=0):
