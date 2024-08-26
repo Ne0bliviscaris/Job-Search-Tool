@@ -3,18 +3,22 @@ from scrappers.listing_scrappers import (
     detect_records,
     fetch_company_logo,
     fetch_company_name,
+    fetch_job_location,
     fetch_job_tags,
     fetch_job_title,
     fetch_job_url,
+    fetch_salary_range,
     get_search_block,
 )
 from websites import identify_website, search_links
 
 
 def search_all_sites():
+    """
+    Search all websites in search_links
+    """
     all_search_results = []
-    for link in search_links:
-        site = search_links[link]
+    for site in search_links:
         search_result = search_site(site)
         all_search_results.append(search_result)
     return all_search_results
@@ -40,19 +44,26 @@ def extract_from_record(current_website, search_records):
     """
     Extract job title, tags, salary, location, URL and company name from the record
     """
-    title_container, tags_container, company_container, logo_container = set_record_containers(current_website)
+    title_container, tags_container, company_container, logo_container, location_container, salary_container = (
+        set_record_containers(current_website)
+    )
     job_url = fetch_job_url(search_records)
     job_title = fetch_job_title(search_records, title_container)
     job_tags = fetch_job_tags(search_records, tags_container)
     company_name = fetch_company_name(search_records, company_container)
     logo = fetch_company_logo(search_records, logo_container)
-    return job_title, job_url, job_tags, company_name, logo
+    location = fetch_job_location(search_records, location_container)
+    salary = fetch_salary_range(search_records, salary_container)
+    return job_title, job_url, job_tags, company_name, logo, location, salary
 
 
 # Test the code
-nfj = search_links[0]
-job_listing = search_site(nfj)[0]
-
-# job_title = fetch_job_title(job_listing)
+# nfj = search_links[0]
+# job_listing = search_site(nfj)[1]
 # print(job_listing)
-print(job_listing)
+
+# Test full search
+full_search = search_all_sites()
+import pprint
+
+pprint.pprint(full_search)
