@@ -1,4 +1,4 @@
-NOFLUFFJOBS = "nofluffjobs"
+NOFLUFFJOBS = "https://nofluffjobs.com"
 JUSTJOIN = "justjoin"
 THEPROTOCOL = "theprotocol"
 ROCKETJOBS = "rocketjobs"
