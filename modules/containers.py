@@ -34,6 +34,8 @@ def set_record_containers(current_website):
         tags_container = {"data-cy": "category name on the job offer listing"}
         company_container = "h4"
         logo_container = "img"
+        location_container = {"data-cy": "location on the job offer listing"}
+        salary_container = {"data-cy": "salary ranges on the job offer listing"}
 
     elif current_website == JUSTJOIN:
         search_container = "TO BE DONE --------------"
@@ -47,4 +49,4 @@ def set_record_containers(current_website):
         search_container = "TO BE DONE --------------"
         record_container = "TO BE DONE --------------"
 
-    return title_container, tags_container, company_container, logo_container
+    return title_container, tags_container, company_container, logo_container, location_container, salary_container
