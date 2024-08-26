@@ -25,7 +25,7 @@ def detect_records(search_results_block, record_container):
     # return records
 
 
-def fetch_job_url(record, index=0):
+def fetch_job_url(record):
     """
     Fetch job URL from the record."""
     url = record["href"]
@@ -58,3 +58,28 @@ def fetch_company_name(record, company_container):
 def fetch_company_logo(record, logo_container):
     company_logo = record.find(logo_container)
     return company_logo
+
+
+def fetch_job_location(records_html, location_container):
+    job_location_elements = records_html.find_all(attrs=location_container)
+    job_location = [job.text.strip() for job in job_location_elements]
+    return job_location
+
+
+def fetch_salary_range(records_html, salary_container):
+    salary_elements = records_html.find_all(attrs=salary_container)
+
+    # Strip salary text from unwanted characters
+    if salary_elements:
+        salary_text = salary_elements[0].get_text(strip=True)
+        salary_text = salary_text.replace("PLN", "").replace("–", "-").replace("\xa0", "").replace(",", "").strip()
+        # Split salary text into min and max salary if range is provided
+        if "-" in salary_text:
+            min_salary_text, max_salary_text = salary_text.split("-")
+            min_salary = int(min_salary_text.strip())
+            max_salary = int(max_salary_text.strip())
+        else:
+            min_salary = max_salary = int(salary_text.strip())
+
+        return min_salary, max_salary
+    return None, None
