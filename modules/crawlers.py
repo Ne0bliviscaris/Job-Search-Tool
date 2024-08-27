@@ -32,5 +32,10 @@ def search_site(search_link):
 
 
 # Test full search and return the first record
-full_search = search_all_sites()
-print(full_search[0][0])
+# full_search = search_all_sites()
+# print(full_search[0][0])
+
+
+# Test search for a single website
+single_search = search_site(search_links[0])
+print(single_search[0])
