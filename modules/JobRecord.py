@@ -61,9 +61,9 @@ class JobRecord:
 
     def fetch_logo(self):
         logo_container = containers.logo(self.website)
-        company_logo = self.html.find(logo_container)
-        if company_logo:
-            return company_logo.get("src")
+        logo = self.html.find(logo_container)
+        return logo
+
         return None
 
     def fetch_location(self):
@@ -90,3 +90,6 @@ class JobRecord:
 
             return min_salary, max_salary
         return None, None
+
+    def html(self):
+        return self.html
