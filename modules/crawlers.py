@@ -1,4 +1,4 @@
-from containers import set_search_containers
+import containers
 from JobRecord import JobRecord
 from scrappers.listing_scrappers import detect_records, get_search_block
 from websites import identify_website, search_links
@@ -21,7 +21,9 @@ def search_site(search_link):
     Get HTML block containing job search results
     """
     current_website = identify_website(search_link)
-    search_container, record_container = set_search_containers(current_website)
+    search_container = containers.search(current_website)
+    record_container = containers.record(current_website)
+
     search_block = get_search_block(search_link, search_container)
     search_records = detect_records(search_block, record_container)
 

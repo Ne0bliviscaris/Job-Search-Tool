@@ -1,27 +1,36 @@
 from websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL
 
 
-def set_search_containers(current_website):
+def search(current_website):
     """
-    Zwraca wartości kontenerów dla każdej strony internetowej
+    Zwraca wartość kontenera wyszukiwania dla każdej strony internetowej
     """
     if current_website == NOFLUFFJOBS:
-        search_container = "nfj-postings-list"
-        record_container = lambda id_name: id_name and id_name.startswith("nfjPostingListItem")
-
+        return "nfj-postings-list"
     elif current_website == JUSTJOIN:
-        search_container = "TO BE DONE --------------"
-        record_container = "TO BE DONE --------------"
-
+        return "TO BE DONE --------------"
     elif current_website == ROCKETJOBS:
-        search_container = "TO BE DONE --------------"
-        record_container = "TO BE DONE --------------"
-
+        return "TO BE DONE --------------"
     elif current_website == THEPROTOCOL:
-        search_container = "TO BE DONE --------------"
-        record_container = "TO BE DONE --------------"
+        return {"data-test": "offersList"}
+    else:
+        raise ValueError(f"Unknown website: {current_website}")
 
-    return search_container, record_container
+
+def record(current_website):
+    """
+    Zwraca wartość kontenera rekordu dla każdej strony internetowej
+    """
+    if current_website == NOFLUFFJOBS:
+        return lambda id_name: id_name and id_name.startswith("nfjPostingListItem")
+    elif current_website == JUSTJOIN:
+        return "TO BE DONE --------------"
+    elif current_website == ROCKETJOBS:
+        return "TO BE DONE --------------"
+    elif current_website == THEPROTOCOL:
+        return {"data-test": "list-item-offer"}
+    else:
+        raise ValueError(f"Unknown website: {current_website}")
 
 
 def job_title(current_website):
