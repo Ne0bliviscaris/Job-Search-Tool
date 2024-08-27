@@ -1,4 +1,4 @@
-import containers
+import modules.containers as containers
 
 
 class JobRecord:
@@ -16,14 +16,14 @@ class JobRecord:
     def __repr__(self):
         return (
             f"JobRecord:\n"
-            f"title: {self.title}\n"
-            f"url: {self.url}\n"
-            f"tags: {self.tags}\n"
-            f"company_name: {self.company_name},\n"
-            f"logo: {self.logo}\n"
-            f"location: {self.location}\n"
-            f"min salary: {self.salary_min})\n"
-            f"max salary: {self.salary_max}"
+            f"Title: {self.title}\n"
+            f"Url: {self.url}\n"
+            f"Tags: {self.tags}\n"
+            f"Company name: {self.company_name},\n"
+            f"Logo: {self.logo}\n"
+            f"Location: {self.location}\n"
+            f"Min salary: {self.salary_min})\n"
+            f"Max salary: {self.salary_max}"
         )
 
     def fetch_job_title(self):
@@ -93,3 +93,20 @@ class JobRecord:
 
     def html(self):
         return self.html
+
+    def to_dataframe_record(self):
+        record = {
+            "Title": self.title,
+            "Url": self.url,
+            "Company name": self.company_name,
+            "Logo": self.logo,
+            "Location": ", ".join(self.location),
+            "Min salary": self.salary_min,
+            "Max salary": self.salary_max,
+        }
+
+        # Dodajemy tagi jako osobne kolumny
+        for i, tag in enumerate(self.tags):
+            record[f"Tag {i+1}"] = tag.strip()
+
+        return record

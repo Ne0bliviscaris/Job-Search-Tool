@@ -1,5 +1,4 @@
 import requests
-import websites as websites
 from bs4 import BeautifulSoup
 
 

@@ -1,4 +1,4 @@
-from websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL
+from modules.websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL
 
 
 def search(current_website):

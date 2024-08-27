@@ -1,7 +1,9 @@
-import containers
-from JobRecord import JobRecord
-from scrappers.listing_scrappers import detect_records, get_search_block
-from websites import identify_website, search_links
+import pandas as pd
+
+import modules.containers as containers
+from modules.JobRecord import JobRecord
+from modules.scrappers.listing_scrappers import detect_records, get_search_block
+from modules.websites import identify_website, search_links
 
 
 def search_all_sites():
@@ -30,14 +32,22 @@ def search_site(search_link):
     # Process HTML code into JobRecord objects
     extracted_record = [JobRecord(record, current_website) for record in search_records]
     return extracted_record
-    # return search_results
 
 
-# Test full search and return the first record
-# full_search = search_all_sites()
-# print(full_search[0][0])
+def records_to_dataframe(records):
+    """
+    Convert a list of JobRecord objects to a pandas DataFrame
+    """
+    records_list = [record.to_dataframe_record() for record in records]
+    df = pd.DataFrame(records_list)
+    return df
 
 
-# Test search for a single website
-single_search = search_site(search_links[0])
-print(single_search[0])
+def main():
+    """
+    Main function
+    """
+    search_results = search_all_sites()
+    all_records = [record for site in search_results for record in site]
+    df = records_to_dataframe(all_records)
+    return df
