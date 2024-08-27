@@ -34,7 +34,7 @@ def search_site(search_link):
     return extracted_record
 
 
-def records_to_dataframe(records):
+def build_dataframe(records):
     """
     Convert a list of JobRecord objects to a pandas DataFrame
     """
@@ -49,5 +49,5 @@ def main():
     """
     search_results = search_all_sites()
     all_records = [record for site in search_results for record in site]
-    df = records_to_dataframe(all_records)
+    df = build_dataframe(all_records)
     return df
