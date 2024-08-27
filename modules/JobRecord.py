@@ -94,7 +94,7 @@ class JobRecord:
     def html(self):
         return self.html
 
-    def to_dataframe_record(self):
+    def record_to_dataframe(self):
         record = {
             "Title": self.title,
             "Url": self.url,
