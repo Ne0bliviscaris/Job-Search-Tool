@@ -73,6 +73,11 @@ def update_site(search_link):
 
 
 if __name__ == "__main__":
-    search_link = search_links[0]  # Use the first search link as an example
-    downloaded_file = update_site(search_link)
-    print(f"HTML content saved to: {downloaded_file}")
+    # # Download HTML content from the first search link
+    # search_link = search_links[0]  # Use the first search link as an example
+    # downloaded_file = update_site(search_link)
+    # print(f"HTML content saved to: {downloaded_file}")
+
+    # Search all websites
+    all_search_results = search_all_sites()
+    print(all_search_results)
