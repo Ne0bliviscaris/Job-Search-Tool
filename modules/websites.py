@@ -15,8 +15,7 @@ def identify_website(search_link):
     """
     Set current website as global variable based on search link
     """
-    global current_website
-    if "nofluffjobs.com" in search_link:
+    if "nofluffjobs" in search_link:
         current_website = NOFLUFFJOBS
     elif "justjoin.it" in search_link:
         current_website = JUSTJOIN
