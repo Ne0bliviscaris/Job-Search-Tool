@@ -1,8 +1,17 @@
+import os
+
 import containers as containers
 import pandas as pd
 from JobRecord import JobRecord
-from scrappers.listing_scrappers import detect_records, get_search_block
-from websites import identify_website, search_links
+from scrapers.listing_scrapers import detect_records, get_search_block
+from websites import (
+    JUSTJOIN,
+    NOFLUFFJOBS,
+    ROCKETJOBS,
+    THEPROTOCOL,
+    identify_website,
+    search_links,
+)
 
 
 def search_all_sites():
@@ -42,7 +51,28 @@ def build_dataframe(records):
     return df
 
 
+def update_site(search_link):
+    """
+    Download HTML content from the search link and save it to a file.
+    """
+    current_website = identify_website(search_link)
+    search_container = containers.search(current_website)
+
+    search_block = get_search_block(search_link, search_container)
+
+    # Ensure the directory exists
+    directory = f"modules/sites/"
+    os.makedirs(directory, exist_ok=True)
+
+    # Save HTML to file
+    filename = os.path.join(directory, f"{current_website}.html")
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(str(search_block))
+
+    return filename
+
+
 if __name__ == "__main__":
-    all_records_data = search_all_sites()
-    # df = build_dataframe(all_records_data)
-    print(all_records_data[0][0])
+    search_link = search_links[0]  # Use the first search link as an example
+    downloaded_file = update_site(search_link)
+    print(f"HTML content saved to: {downloaded_file}")

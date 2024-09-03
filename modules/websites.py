@@ -1,4 +1,4 @@
-NOFLUFFJOBS = "https://nofluffjobs.com"
+NOFLUFFJOBS = "nofluffjobs"
 JUSTJOIN = "justjoin"
 THEPROTOCOL = "theprotocol"
 ROCKETJOBS = "rocketjobs"
@@ -25,6 +25,7 @@ def identify_website(search_link):
     elif "rocketjobs.pl" in search_link:
         current_website = ROCKETJOBS
     else:
+        print("identify_website: Error: Website not recognized")
         current_website = "Error: Website not recognized"
 
     return current_website
