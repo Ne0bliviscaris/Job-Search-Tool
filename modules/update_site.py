@@ -2,6 +2,7 @@ import os
 
 import containers as containers
 from data_collector import generate_filename, get_search_block
+from websites import search_links
 
 
 def update_site(key, search_link):
@@ -19,16 +20,17 @@ def update_site(key, search_link):
     os.makedirs(directory, exist_ok=True)
 
     # Save HTML to file
-    filename = os.path.join(directory, generate_filename(key))
-    with open(filename, "w", encoding="utf-8") as file:
+    filename = generate_filename(key)
+    filepath = os.path.join(directory, filename)
+    with open(filepath, "w", encoding="utf-8") as file:
         file.write(str(search_block))
 
     if PRINTS:
-        print(f"[updater.py - update_site] HTML content saved to: {filename}")
-    return filename
+        print(f"[update_site.py - update_site] HTML content saved to: {filepath}")
+    return filepath
 
 
-def update_all_sites(search_links):
+def update_all_sites():
     """
     Download HTML content for all search links and save them to files.
     """
@@ -40,8 +42,5 @@ def update_all_sites(search_links):
 
 
 if __name__ == "__main__":
-    search_links = {
-        "nofluffjobs_data-ai-trainee-junior": "https://nofluffjobs.com/pl/artificial-intelligence?criteria=category%3Ddata%20seniority%3Dtrainee,junior",
-        # Add more websites and their search links with tags here
-    }
-    update_all_sites(search_links)
+
+    update_all_sites()

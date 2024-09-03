@@ -19,7 +19,6 @@ def process_records(soup, key):
     """
     Process HTML soup into JobRecord objects
     """
-    PRINTS = False
     current_website = key.split("_")[0]
     search_records = detect_records(soup, containers.record(current_website))
     return [JobRecord(record, current_website) for record in search_records]
@@ -29,7 +28,6 @@ def build_dataframe(records):
     """
     Convert a list of JobRecord objects to a pandas DataFrame
     """
-    PRINTS = False
     records_list = [record.record_to_dataframe() for record in records]
     df = pd.DataFrame(records_list)
     return df

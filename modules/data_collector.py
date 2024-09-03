@@ -19,11 +19,14 @@ def get_search_block(search_link, search_container):
     return job_listing
 
 
-def generate_filename(key):
+def generate_filename(key, directory=None):
     """
     Generate a readable filename based on the combined key
     """
-    return os.path.join("modules/sites", f"{key}.html")
+    filename = f"{key}.html"
+    if directory:
+        return os.path.join(directory, filename)
+    return filename
 
 
 def search_all_sites():
@@ -45,7 +48,7 @@ def search_site(key, search_link):
     Get HTML block containing job search results from a file
     """
     PRINTS = False
-    filename = generate_filename(key)
+    filename = generate_filename(key, "modules/sites")
     soup = html_to_soup(filename)
     if soup is None:
         if PRINTS:
