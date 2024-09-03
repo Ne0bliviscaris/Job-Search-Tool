@@ -15,21 +15,22 @@ def detect_records(search_results_block, record_container):
     return records
 
 
-def process_records(soup, key):
+def process_records(soup, link):
     """
     Process HTML soup into JobRecord objects
     """
-    current_website = key.split("_")[0]
+    current_website = link.split("_")[0]
     search_records = detect_records(soup, containers.record(current_website))
     return [JobRecord(record, current_website) for record in search_records]
 
 
 def build_dataframe(records):
     """
-    Convert a list of JobRecord objects to a pandas DataFrame
+    Convert a flattened list of JobRecord objects to a pandas DataFrame
     """
-    records_list = [record.record_to_dataframe() for record in records]
-    df = pd.DataFrame(records_list)
+    records_list = [item for sublist in records for item in sublist]
+    flattened_records = [record.record_to_dataframe() for record in records_list]
+    df = pd.DataFrame(flattened_records)
     return df
 
 
