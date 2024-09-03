@@ -1,18 +1,9 @@
 import os
 
-import containers as containers
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from JobRecord import JobRecord
+from data_processor import html_to_soup, process_records
 from websites import search_links
-
-
-def generate_filename(key):
-    """
-    Generate a readable filename based on the combined key
-    """
-    return f"{key}.html"
 
 
 def get_search_block(search_link, search_container):
@@ -28,15 +19,11 @@ def get_search_block(search_link, search_container):
     return job_listing
 
 
-def detect_records(search_results_block, record_container):
+def generate_filename(key):
     """
-    Split given HTML code block into records
+    Generate a readable filename based on the combined key
     """
-    PRINTS = False
-    records = [job for job in search_results_block.find_all(id=record_container)]
-    if PRINTS:
-        print(f"[data_collector.py - detect_records] Records: {records}")
-    return records
+    return os.path.join("modules/sites", f"{key}.html")
 
 
 def search_all_sites():
@@ -53,33 +40,12 @@ def search_all_sites():
     return all_search_results
 
 
-def html_to_soup(filename):
-    """
-    Convert HTML file to BeautifulSoup object
-    """
-    PRINTS = False
-    if PRINTS:
-        print(f"[data_collector.py - html_to_soup] Reading HTML from: {filename}")
-    with open(filename, "r", encoding="utf-8") as file:
-        return BeautifulSoup(file, "html.parser")
-
-
-def process_records(soup, key):
-    """
-    Process HTML soup into JobRecord objects
-    """
-    PRINTS = False
-    current_website = key.split("_")[0]
-    search_records = detect_records(soup, containers.record(current_website))
-    return [JobRecord(record, current_website) for record in search_records]
-
-
 def search_site(key, search_link):
     """
     Get HTML block containing job search results from a file
     """
     PRINTS = False
-    filename = os.path.join("modules/sites", generate_filename(key))
+    filename = generate_filename(key)
     soup = html_to_soup(filename)
     if soup is None:
         if PRINTS:
@@ -88,17 +54,6 @@ def search_site(key, search_link):
     return process_records(soup, key)
 
 
-def build_dataframe(records):
-    """
-    Convert a list of JobRecord objects to a pandas DataFrame
-    """
-    PRINTS = False
-    records_list = [record.record_to_dataframe() for record in records]
-    df = pd.DataFrame(records_list)
-    return df
-
-
 if __name__ == "__main__":
-    # Search all websites
-    all_search_results = search_all_sites()
-    print(all_search_results[0][0])
+    results = search_all_sites()[0][0]
+    print(results)
