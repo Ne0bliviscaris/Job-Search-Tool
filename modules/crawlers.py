@@ -8,12 +8,11 @@ from scrapers.listing_scrapers import detect_records, get_search_block
 from websites import identify_website, search_links
 
 
-def generate_filename(current_website, tag):
+def generate_filename(key):
     """
-    Generate a readable filename based on the website and tag
+    Generate a readable filename based on the combined key
     """
-    sanitized_tag = tag.replace(" ", "_")
-    return f"{current_website}_{sanitized_tag}.html"
+    return f"{key}.html"
 
 
 def search_all_sites():
@@ -22,12 +21,11 @@ def search_all_sites():
     """
     PRINTS = False
     all_search_results = []
-    for website, links in search_links.items():
-        for tag, link in links.items():
-            if PRINTS:
-                print(f"[crawlers.py - search_all_sites] Searching site: {website} with tag: {tag}")
-            search_result = search_site(link, tag)
-            all_search_results.append(search_result)
+    for key, link in search_links.items():
+        if PRINTS:
+            print(f"[crawlers.py - search_all_sites] Searching site with key: {key}")
+        search_result = search_site(key, link)
+        all_search_results.append(search_result)
     return all_search_results
 
 
@@ -35,50 +33,53 @@ def html_to_soup(filename):
     """
     Convert HTML file to BeautifulSoup object
     """
-    PRINTS = True
+    PRINTS = False
     if PRINTS:
         print(f"[crawlers.py - html_to_soup] Reading HTML from: {filename}")
     with open(filename, "r", encoding="utf-8") as file:
         return BeautifulSoup(file, "html.parser")
 
 
-def search_site(search_link, tag):
+def process_records(soup, key):
+    """
+    Process HTML soup into JobRecord objects
+    """
+    PRINTS = False
+    current_website = key.split("_")[0]
+    search_records = detect_records(soup, containers.record(current_website))
+    return [JobRecord(record, current_website) for record in search_records]
+
+
+def search_site(key, search_link):
     """
     Get HTML block containing job search results from a file
     """
-    PRINTS = True
-    current_website = identify_website(search_link)
-    filename = os.path.join("modules/sites", generate_filename(current_website, tag))
-
-    if not os.path.exists(filename):
+    PRINTS = False
+    filename = os.path.join("modules/sites", generate_filename(key))
+    soup = html_to_soup(filename)
+    if soup is None:
         if PRINTS:
             print(f"[crawlers.py - search_site] File not found: {filename}")
         return []
-
-    soup = html_to_soup(filename)
-    search_records = detect_records(soup, containers.record(current_website))
-
-    # Process HTML code into JobRecord objects
-    extracted_record = [JobRecord(record, current_website) for record in search_records]
-    return extracted_record
+    return process_records(soup, key)
 
 
 def build_dataframe(records):
     """
     Convert a list of JobRecord objects to a pandas DataFrame
     """
-    PRINTS = True
+    PRINTS = False
     records_list = [record.record_to_dataframe() for record in records]
     df = pd.DataFrame(records_list)
     return df
 
 
-def update_site(search_link, tag):
+def update_site(key, search_link):
     """
     Download HTML content from the search link and save it to a file.
     """
-    PRINTS = True
-    current_website = identify_website(search_link)
+    PRINTS = False
+    current_website = key.split("_")[0]
     search_container = containers.search(current_website)
 
     search_block = get_search_block(search_link, search_container)
@@ -88,7 +89,7 @@ def update_site(search_link, tag):
     os.makedirs(directory, exist_ok=True)
 
     # Save HTML to file
-    filename = os.path.join(directory, generate_filename(current_website, tag))
+    filename = os.path.join(directory, generate_filename(key))
     with open(filename, "w", encoding="utf-8") as file:
         file.write(str(search_block))
 
@@ -97,13 +98,20 @@ def update_site(search_link, tag):
     return filename
 
 
+def update_all_sites():
+    """
+    Download HTML content for all search links and save them to files.
+    """
+    PRINTS = False
+    for key, search_link in search_links.items():
+        if PRINTS:
+            print(f"[crawlers.py - update_all_sites] Updating site with key: {key}")
+        update_site(key, search_link)
+
+
 if __name__ == "__main__":
-    # # Download HTML content from the first search link
-    # first_website = next(iter(search_links))
-    # first_tag = next(iter(search_links[first_website]))
-    # search_link = search_links[first_website][first_tag]  # Use the first search link as an example
-    # downloaded_file = update_site(search_link, first_tag)
-    # print(f"HTML content saved to: {downloaded_file}")
+    # Update all websites
+    # update_all_sites()
 
     # Search all websites
     all_search_results = search_all_sites()
