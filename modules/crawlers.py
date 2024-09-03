@@ -1,9 +1,8 @@
+import containers as containers
 import pandas as pd
-
-import modules.containers as containers
-from modules.JobRecord import JobRecord
-from modules.scrappers.listing_scrappers import detect_records, get_search_block
-from modules.websites import identify_website, search_links
+from JobRecord import JobRecord
+from scrappers.listing_scrappers import detect_records, get_search_block
+from websites import identify_website, search_links
 
 
 def search_all_sites():
@@ -43,11 +42,7 @@ def build_dataframe(records):
     return df
 
 
-def main():
-    """
-    Main function
-    """
-    search_results = search_all_sites()
-    all_records = [record for site in search_results for record in site]
-    df = build_dataframe(all_records)
-    return df
+if __name__ == "__main__":
+    all_records_data = search_all_sites()
+    # df = build_dataframe(all_records_data)
+    print(all_records_data[0][0])
