@@ -7,7 +7,7 @@ current_website = None
 
 search_links = {
     "nofluffjobs_data-ai-trainee-junior": "https://nofluffjobs.com/pl/artificial-intelligence?criteria=category%3Ddata%20seniority%3Dtrainee,junior",
-    # Add more websites and their search links with tags here
+    "nofluffjobs_data-ai-trainee-junior-mid": "https://nofluffjobs.com/pl/artificial-intelligence?criteria=category%3Ddata%20seniority%3Dtrainee,junior,mid",
 }
 
 
