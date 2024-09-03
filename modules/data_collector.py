@@ -1,22 +1,7 @@
 import os
 
-import requests
-from bs4 import BeautifulSoup
 from data_processor import build_dataframe, html_to_soup, process_records
 from websites import search_links
-
-
-def get_search_block(search_link, search_container):
-    """
-    Get HTML block containing job search results
-    """
-    PRINTS = False
-    response = requests.get(search_link)
-    soup = BeautifulSoup(response.content, "html.parser")
-    job_listing = soup.find(search_container)
-    if PRINTS:
-        print(f"[data_collector.py - get_search_block] Job listing: {job_listing}")
-    return job_listing
 
 
 def set_filename(link):
