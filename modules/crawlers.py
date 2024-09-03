@@ -38,7 +38,7 @@ def build_dataframe(records):
     """
     Convert a list of JobRecord objects to a pandas DataFrame
     """
-    records_list = [record.to_dataframe_record() for record in records]
+    records_list = [record.record_to_dataframe() for record in records]
     df = pd.DataFrame(records_list)
     return df
 
