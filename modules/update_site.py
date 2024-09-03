@@ -15,19 +15,14 @@ def update_site(key, search_link):
 
     search_block = get_search_block(search_link, search_container)
 
-    # Ensure the directory exists
-    directory = "modules/sites/"
-    os.makedirs(directory, exist_ok=True)
-
     # Save HTML to file
-    filename = generate_filename(key)
-    filepath = os.path.join(directory, filename)
-    with open(filepath, "w", encoding="utf-8") as file:
+    filename = os.path.join(generate_filename(key))
+    with open(filename, "w", encoding="utf-8") as file:
         file.write(str(search_block))
 
     if PRINTS:
-        print(f"[update_site.py - update_site] HTML content saved to: {filepath}")
-    return filepath
+        print(f"[updater.py - update_site] HTML content saved to: {filename}")
+    return filename
 
 
 def update_all_sites():

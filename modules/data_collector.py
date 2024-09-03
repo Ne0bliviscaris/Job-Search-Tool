@@ -19,14 +19,11 @@ def get_search_block(search_link, search_container):
     return job_listing
 
 
-def generate_filename(key, directory=None):
+def generate_filename(key):
     """
     Generate a readable filename based on the combined key
     """
-    filename = f"{key}.html"
-    if directory:
-        return os.path.join(directory, filename)
-    return filename
+    return os.path.join("modules/sites", f"{key}.html")
 
 
 def search_all_sites():
@@ -38,17 +35,17 @@ def search_all_sites():
     for key, link in search_links.items():
         if PRINTS:
             print(f"[data_collector.py - search_all_sites] Searching site with key: {key}")
-        search_result = search_site(key, link)
+        search_result = search_site(key)
         all_search_results.append(search_result)
     return all_search_results
 
 
-def search_site(key, search_link):
+def search_site(key):
     """
     Get HTML block containing job search results from a file
     """
     PRINTS = False
-    filename = generate_filename(key, "modules/sites")
+    filename = generate_filename(key)
     soup = html_to_soup(filename)
     if soup is None:
         if PRINTS:
@@ -58,5 +55,5 @@ def search_site(key, search_link):
 
 
 if __name__ == "__main__":
-    results = search_all_sites()[0][0]
+    results = search_all_sites()[1][0]
     print(results)
