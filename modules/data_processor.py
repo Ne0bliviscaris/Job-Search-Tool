@@ -15,12 +15,12 @@ def detect_records(search_results_block, record_container):
     return records
 
 
-def process_records(soup, link):
+def process_records(soup_object, link):
     """
     Process HTML soup into JobRecord objects
     """
     current_website = link.split("_")[0]
-    search_records = detect_records(soup, containers.record(current_website))
+    search_records = detect_records(soup_object, containers.record(current_website))
     return [JobRecord(record, current_website) for record in search_records]
 
 
