@@ -44,4 +44,7 @@ if __name__ == "__main__":
     # print(results)
 
     records_frame = build_dataframe(results)
-    print(records_frame)
+    # print(records_frame)
+
+    columns = records_frame[["Title", "Company name"]]
+    print(columns)
