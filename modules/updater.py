@@ -4,16 +4,31 @@ import containers as containers
 import requests
 from bs4 import BeautifulSoup
 from data_collector import set_filename
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 from websites import identify_website, search_links
 
 
 def fetch_html_requests(url: str) -> str:
     """
-    Fetch HTML content from a URL
+    Fetch HTML content from a URL using requests
     """
     response = requests.get(url)
     response.raise_for_status()
     return response.content
+
+
+def fetch_html_selenium(url: str, search_container: str) -> str:
+    """
+    Fetch HTML content from a URL using Selenium
+    """
+    driver = setup_webdriver()
+    with driver:
+        driver.get(url)
+        driver.implicitly_wait(5)
+        search_block_html = get_container(driver, search_container)
+    return search_block_html
 
 
 def parse_with_beautifulsoup(html_content: str, search_container: dict) -> BeautifulSoup:
@@ -28,7 +43,11 @@ def scrape(search_link: str, search_container: dict) -> BeautifulSoup:
     """
     Get HTML block containing job search results
     """
-    html_content = fetch_html_requests(search_link)
+    USE_SELENIUM = True
+    if USE_SELENIUM:
+        html_content = fetch_html_selenium(search_link, search_container)
+    else:
+        html_content = fetch_html_requests(search_link)
     job_listing = parse_with_beautifulsoup(html_content, search_container)
     return job_listing
 
@@ -75,6 +94,33 @@ def update_all_sites() -> None:
         if PRINTS:
             print(f"[updater.py - update_all_sites] Updating site with link: {search_link}")
         update_site(link, search_link)
+
+
+def get_container(driver, search_container):
+    try:
+        search_block = driver.find_element(By.CSS_SELECTOR, search_container)
+        return search_block.get_attribute("outerHTML")
+    except Exception as e:
+        print(f"Selenium_functions.get_container: Failed to find the element: {e}")
+        return ""
+
+
+def setup_webdriver():
+    # Local path to chromedriver - static - change if needed
+    chromedriver_path = "C:\\Users\\Dragon\\Downloads\\chromedriver-win64\\chromedriver.exe"
+    # Create and start ChromeDriver service
+    webdriver_service = Service(chromedriver_path)
+    webdriver_service.start()
+
+    # Chrome options
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Run Chrome in headless mode - no window is displayed
+    options.add_argument("--disable-gpu")  # Disable GPU (optional but recommended in headless mode)
+    options.add_argument("--no-sandbox")  # Disable sandbox (optional but may help in some cases)
+    options.add_argument("--disable-dev-shm-usage")  # Disable shared memory (optional but may help in some cases)
+
+    # Return WebDriver instance
+    return webdriver.Chrome(service=webdriver_service, options=options)
 
 
 if __name__ == "__main__":
