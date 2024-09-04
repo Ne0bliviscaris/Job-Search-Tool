@@ -7,7 +7,7 @@ from data_collector import set_filename
 from websites import identify_website, search_links
 
 
-def get_search_block(search_link, search_container):
+def scrape_BeautifulSoup(search_link, search_container):
     """
     Get HTML block containing job search results
     """
@@ -16,7 +16,7 @@ def get_search_block(search_link, search_container):
     soup = BeautifulSoup(response.content, "html.parser")
     job_listing = soup.find(search_container)
     if PRINTS:
-        print(f"[data_collector.py - get_search_block] Job listing: {job_listing}")
+        print(f"[updater.py - scrape_BeautifulSoup] Job listing: {job_listing}")
     return job_listing
 
 
@@ -42,14 +42,14 @@ def update_site(link, search_link):
     """
     PRINTS = False
     search_container = get_search_container(link)
-    search_block = get_search_block(search_link, search_container)
+    search_block = scrape_BeautifulSoup(search_link, search_container)
 
     # Save HTML to file
     filename = os.path.join(set_filename(link))
     save_html_to_file(search_block, filename)
 
     if PRINTS:
-        print(f"[update_site.py - update_site] HTML content saved to: {filename}")
+        print(f"[updater.py - update_site] HTML content saved to: {filename}")
     return filename
 
 
@@ -60,7 +60,7 @@ def update_all_sites():
     PRINTS = False
     for link, search_link in search_links.items():
         if PRINTS:
-            print(f"[update_site.py - update_all_sites] Updating site with link: {link}")
+            print(f"[updater.py - update_all_sites] Updating site with link: {search_link}")
         update_site(link, search_link)
 
 
