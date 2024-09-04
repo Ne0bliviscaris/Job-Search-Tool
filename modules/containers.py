@@ -74,17 +74,17 @@ def company(current_website):
     Returns company name container for each website
     """
     if current_website == NOFLUFFJOBS:
-        company_name = "h4"
-
+        return {
+            "class": "tw-text-gray-60 company-name tw-w-[50%] desktop:tw-w-auto tw-mb-0 !tw-text-xs !desktop:tw-text-sm tw-font-semibold desktop:tw-font-normal"
+        }
     elif current_website == JUSTJOIN:
-        company_name = "TO BE DONE --------------"
-
+        return "TO BE DONE --------------"
     elif current_website == ROCKETJOBS:
-        company_name = "TO BE DONE --------------"
-
+        return "TO BE DONE --------------"
     elif current_website == THEPROTOCOL:
-        company_name = "TO BE DONE --------------"
-    return company_name
+        return "TO BE DONE --------------"
+    else:
+        raise ValueError(f"Unknown website: {current_website}")
 
 
 def logo(current_website):
