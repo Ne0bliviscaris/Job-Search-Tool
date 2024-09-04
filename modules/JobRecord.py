@@ -12,6 +12,7 @@ class JobRecord:
         self.logo = self.fetch_logo()
         self.location = self.fetch_location()
         self.salary_min, self.salary_max = self.fetch_salary_range()
+        self.host_site = self.host_site()
 
     def __repr__(self):
         return (
@@ -24,6 +25,7 @@ class JobRecord:
             f"Location: {self.location}\n"
             f"Min salary: {self.salary_min})\n"
             f"Max salary: {self.salary_max}"
+            f"Website: {self.host_site}"
         )
 
     def fetch_job_title(self):
@@ -103,6 +105,7 @@ class JobRecord:
             "Location": ", ".join(self.location),
             "Min salary": self.salary_min,
             "Max salary": self.salary_max,
+            "Website": self.host_site,
         }
 
         # Dodajemy tagi jako osobne kolumny
@@ -110,3 +113,9 @@ class JobRecord:
             record[f"Tag {i+1}"] = tag.strip()
 
         return record
+
+    def host_site(self) -> str:
+        """
+        Extract the main domain from the website URL.
+        """
+        return self.website.split("//")[-1].split(".")[0]
