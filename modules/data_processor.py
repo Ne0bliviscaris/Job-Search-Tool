@@ -9,7 +9,7 @@ def detect_records(search_results_block, record_container):
     Split given HTML code block into records
     """
     PRINTS = False
-    records = [job for job in search_results_block.find_all(id=record_container)]
+    records = [job for job in search_results_block.find_all(attrs=record_container)]
     if PRINTS:
         print(f"[data_processor.py - detect_records] Records: {records}")
     return records

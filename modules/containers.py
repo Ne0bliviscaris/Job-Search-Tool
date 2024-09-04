@@ -22,7 +22,7 @@ def record(current_website):
     Zwraca wartość kontenera rekordu dla każdej strony internetowej
     """
     if current_website == NOFLUFFJOBS:
-        return lambda id_name: id_name and id_name.startswith("nfjPostingListItem")
+        return {"id": lambda id_name: id_name and id_name.startswith("nfjPostingListItem")}
     elif current_website == JUSTJOIN:
         return "TO BE DONE --------------"
     elif current_website == ROCKETJOBS:
