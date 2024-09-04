@@ -56,12 +56,12 @@ class JobRecord:
         Fetch company name from the record
         """
         company_container = containers.company(self.website)
-        company_name = self.html.find(company_container).text.strip()
+        company_name = self.html.find(attrs=company_container).text.strip()
         return company_name
 
     def fetch_logo(self):
         logo_container = containers.logo(self.website)
-        logo = self.html.find(logo_container)
+        logo = self.html.find(attrs=logo_container)
         return logo
 
         return None
