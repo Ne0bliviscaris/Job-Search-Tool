@@ -12,7 +12,8 @@ def search(search_link):
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     elif THEPROTOCOL in search_link:
-        return {"data-test": "offersList"}
+        # return {"data-test": "offersList"}
+        return '[data-test="offersList"]'
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
