@@ -1,141 +1,131 @@
 from websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL
 
 
-def search(current_website):
+def search(search_link):
     """
-    Zwraca wartość kontenera wyszukiwania dla każdej strony internetowej
+    Returns search container for each website
     """
-    if current_website == NOFLUFFJOBS:
+    if NOFLUFFJOBS in search_link:
         return "nfj-postings-list"
-    elif current_website == JUSTJOIN:
+    elif JUSTJOIN in search_link:
         return "TO BE DONE --------------"
-    elif current_website == ROCKETJOBS:
+    elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
-    elif current_website == THEPROTOCOL:
+    elif THEPROTOCOL in search_link:
         return {"data-test": "offersList"}
     else:
-        raise ValueError(f"Unknown website: {current_website}")
+        raise ValueError(f"Unknown website: {search_link}")
 
 
-def record(current_website):
+def record(search_link):
     """
-    Zwraca wartość kontenera rekordu dla każdej strony internetowej
+    Returns record container for each website
     """
-    if current_website == NOFLUFFJOBS:
+    if NOFLUFFJOBS in search_link:
         return {"id": lambda id_name: id_name and id_name.startswith("nfjPostingListItem")}
-    elif current_website == JUSTJOIN:
+    elif JUSTJOIN in search_link:
         return "TO BE DONE --------------"
-    elif current_website == ROCKETJOBS:
+    elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
-    elif current_website == THEPROTOCOL:
+    elif THEPROTOCOL in search_link:
         return {"data-test": "list-item-offer"}
     else:
-        raise ValueError(f"Unknown website: {current_website}")
+        raise ValueError(f"Unknown website: {search_link}")
 
 
-def job_title(current_website):
+def job_title(search_link):
     """
     Returns title container for each website
     """
-    if current_website == NOFLUFFJOBS:
-        title_container = {"data-cy": "title position on the job offer listing"}
-
-    elif current_website == JUSTJOIN:
-        title_container = "TO BE DONE --------------"
-
-    elif current_website == ROCKETJOBS:
-        title_container = "TO BE DONE --------------"
-
-    elif current_website == THEPROTOCOL:
-        title_container = "TO BE DONE --------------"
-    return title_container
+    if NOFLUFFJOBS in search_link:
+        return {"data-cy": "title position on the job offer listing"}
+    elif JUSTJOIN in search_link:
+        return "TO BE DONE --------------"
+    elif ROCKETJOBS in search_link:
+        return "TO BE DONE --------------"
+    elif THEPROTOCOL in search_link:
+        return "TO BE DONE --------------"
+    else:
+        raise ValueError(f"Unknown website: {search_link}")
 
 
-def tags(current_website):
+def tags(search_link):
     """
     Returns tags container for each website
     """
-    if current_website == NOFLUFFJOBS:
-        tags_container = {"data-cy": "category name on the job offer listing"}
-
-    elif current_website == JUSTJOIN:
-        tags_container = "TO BE DONE --------------"
-
-    elif current_website == ROCKETJOBS:
-        tags_container = "TO BE DONE --------------"
-
-    elif current_website == THEPROTOCOL:
-        tags_container = "TO BE DONE --------------"
-    return tags_container
+    if NOFLUFFJOBS in search_link:
+        return {"data-cy": "category name on the job offer listing"}
+    elif JUSTJOIN in search_link:
+        return "TO BE DONE --------------"
+    elif ROCKETJOBS in search_link:
+        return "TO BE DONE --------------"
+    elif THEPROTOCOL in search_link:
+        return "TO BE DONE --------------"
+    else:
+        raise ValueError(f"Unknown website: {search_link}")
 
 
-def company(current_website):
+def company(search_link):
     """
     Returns company name container for each website
     """
-    if current_website == NOFLUFFJOBS:
+    if NOFLUFFJOBS in search_link:
         return {
             "class": "tw-text-gray-60 company-name tw-w-[50%] desktop:tw-w-auto tw-mb-0 !tw-text-xs !desktop:tw-text-sm tw-font-semibold desktop:tw-font-normal"
         }
-    elif current_website == JUSTJOIN:
+    elif JUSTJOIN in search_link:
         return "TO BE DONE --------------"
-    elif current_website == ROCKETJOBS:
+    elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
-    elif current_website == THEPROTOCOL:
+    elif THEPROTOCOL in search_link:
         return "TO BE DONE --------------"
     else:
-        raise ValueError(f"Unknown website: {current_website}")
+        raise ValueError(f"Unknown website: {search_link}")
 
 
-def logo(current_website):
+def logo(search_link):
     """
     Returns logo container for each website
     """
-    if current_website == NOFLUFFJOBS:
-        logo_container = {"alt": "Company logo"}
-
-    elif current_website == JUSTJOIN:
-        logo_container = "TO BE DONE --------------"
-
-    elif current_website == ROCKETJOBS:
-        logo_container = "TO BE DONE --------------"
-
-    elif current_website == THEPROTOCOL:
-        logo_container = "TO BE DONE --------------"
-    return logo_container
+    if NOFLUFFJOBS in search_link:
+        return {"alt": "Company logo"}
+    elif JUSTJOIN in search_link:
+        return "TO BE DONE --------------"
+    elif ROCKETJOBS in search_link:
+        return "TO BE DONE --------------"
+    elif THEPROTOCOL in search_link:
+        return "TO BE DONE --------------"
+    else:
+        raise ValueError(f"Unknown website: {search_link}")
 
 
-def location(current_website):
+def location(search_link):
     """
     Returns location container for each website
     """
-    if current_website == NOFLUFFJOBS:
-        location_container = {"data-cy": "location on the job offer listing"}
-
-    elif current_website == JUSTJOIN:
-        location_container = "TO BE DONE --------------"
-
-    elif current_website == ROCKETJOBS:
-        location_container = "TO BE DONE --------------"
-
-    elif current_website == THEPROTOCOL:
-        location_container = "TO BE DONE --------------"
-    return location_container
+    if NOFLUFFJOBS in search_link:
+        return {"data-cy": "location on the job offer listing"}
+    elif JUSTJOIN in search_link:
+        return "TO BE DONE --------------"
+    elif ROCKETJOBS in search_link:
+        return "TO BE DONE --------------"
+    elif THEPROTOCOL in search_link:
+        return "TO BE DONE --------------"
+    else:
+        raise ValueError(f"Unknown website: {search_link}")
 
 
-def salary(current_website):
+def salary(search_link):
     """
     Returns salary container for each website
     """
-    if current_website == NOFLUFFJOBS:
-        salary_container = {"data-cy": "salary ranges on the job offer listing"}
-
-    elif current_website == JUSTJOIN:
-        salary_container = "TO BE DONE --------------"
-
-    elif current_website == ROCKETJOBS:
-        salary_container = "TO BE DONE --------------"
-
-    elif current_website == THEPROTOCOL:
-        salary_container = "TO BE DONE --------------"
-    return salary_container
+    if NOFLUFFJOBS in search_link:
+        return {"data-cy": "salary ranges on the job offer listing"}
+    elif JUSTJOIN in search_link:
+        return "TO BE DONE --------------"
+    elif ROCKETJOBS in search_link:
+        return "TO BE DONE --------------"
+    elif THEPROTOCOL in search_link:
+        return "TO BE DONE --------------"
+    else:
+        raise ValueError(f"Unknown website: {search_link}")
