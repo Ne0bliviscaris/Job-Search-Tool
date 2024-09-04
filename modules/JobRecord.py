@@ -62,7 +62,7 @@ class JobRecord:
     def fetch_logo(self):
         logo_container = containers.logo(self.website)
         logo = self.html.find(attrs=logo_container)
-        return logo
+        return logo.get("src") if logo else None
 
         return None
 
