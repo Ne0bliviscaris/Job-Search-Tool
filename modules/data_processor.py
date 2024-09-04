@@ -2,6 +2,7 @@ import containers as containers
 import pandas as pd
 from bs4 import BeautifulSoup
 from JobRecord import JobRecord
+from websites import identify_website
 
 
 def detect_records(search_results_block, record_container):
@@ -19,7 +20,7 @@ def process_records(soup_object, link):
     """
     Process HTML soup into JobRecord objects
     """
-    current_website = link.split("_")[0]
+    current_website = identify_website(link)
     search_records = detect_records(soup_object, containers.record(current_website))
     return [JobRecord(record, current_website) for record in search_records]
 

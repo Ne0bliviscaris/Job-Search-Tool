@@ -4,7 +4,7 @@ import containers as containers
 import requests
 from bs4 import BeautifulSoup
 from data_collector import set_filename
-from websites import search_links
+from websites import identify_website, search_links
 
 
 def get_search_block(search_link, search_container):
@@ -24,7 +24,7 @@ def get_search_container(link):
     """
     Get the search container based on the link.
     """
-    current_website = link.split("_")[0]
+    current_website = identify_website(link)
     return containers.search(current_website)
 
 
