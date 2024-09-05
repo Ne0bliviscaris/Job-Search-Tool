@@ -70,7 +70,6 @@ def update_site(link: str, search_link: str) -> str:
     """
     Download HTML content from the search link and save it to a file.
     """
-    PRINTS = False
     search_container = get_search_container(link)
     search_block = scrape(search_link, search_container)
 
@@ -78,8 +77,6 @@ def update_site(link: str, search_link: str) -> str:
     filename = os.path.join(set_filename(link))
     save_html_to_file(search_block, filename)
 
-    if PRINTS:
-        print(f"[updater.py - update_site] HTML content saved to: {filename}")
     return filename
 
 
@@ -87,10 +84,7 @@ def update_all_sites() -> None:
     """
     Download HTML content for all search links and save them to files.
     """
-    PRINTS = False
     for link, search_link in search_links.items():
-        if PRINTS:
-            print(f"[updater.py - update_all_sites] Updating site with link: {search_link}")
         update_site(link, search_link)
 
 
