@@ -1,3 +1,5 @@
+import re
+
 import containers as containers
 
 
@@ -75,6 +77,8 @@ class JobRecord:
         job_location = [job.text.strip() for job in job_location_elements]
         return job_location
 
+    import re
+
     def fetch_salary_range(self) -> tuple[int, int, str]:
         """
         Fetch salary range from the job listing HTML.
@@ -84,15 +88,26 @@ class JobRecord:
 
         if salary_elements:
             raw_salary_text = salary_elements[0].get_text(strip=True)
+            # Remove PLN, "zł" and anything inside parentheses like "(B2B)"
             processed_salary_text = (
-                raw_salary_text.replace("PLN", "").replace("–", "-").replace("\xa0", "").replace(",", "").strip()
+                raw_salary_text.replace("PLN", "")
+                .replace("–", "-")
+                .replace("\xa0", "")
+                .replace(",", "")
+                .replace("zł", "")
+                .strip()
             )
+            # Remove anything in parentheses (e.g., "(B2B)")
+            processed_salary_text = re.sub(r"\(.*?\)", "", processed_salary_text)
 
-            # Handle 'k' notation (e.g., 4.5k)
-            if "k" in processed_salary_text:
-                processed_salary_text = processed_salary_text.replace("k", "000").replace(".", "")
+            # Regular expression to handle 'k' notation (e.g., 4.5k, 5k)
+            def convert_k_notation(salary_text):
+                return re.sub(r"(\d+(\.\d+)?)k", lambda x: str(int(float(x.group(1)) * 1000)), salary_text)
 
-            # Remove any non-digit characters
+            # Apply 'k' notation conversion
+            processed_salary_text = convert_k_notation(processed_salary_text)
+
+            # Remove any non-digit or non-range characters
             processed_salary_text = "".join(filter(lambda x: x.isdigit() or x == "-", processed_salary_text))
 
             # Split salary text into min and max salary if range is provided
