@@ -77,8 +77,6 @@ class JobRecord:
         job_location = [job.text.strip() for job in job_location_elements]
         return job_location
 
-    import re
-
     def fetch_salary_range(self) -> tuple[int, int, str]:
         """
         Fetch salary range from the job listing HTML.
