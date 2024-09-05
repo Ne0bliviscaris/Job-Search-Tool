@@ -1,36 +1,21 @@
 import os
 
 import containers as containers
-import requests
-from bs4 import BeautifulSoup
 from data_collector import set_filename
+from selenium_utils import get_container, setup_webdriver
 from websites import identify_website, search_links
 
 
-def fetch_html_requests(url: str) -> str:
+def scrape(url: str, search_container: str) -> str:
     """
-    Fetch HTML content from a URL
+    Fetch HTML content from a URL using Selenium
     """
-    response = requests.get(url)
-    response.raise_for_status()
-    return response.content
-
-
-def parse_with_beautifulsoup(html_content: str, search_container: dict) -> BeautifulSoup:
-    """
-    Parse HTML content using BeautifulSoup
-    """
-    soup = BeautifulSoup(html_content, "html.parser")
-    return soup.find(search_container)
-
-
-def scrape(search_link: str, search_container: dict) -> BeautifulSoup:
-    """
-    Get HTML block containing job search results
-    """
-    html_content = fetch_html_requests(search_link)
-    job_listing = parse_with_beautifulsoup(html_content, search_container)
-    return job_listing
+    driver = setup_webdriver()
+    with driver:
+        driver.get(url)
+        driver.implicitly_wait(7)
+        html_content = get_container(driver, search_container)
+    return html_content
 
 
 def get_search_container(link: str) -> dict:
@@ -53,7 +38,6 @@ def update_site(link: str, search_link: str) -> str:
     """
     Download HTML content from the search link and save it to a file.
     """
-    PRINTS = False
     search_container = get_search_container(link)
     search_block = scrape(search_link, search_container)
 
@@ -61,8 +45,6 @@ def update_site(link: str, search_link: str) -> str:
     filename = os.path.join(set_filename(link))
     save_html_to_file(search_block, filename)
 
-    if PRINTS:
-        print(f"[updater.py - update_site] HTML content saved to: {filename}")
     return filename
 
 
@@ -70,10 +52,7 @@ def update_all_sites() -> None:
     """
     Download HTML content for all search links and save them to files.
     """
-    PRINTS = False
     for link, search_link in search_links.items():
-        if PRINTS:
-            print(f"[updater.py - update_all_sites] Updating site with link: {search_link}")
         update_site(link, search_link)
 
 

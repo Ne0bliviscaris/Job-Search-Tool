@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 from data_processor import build_dataframe, html_to_soup, process_records
 from websites import search_links
 
@@ -15,11 +16,8 @@ def search_all_sites():
     """
     Search all websites in search_links
     """
-    PRINTS = False
     all_search_results = []
     for link, search_link in search_links.items():
-        if PRINTS:
-            print(f"[data_collector.py - search_all_sites] Searching site with link: {search_link}")
         search_result = search_site(link)
         all_search_results.append(search_result)
     return all_search_results
@@ -29,14 +27,18 @@ def search_site(search_link):
     """
     Get HTML block containing job search results from a file
     """
-    PRINTS = False
     filename = set_filename(search_link)
     soup = html_to_soup(filename)
     if soup is None:
-        if PRINTS:
-            print(f"[data_collector.py - search_site] File not found: {filename}")
         return []
     return process_records(soup, search_link)
+
+
+def save_dataframe_to_csv(dataframe: pd.DataFrame, filename: str) -> None:
+    """
+    Save the given DataFrame to a CSV file.
+    """
+    dataframe.to_csv(filename, index=False)
 
 
 if __name__ == "__main__":
@@ -45,6 +47,6 @@ if __name__ == "__main__":
 
     records_frame = build_dataframe(results)
     # print(records_frame)
-
-    columns = records_frame[["Title", "Company name", "Url"]]
+    save_dataframe_to_csv(records_frame, "modules/sites/records.csv")
+    columns = records_frame[["Title", "Website", "Min salary", "Salary text"]]
     print(columns)
