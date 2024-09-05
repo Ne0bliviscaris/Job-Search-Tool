@@ -10,7 +10,7 @@ def search(search_link: str) -> str:
     elif THEPROTOCOL in search_link:
         return '[data-test="offersList"]'
     elif JUSTJOIN in search_link:
-        return "TO BE DONE --------------"
+        return '[data-test-id="virtuoso-item-list"]'
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
@@ -26,7 +26,7 @@ def record(search_link: str) -> dict:
     elif THEPROTOCOL in search_link:
         return {"data-test": "list-item-offer"}
     elif JUSTJOIN in search_link:
-        return "TO BE DONE --------------"
+        return {"class": "offer_list_offer_link css-3qyn8a"}
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
@@ -42,7 +42,7 @@ def job_title(search_link: str) -> dict:
     elif THEPROTOCOL in search_link:
         return {"data-test": "text-jobTitle"}
     elif JUSTJOIN in search_link:
-        return "TO BE DONE --------------"
+        return {"class": "css-3hs82j"}
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
@@ -58,7 +58,7 @@ def tags(search_link: str) -> dict:
     elif THEPROTOCOL in search_link:
         return {"data-test": "chip-expectedTechnology"}
     elif JUSTJOIN in search_link:
-        return "TO BE DONE --------------"
+        return {"class": "MuiBox-root css-vzlxkq"}
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
@@ -76,7 +76,7 @@ def company(search_link: str) -> dict:
     elif THEPROTOCOL in search_link:
         return {"data-test": "text-employerName"}
     elif JUSTJOIN in search_link:
-        return "TO BE DONE --------------"
+        return {"class": "css-7e0395"}
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
@@ -92,7 +92,7 @@ def logo(search_link: str) -> dict:
     elif THEPROTOCOL in search_link:
         return {"data-test": "icon-companyLogo"}
     elif JUSTJOIN in search_link:
-        return "TO BE DONE --------------"
+        return {"class": "MuiBox-root css-677aw9"}
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
@@ -108,7 +108,7 @@ def location(search_link: str) -> dict:
     elif THEPROTOCOL in search_link:
         return {"data-test": "text-workModes"}
     elif JUSTJOIN in search_link:
-        return "TO BE DONE --------------"
+        return {"class": "css-1o4wo1x"}
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
@@ -124,7 +124,7 @@ def salary(search_link: str) -> dict:
     elif THEPROTOCOL in search_link:
         return {"data-test": "text-salary"}
     elif JUSTJOIN in search_link:
-        return "TO BE DONE --------------"
+        return {"class": "css-19u0lmu"}
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
