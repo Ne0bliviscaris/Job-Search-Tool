@@ -11,7 +11,7 @@ class JobRecord:
         self.company_name = self.fetch_company_name()
         self.logo = self.fetch_logo()
         self.location = self.fetch_location()
-        self.salary_min, self.salary_max = self.fetch_salary_range()
+        self.salary_min, self.salary_max, self.salary_text = self.fetch_salary_range()
         self.host_site = self.host_site()
 
     def __repr__(self):
@@ -20,11 +20,12 @@ class JobRecord:
             f"Title: {self.title}\n"
             f"Url: {self.url}\n"
             f"Tags: {self.tags}\n"
-            f"Company name: {self.company_name},\n"
+            f"Company name: {self.company_name}\n"
             f"Logo: {self.logo}\n"
             f"Location: {self.location}\n"
-            f"Min salary: {self.salary_min})\n"
-            f"Max salary: {self.salary_max}"
+            f"Min salary: {self.salary_min}\n"
+            f"Max salary: {self.salary_max}\n"
+            f"Salary text: {self.salary_text}\n"
             f"Website: {self.host_site}"
         )
 
@@ -74,24 +75,37 @@ class JobRecord:
         job_location = [job.text.strip() for job in job_location_elements]
         return job_location
 
-    def fetch_salary_range(self):
+    def fetch_salary_range(self) -> tuple[int, int, str]:
+        """
+        Fetch salary range from the job listing HTML.
+        """
         salary_container = containers.salary(self.website)
         salary_elements = self.html.find_all(attrs=salary_container)
 
-        # Strip salary text from unwanted characters
         if salary_elements:
-            salary_text = salary_elements[0].get_text(strip=True)
-            salary_text = salary_text.replace("PLN", "").replace("–", "-").replace("\xa0", "").replace(",", "").strip()
+            raw_salary_text = salary_elements[0].get_text(strip=True)
+            processed_salary_text = (
+                raw_salary_text.replace("PLN", "").replace("–", "-").replace("\xa0", "").replace(",", "").strip()
+            )
+
+            # Handle 'k' notation (e.g., 4.5k)
+            if "k" in processed_salary_text:
+                processed_salary_text = processed_salary_text.replace("k", "000").replace(".", "")
+
+            # Remove any non-digit characters
+            processed_salary_text = "".join(filter(lambda x: x.isdigit() or x == "-", processed_salary_text))
+
             # Split salary text into min and max salary if range is provided
-            if "-" in salary_text:
-                min_salary_text, max_salary_text = salary_text.split("-")
+            if "-" in processed_salary_text:
+                min_salary_text, max_salary_text = processed_salary_text.split("-")
                 min_salary = int(min_salary_text.strip())
                 max_salary = int(max_salary_text.strip())
             else:
-                min_salary = max_salary = int(salary_text.strip())
+                min_salary = max_salary = int(processed_salary_text.strip())
 
-            return min_salary, max_salary
-        return None, None
+            return min_salary, max_salary, raw_salary_text
+
+        return None, None, None
 
     def html(self):
         return self.html
@@ -105,6 +119,7 @@ class JobRecord:
             "Location": ", ".join(self.location),
             "Min salary": self.salary_min,
             "Max salary": self.salary_max,
+            "Salary text": self.salary_text,
             "Website": self.host_site,
         }
 
