@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 from data_processor import build_dataframe, html_to_soup, process_records
 from websites import search_links
 
@@ -33,12 +34,19 @@ def search_site(search_link):
     return process_records(soup, search_link)
 
 
+def save_dataframe_to_csv(dataframe: pd.DataFrame, filename: str) -> None:
+    """
+    Save the given DataFrame to a CSV file.
+    """
+    dataframe.to_csv(filename, index=False)
+
+
 if __name__ == "__main__":
     results = search_all_sites()  # [1][0]
     # print(results)
 
     records_frame = build_dataframe(results)
     # print(records_frame)
-
+    save_dataframe_to_csv(records_frame, "modules/sites/records.csv")
     columns = records_frame[["Title", "Website", "Min salary", "Salary text"]]
     print(columns)
