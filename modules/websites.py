@@ -1,6 +1,6 @@
 NOFLUFFJOBS = "https://nofluffjobs.com"
 THEPROTOCOL = "https://theprotocol.it"
-JUSTJOIN = "justjoin"
+JUSTJOIN = "https://justjoin.it"
 ROCKETJOBS = "rocketjobs"
 SOLIDJOBS = "solidjobs"
 
