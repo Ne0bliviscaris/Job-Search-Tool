@@ -1,18 +1,19 @@
+import containers
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
 
-def get_container(driver: webdriver.Chrome, search_container: str) -> str:
+def get_container(driver: webdriver.Chrome, search_link: str) -> str:
     """
     Get the HTML content of the search container using Selenium
     """
+    search_container = containers.search(search_link)
     try:
         search_block = driver.find_element(By.CSS_SELECTOR, search_container)
         return search_block.get_attribute("outerHTML")
     except Exception as e:
-        print(f"Selenium_utils.get_container: Failed to find the element: {e}")
-        return ""
+        raise RuntimeError(f"Selenium_utils.get_container: Failed to find the element: {e}")
 
 
 def setup_webdriver() -> webdriver.Chrome:
@@ -34,3 +35,16 @@ def setup_webdriver() -> webdriver.Chrome:
 
     # Return WebDriver instance
     return webdriver.Chrome(service=webdriver_service, options=options)
+
+
+def scrape(search_link):
+    """
+    Scrape given link using Selenium
+    """
+    driver = setup_webdriver()
+    driver.set_window_size(1920, 1080)
+    with driver:
+        driver.get(search_link)
+        driver.implicitly_wait(10)
+        html_content = get_container(driver, search_link)
+    return html_content

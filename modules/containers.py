@@ -1,25 +1,26 @@
-from websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL
+from websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL, identify_website
 
 
 def search(search_link: str) -> str:
     """
     Returns search container for each website
     """
-    if NOFLUFFJOBS in search_link:
+    current_website = identify_website(search_link)
+    if NOFLUFFJOBS in current_website:
         return "nfj-postings-list"
-    elif THEPROTOCOL in search_link:
+    elif THEPROTOCOL in current_website:
         return '[data-test="offersList"]'
-    elif JUSTJOIN in search_link:
+    elif JUSTJOIN in current_website:
         return '[data-test-id="virtuoso-item-list"]'
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in current_website:
         return "TO BE DONE --------------"
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        raise ValueError(f"Unknown website: {current_website}")
 
 
 def detect_records(html, search_link) -> list[str]:
     """
-    Returns record container for each website
+    Returns record container content for each website
     """
     if NOFLUFFJOBS in search_link:
         record_container = {"id": lambda id_name: id_name and id_name.startswith("nfjPostingListItem")}
@@ -40,7 +41,7 @@ def detect_records(html, search_link) -> list[str]:
 
 def job_title(html, search_link) -> str:
     """
-    Returns title container for each website
+    Returns title container content for each website
     """
     if NOFLUFFJOBS in search_link:
         title_container = {"data-cy": "title position on the job offer listing"}
@@ -62,7 +63,7 @@ def job_title(html, search_link) -> str:
 
 def tags(html, search_link: str) -> list[str]:
     """
-    Returns tags container for each website
+    Returns tags container content for each website
     """
     if NOFLUFFJOBS in search_link:
         tags_container = {"data-cy": "category name on the job offer listing"}
@@ -86,7 +87,7 @@ def tags(html, search_link: str) -> list[str]:
 
 def company(html, search_link: str) -> dict:
     """
-    Returns company name container for each website
+    Returns company name container content for each website
     """
     if NOFLUFFJOBS in search_link:
         company_container = {
@@ -112,7 +113,7 @@ def company(html, search_link: str) -> dict:
 
 def logo(html, search_link: str) -> dict:
     """
-    Returns logo container for each website
+    Returns logo container content for each website
     """
     if NOFLUFFJOBS in search_link:
         logo_container = {"alt": "Company logo"}
@@ -140,7 +141,7 @@ def logo(html, search_link: str) -> dict:
 
 def location(html, search_link: str) -> dict:
     """
-    Returns location container for each website
+    Returns location container content for each website
     """
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
@@ -162,7 +163,7 @@ def location(html, search_link: str) -> dict:
 
 def salary(html, search_link: str) -> dict:
     """
-    Returns salary container for each website
+    Returns salary container content for each website
     """
     if NOFLUFFJOBS in search_link:
         salary_container = {"data-cy": "salary ranges on the job offer listing"}
