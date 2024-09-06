@@ -17,30 +17,41 @@ def search(search_link: str) -> str:
         raise ValueError(f"Unknown website: {search_link}")
 
 
-def record(search_link: str) -> dict:
+def detect_records(html, search_link) -> list[str]:
     """
     Returns record container for each website
     """
     if NOFLUFFJOBS in search_link:
-        return {"id": lambda id_name: id_name and id_name.startswith("nfjPostingListItem")}
+        record_container = {"id": lambda id_name: id_name and id_name.startswith("nfjPostingListItem")}
+        return [job for job in html.find_all(attrs=record_container)]
+
     elif THEPROTOCOL in search_link:
-        return {"data-test": "list-item-offer"}
+        record_container = {"data-test": "list-item-offer"}
+        return [job for job in html.find_all(attrs=record_container)]
+
     elif JUSTJOIN in search_link:
         return {"class": "offer_list_offer_link css-3qyn8a"}
+
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
 
-def job_title(search_link: str) -> dict:
+def job_title(html, search_link) -> str:
     """
     Returns title container for each website
     """
     if NOFLUFFJOBS in search_link:
-        return {"data-cy": "title position on the job offer listing"}
+        title_container = {"data-cy": "title position on the job offer listing"}
+        title = html.find(attrs=title_container)
+        return title.text if title else None
+
     elif THEPROTOCOL in search_link:
-        return {"data-test": "text-jobTitle"}
+        title_container = {"data-test": "text-jobTitle"}
+        title = html.find(attrs=title_container)
+        return title.text if title else None
+
     elif JUSTJOIN in search_link:
         return {"class": "css-3hs82j"}
     elif ROCKETJOBS in search_link:
@@ -49,83 +60,121 @@ def job_title(search_link: str) -> dict:
         raise ValueError(f"Unknown website: {search_link}")
 
 
-def tags(search_link: str) -> dict:
+def tags(html, search_link: str) -> list[str]:
     """
     Returns tags container for each website
     """
     if NOFLUFFJOBS in search_link:
-        return {"data-cy": "category name on the job offer listing"}
+        tags_container = {"data-cy": "category name on the job offer listing"}
+        job_tags = [job.text for job in html.find_all(attrs=tags_container)]
+        return job_tags if job_tags else None
+
     elif THEPROTOCOL in search_link:
-        return {"data-test": "chip-expectedTechnology"}
+        tags_container = {"data-test": "chip-expectedTechnology"}
+        job_tags = [job.text for job in html.find_all(attrs=tags_container)]
+        return job_tags if job_tags else None
+
     elif JUSTJOIN in search_link:
         return {"class": "MuiBox-root css-vzlxkq"}
+
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
 
-def company(search_link: str) -> dict:
+def company(html, search_link: str) -> dict:
     """
     Returns company name container for each website
     """
     if NOFLUFFJOBS in search_link:
-        return {
+        company_container = {
             "class": "tw-text-gray-60 company-name tw-w-[50%] desktop:tw-w-auto tw-mb-0 !tw-text-xs !desktop:tw-text-sm tw-font-semibold desktop:tw-font-normal"
         }
+        company = html.find(attrs=company_container)
+        return company.text if company else None
+
     elif THEPROTOCOL in search_link:
-        return {"data-test": "text-employerName"}
+        company_container = {"data-test": "text-employerName"}
+        company = html.find(attrs=company_container)
+        return company.text if company else None
+
     elif JUSTJOIN in search_link:
         return {"class": "css-7e0395"}
+
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
 
-def logo(search_link: str) -> dict:
+def logo(html, search_link: str) -> dict:
     """
     Returns logo container for each website
     """
     if NOFLUFFJOBS in search_link:
-        return {"alt": "Company logo"}
+        logo_container = {"alt": "Company logo"}
+        logo = html.find(attrs=logo_container)
+        return logo.get("src") if logo else None
+
     elif THEPROTOCOL in search_link:
-        return {"data-test": "icon-companyLogo"}
+        logo_container = {"data-test": "icon-companyLogo"}
+        logo = html.find(attrs=logo_container)
+        return logo.get("src") if logo else None
+
     elif JUSTJOIN in search_link:
-        return {"class": "MuiBox-root css-677aw9"}
+        logo_container = {"class": "MuiBox-root css-677aw9"}
+        logo = html.find(attrs=logo_container)
+        return logo.get("src") if logo else None
+
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        logo_container = "TO BE DONE --------------"
+        logo = html.find(attrs=logo_container)
+        return logo.get("src") if logo else None
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
 
-def location(search_link: str) -> dict:
+def location(html, search_link: str) -> dict:
     """
     Returns location container for each website
     """
     if NOFLUFFJOBS in search_link:
-        return {"data-cy": "location on the job offer listing"}
+        location_container = {"data-cy": "location on the job offer listing"}
+        job_location_elements = html.find_all(attrs=location_container)
+        job_location = [job.text.strip() for job in job_location_elements]
+        return job_location if job_location else None
     elif THEPROTOCOL in search_link:
-        return {"data-test": "text-workModes"}
+        location_container = {"data-test": "text-workModes"}
+        job_location_elements = html.find_all(attrs=location_container)
+        job_location = [job.text.strip() for job in job_location_elements]
+        return job_location if job_location else None
     elif JUSTJOIN in search_link:
-        return {"class": "css-1o4wo1x"}
+        location_container = {"class": "css-1o4wo1x"}
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        location_container = "TO BE DONE --------------"
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
 
-def salary(search_link: str) -> dict:
+def salary(html, search_link: str) -> dict:
     """
     Returns salary container for each website
     """
     if NOFLUFFJOBS in search_link:
-        return {"data-cy": "salary ranges on the job offer listing"}
+        salary_container = {"data-cy": "salary ranges on the job offer listing"}
+        return html.find(attrs=salary_container)
+
     elif THEPROTOCOL in search_link:
-        return {"data-test": "text-salary"}
+        salary_container = {"data-test": "text-salary"}
+        return html.find(attrs=salary_container)
+
     elif JUSTJOIN in search_link:
-        return {"class": "css-19u0lmu"}
+        salary_container = {"class": "css-19u0lmu"}
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        salary_container = "TO BE DONE --------------"
     else:
         raise ValueError(f"Unknown website: {search_link}")
