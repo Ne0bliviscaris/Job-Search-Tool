@@ -1,20 +1,21 @@
-from websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL
+from websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL, identify_website
 
 
 def search(search_link: str) -> str:
     """
     Returns search container for each website
     """
-    if NOFLUFFJOBS in search_link:
+    current_website = identify_website(search_link)
+    if NOFLUFFJOBS in current_website:
         return "nfj-postings-list"
-    elif THEPROTOCOL in search_link:
+    elif THEPROTOCOL in current_website:
         return '[data-test="offersList"]'
-    elif JUSTJOIN in search_link:
+    elif JUSTJOIN in current_website:
         return '[data-test-id="virtuoso-item-list"]'
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in current_website:
         return "TO BE DONE --------------"
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        raise ValueError(f"Unknown website: {current_website}")
 
 
 def detect_records(html, search_link) -> list[str]:
