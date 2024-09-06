@@ -42,8 +42,9 @@ def scrape(search_link):
     Scrape given link using Selenium
     """
     driver = setup_webdriver()
+    driver.set_window_size(1920, 1080)
     with driver:
         driver.get(search_link)
-        driver.implicitly_wait(7)
+        driver.implicitly_wait(10)
         html_content = get_container(driver, search_link)
     return html_content
