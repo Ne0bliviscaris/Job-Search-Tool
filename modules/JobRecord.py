@@ -45,7 +45,7 @@ class JobRecord:
         """
         tags_container = containers.tags(self.website)
         job_tags = [job.text for job in self.html.find_all(attrs=tags_container)]
-        return job_tags
+        return job_tags if job_tags else None
 
     def fetch_url(self):
         """
@@ -62,20 +62,18 @@ class JobRecord:
         """
         company_container = containers.company(self.website)
         company_name = self.html.find(attrs=company_container).text.strip()
-        return company_name
+        return company_name if company_name else None
 
     def fetch_logo(self):
         logo_container = containers.logo(self.website)
         logo = self.html.find(attrs=logo_container)
         return logo.get("src") if logo else None
 
-        return None
-
     def fetch_location(self):
         location_container = containers.location(self.website)
         job_location_elements = self.html.find_all(attrs=location_container)
         job_location = [job.text.strip() for job in job_location_elements]
-        return job_location
+        return job_location if job_location else None
 
     def fetch_salary_range(self) -> tuple[int, int, str]:
         """
