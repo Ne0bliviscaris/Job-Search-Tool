@@ -31,66 +31,53 @@ class JobRecord:
             f"Website: {self.host_site}"
         )
 
-    def fetch_job_title(self):
+    def fetch_job_title(self) -> str:
         """
         Fetch job title from the record
         """
-        title_container = containers.job_title(self.website)
-        job_title = [job.text for job in self.html.find(attrs=title_container)]
-        return job_title[0] if job_title else None
+        job_title = containers.job_title(self.html, self.website)
+        return job_title if job_title else None
 
-    def fetch_job_tags(self):
+    def fetch_job_tags(self) -> list[str]:
         """
         Fetch job tags from the record
         """
-        tags_container = containers.tags(self.website)
-        job_tags = [job.text for job in self.html.find_all(attrs=tags_container)]
-        return job_tags
+        tags = containers.tags(self.html, self.website)
+        return tags if tags else []
 
     def fetch_url(self):
         """
         Fetch job record url
         """
         url = self.html["href"]
-        if url:
-            return self.website + url
-        return None
+        return self.website + url if url else None
 
     def fetch_company_name(self):
         """
         Fetch company name from the record
         """
-        company_container = containers.company(self.website)
-        company_name = self.html.find(attrs=company_container).text.strip()
-        return company_name
+        company = containers.company(self.html, self.website)
+        return company if company else None
 
     def fetch_logo(self):
-        logo_container = containers.logo(self.website)
-        logo = self.html.find(attrs=logo_container)
-        return logo.get("src") if logo else None
-
-        return None
+        logo = containers.logo(self.html, self.website)
+        return logo if logo else None
 
     def fetch_location(self):
-        location_container = containers.location(self.website)
-        job_location_elements = self.html.find_all(attrs=location_container)
-        job_location = [job.text.strip() for job in job_location_elements]
-        return job_location
-
-    import re
+        location = containers.location(self.html, self.website)
+        return location if location else None
 
     def fetch_salary_range(self) -> tuple[int, int, str]:
         """
         Fetch salary range from the job listing HTML.
         """
-        salary_container = containers.salary(self.website)
-        salary_elements = self.html.find_all(attrs=salary_container)
+        salary = containers.salary(self.html, self.website)
 
-        if salary_elements:
-            raw_salary_text = salary_elements[0].get_text(strip=True)
+        if salary:
+            salary_text = salary.get_text(strip=True)
             # Remove PLN, "zł" and anything inside parentheses like "(B2B)"
-            processed_salary_text = (
-                raw_salary_text.replace("PLN", "")
+            processed_salary = (
+                salary_text.replace("PLN", "")
                 .replace("–", "-")
                 .replace("\xa0", "")
                 .replace(",", "")
@@ -98,34 +85,34 @@ class JobRecord:
                 .strip()
             )
             # Remove anything in parentheses (e.g., "(B2B)")
-            processed_salary_text = re.sub(r"\(.*?\)", "", processed_salary_text)
+            processed_salary = re.sub(r"\(.*?\)", "", processed_salary)
 
             # Regular expression to handle 'k' notation (e.g., 4.5k, 5k)
             def convert_k_notation(salary_text):
                 return re.sub(r"(\d+(\.\d+)?)k", lambda x: str(int(float(x.group(1)) * 1000)), salary_text)
 
             # Apply 'k' notation conversion
-            processed_salary_text = convert_k_notation(processed_salary_text)
+            processed_salary = convert_k_notation(processed_salary)
 
             # Remove any non-digit or non-range characters
-            processed_salary_text = "".join(filter(lambda x: x.isdigit() or x == "-", processed_salary_text))
+            processed_salary = "".join(filter(lambda x: x.isdigit() or x == "-", processed_salary))
 
             # Split salary text into min and max salary if range is provided
-            if "-" in processed_salary_text:
-                min_salary_text, max_salary_text = processed_salary_text.split("-")
+            if "-" in processed_salary:
+                min_salary_text, max_salary_text = processed_salary.split("-")
                 min_salary = int(min_salary_text.strip())
                 max_salary = int(max_salary_text.strip())
             else:
-                min_salary = max_salary = int(processed_salary_text.strip())
+                min_salary = max_salary = int(processed_salary.strip())
 
-            return min_salary, max_salary, raw_salary_text
+            return min_salary, max_salary, salary_text
 
         return None, None, None
 
     def html(self):
         return self.html
 
-    def record_to_dataframe(self):
+    def prepare_dataframe(self):
         record = {
             "Title": self.title,
             "Url": self.url,
