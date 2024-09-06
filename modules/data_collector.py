@@ -42,11 +42,14 @@ def save_dataframe_to_csv(dataframe: pd.DataFrame, filename: str) -> None:
 
 
 if __name__ == "__main__":
-    results = search_all_sites()  # [1][0]
+    results = search_all_sites()
     # print(results)
 
-    records_frame = build_dataframe(results)
+    # records_frame = build_dataframe(results)
     # print(records_frame)
-    save_dataframe_to_csv(records_frame, "modules/sites/records.csv")
-    columns = records_frame[["Title", "Website", "Min salary", "Salary text"]]
-    print(columns)
+    # save_dataframe_to_csv(records_frame, "modules/sites/records.csv")
+    # columns = records_frame[["Title", "Website", "Min salary", "Salary text"]]
+    # print(columns)
+
+    # return a single JobRecord object
+    print(results[0][0])
