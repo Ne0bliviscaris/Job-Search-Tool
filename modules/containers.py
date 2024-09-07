@@ -147,7 +147,7 @@ def location(html, search_link: str) -> dict:
         location_container = {"data-cy": "location on the job offer listing"}
         job_location_elements = html.find_all(attrs=location_container)
         job_location = [job.text.strip() for job in job_location_elements]
-        return job_location if job_location else None
+        return job_location[0] if job_location else None
     elif THEPROTOCOL in search_link:
         location_container = {"data-test": "text-workModes"}
         job_location_elements = html.find_all(attrs=location_container)
