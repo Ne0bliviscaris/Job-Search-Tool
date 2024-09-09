@@ -32,19 +32,17 @@ def setup_webdriver() -> webdriver.Chrome:
     options.add_argument("--disable-gpu")  # Disable GPU (optional but recommended in headless mode)
     options.add_argument("--no-sandbox")  # Disable sandbox (optional but may help in some cases)
     options.add_argument("--disable-dev-shm-usage")  # Disable shared memory (optional but may help in some cases)
+    options.add_argument("window-size=1920,1080")  # Always force PC version of the website
 
     # Return WebDriver instance
     return webdriver.Chrome(service=webdriver_service, options=options)
 
 
-def scrape(search_link):
+def scrape(web_driver, search_link: str) -> str:
     """
     Scrape given link using Selenium
     """
-    driver = setup_webdriver()
-    driver.set_window_size(1920, 1080)
-    with driver:
-        driver.get(search_link)
-        driver.implicitly_wait(10)
-        html_content = get_container(driver, search_link)
+    web_driver.get(search_link)
+    web_driver.implicitly_wait(10)
+    html_content = get_container(web_driver, search_link)
     return html_content
