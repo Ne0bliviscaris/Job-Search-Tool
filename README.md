@@ -8,8 +8,11 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 - Sync with file
 - Move out of date files to archive
 - Add buttons to fetch records and save them to file
+<details>
+<summary># Changelog:</summary>
 
-# Changelog:
+# 09.09.2024
+Massively reduced update time complexity by reusing one webdriver
 # 06.09.2024
 - Moved data extraction to containers:
 Instead of only pointing containers, functions now handle data extraction. This greatly improves scaleability for the project
@@ -29,3 +32,4 @@ The point of failure was rendering site in mobile version by default
 - Added function to turn records into dataframe
 26.08.2024
 - Introduced JobRecord class to handle HTML records
+</details>

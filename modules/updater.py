@@ -2,15 +2,15 @@ import os
 
 import containers as containers
 from data_collector import set_filename
-from selenium_utils import scrape
+from selenium_utils import scrape, setup_webdriver
 from websites import search_links
 
 
-def update_site(link: str, search_link: str) -> str:
+def update_site(webdriver, link: str, search_link: str) -> str:
     """
     Download HTML content from the search link and save it to a file.
     """
-    search_block = scrape(search_link)
+    search_block = scrape(webdriver, search_link)
 
     # Save HTML to file
     filename = os.path.join(set_filename(link))
@@ -31,8 +31,10 @@ def update_all_sites() -> None:
     """
     Download HTML content for all search links and save them to files.
     """
-    for link, search_link in search_links.items():
-        update_site(link, search_link)
+    web_driver = setup_webdriver()
+    for link_name, search_link in search_links.items():
+        update_site(web_driver, link_name, search_link)
+        print(f"Downloaded {link_name}")
 
 
 if __name__ == "__main__":
