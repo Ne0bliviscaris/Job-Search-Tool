@@ -1,4 +1,4 @@
-from websites import JUSTJOIN, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL, identify_website
+from websites import BULLDOGJOB, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL, identify_website
 
 
 def search(search_link: str) -> str:
@@ -10,7 +10,7 @@ def search(search_link: str) -> str:
         return "nfj-postings-list"
     elif THEPROTOCOL in current_website:
         return '[data-test="offersList"]'
-    elif JUSTJOIN in current_website:
+    elif BULLDOGJOB in current_website:
         return '[data-test-id="virtuoso-item-list"]'
     elif ROCKETJOBS in current_website:
         return "TO BE DONE --------------"
@@ -30,7 +30,7 @@ def detect_records(html, search_link) -> list[str]:
         record_container = {"data-test": "list-item-offer"}
         return [job for job in html.find_all(attrs=record_container)]
 
-    elif JUSTJOIN in search_link:
+    elif BULLDOGJOB in search_link:
         return {"class": "offer_list_offer_link css-3qyn8a"}
 
     elif ROCKETJOBS in search_link:
@@ -53,7 +53,7 @@ def job_title(html, search_link) -> str:
         title = html.find(attrs=title_container)
         return title.text if title else None
 
-    elif JUSTJOIN in search_link:
+    elif BULLDOGJOB in search_link:
         return {"class": "css-3hs82j"}
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
@@ -75,7 +75,7 @@ def tags(html, search_link: str) -> list[str]:
         job_tags = [job.text for job in html.find_all(attrs=tags_container)]
         return job_tags if job_tags else None
 
-    elif JUSTJOIN in search_link:
+    elif BULLDOGJOB in search_link:
         return {"class": "MuiBox-root css-vzlxkq"}
 
     elif ROCKETJOBS in search_link:
@@ -101,7 +101,7 @@ def company(html, search_link: str) -> dict:
         company = html.find(attrs=company_container)
         return company.text if company else None
 
-    elif JUSTJOIN in search_link:
+    elif BULLDOGJOB in search_link:
         return {"class": "css-7e0395"}
 
     elif ROCKETJOBS in search_link:
@@ -125,7 +125,7 @@ def logo(html, search_link: str) -> dict:
         logo = html.find(attrs=logo_container)
         return logo.get("src") if logo else None
 
-    elif JUSTJOIN in search_link:
+    elif BULLDOGJOB in search_link:
         logo_container = {"class": "MuiBox-root css-677aw9"}
         logo = html.find(attrs=logo_container)
         return logo.get("src") if logo else None
@@ -153,7 +153,7 @@ def location(html, search_link: str) -> dict:
         job_location_elements = html.find_all(attrs=location_container)
         job_location = [job.text.strip() for job in job_location_elements]
         return job_location if job_location else None
-    elif JUSTJOIN in search_link:
+    elif BULLDOGJOB in search_link:
         location_container = {"class": "css-1o4wo1x"}
     elif ROCKETJOBS in search_link:
         location_container = "TO BE DONE --------------"
@@ -173,7 +173,7 @@ def salary(html, search_link: str) -> dict:
         salary_container = {"data-test": "text-salary"}
         return html.find(attrs=salary_container)
 
-    elif JUSTJOIN in search_link:
+    elif BULLDOGJOB in search_link:
         salary_container = {"class": "css-19u0lmu"}
     elif ROCKETJOBS in search_link:
         salary_container = "TO BE DONE --------------"
