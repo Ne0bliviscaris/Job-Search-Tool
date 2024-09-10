@@ -125,7 +125,9 @@ def tags(html, search_link: str) -> list[str]:
             return job_tags if job_tags else []
 
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        tag_container = lambda class_name: class_name and class_name.startswith("skill-tag")
+        tags = html.find_all(class_=tag_container)
+        return [tag.text.strip() for tag in tags] if tags else []
 
     else:
         raise ValueError(f"Unknown website: {search_link}")
@@ -159,7 +161,13 @@ def company(html, search_link: str) -> dict:
                     return company_div.text.strip()
 
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+        svg_icon = html.find("svg", {"data-testid": "ApartmentRoundedIcon"})
+        if svg_icon:
+            parent_div = svg_icon.find_parent("div", class_=MuiBox_block)
+            if parent_div:
+                company_name = parent_div.span
+                return company_name.text.strip() if company_name else None
 
     else:
         raise ValueError(f"Unknown website: {search_link}")
