@@ -49,13 +49,8 @@ class JobRecord:
         """
         Fetch job record url
         """
-        url = self.html.get("href")
-        if url:
-            if url.startswith("http"):
-                return url
-            else:
-                return self.website.rstrip("/") + "/" + url.lstrip("/")
-        return None
+        url = containers.url(self.html, self.website)
+        return url if url else None
 
     def fetch_company_name(self):
         """

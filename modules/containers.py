@@ -13,7 +13,7 @@ def search(search_link: str) -> str:
     elif BULLDOGJOB in current_website:
         return '[id="__next"]'
     elif ROCKETJOBS in current_website:
-        return "TO BE DONE --------------"
+        return '[data-test-id="virtuoso-item-list"]'
     else:
         raise ValueError(f"Unknown website: {current_website}")
 
@@ -43,9 +43,36 @@ def detect_records(html, search_link) -> list[str]:
         return [job for job in html.find_all(attrs=record_container)]
 
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        record_container = {"data-index": True}
+        return [job for job in html.find_all(attrs=record_container)]
     else:
         raise ValueError(f"Unknown website: {search_link}")
+
+
+def url(record, search_link) -> str:
+    """
+    Returns url container content for each website
+    """
+    if NOFLUFFJOBS in search_link:
+        # url = record.get("a", href=True)
+        url = record.get("href")
+
+    elif THEPROTOCOL in search_link:
+        url = record.get("href")
+
+    elif BULLDOGJOB in search_link:
+        url = record.get("href")
+
+    elif ROCKETJOBS in search_link:
+        url_a = record.find("a", href=True)
+        url = url_a.get("href")
+
+    if url:
+        if url.startswith("http"):
+            return url
+        else:
+            return search_link.rstrip("/") + "/" + url.lstrip("/")
+    return None
 
 
 def job_title(html, search_link) -> str:
@@ -69,7 +96,9 @@ def job_title(html, search_link) -> str:
             title = title_block.find("h3")
             return title.text if title else None
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        title = html.h3
+        return title.text if title else None
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -156,8 +185,7 @@ def logo(html, search_link: str) -> dict:
         return logo.find("img").get("src") if logo else None
 
     elif ROCKETJOBS in search_link:
-        logo_container = "TO BE DONE --------------"
-        logo = html.find(attrs=logo_container)
+        logo = html.img
         return logo.get("src") if logo else None
 
     else:
