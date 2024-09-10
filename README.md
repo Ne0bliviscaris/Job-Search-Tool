@@ -10,6 +10,9 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 - Add buttons to fetch records and save them to file
 
 # Changelog:
+#### 10.09.2024
+- Introduced bulldogjob.pl website
+- Minor improvements to handling data
 #### 09.09.2024
 - Massively reduced update time complexity by reusing one webdriver
 #### 06.09.2024
