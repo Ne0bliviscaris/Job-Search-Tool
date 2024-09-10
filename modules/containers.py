@@ -11,7 +11,7 @@ def search(search_link: str) -> str:
     elif THEPROTOCOL in current_website:
         return '[data-test="offersList"]'
     elif BULLDOGJOB in current_website:
-        return '[data-test-id="virtuoso-item-list"]'
+        return '[id="__next"]'
     elif ROCKETJOBS in current_website:
         return "TO BE DONE --------------"
     else:
@@ -31,7 +31,16 @@ def detect_records(html, search_link) -> list[str]:
         return [job for job in html.find_all(attrs=record_container)]
 
     elif BULLDOGJOB in search_link:
-        return {"class": "offer_list_offer_link css-3qyn8a"}
+        record_container = {
+            "class": lambda class_name: (
+                class_name
+                and class_name.startswith("JobListItem_item")
+                and all(
+                    excluded not in class_name for excluded in ["logo", "title", "details", "salary", "tags", "save"]
+                )
+            )
+        }
+        return [job for job in html.find_all(attrs=record_container)]
 
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
@@ -54,7 +63,11 @@ def job_title(html, search_link) -> str:
         return title.text if title else None
 
     elif BULLDOGJOB in search_link:
-        return {"class": "css-3hs82j"}
+        title_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__title")}
+        title_block = html.find(attrs=title_container)
+        if title_block:
+            title = title_block.find("h3")
+            return title.text if title else None
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
     else:
@@ -76,7 +89,11 @@ def tags(html, search_link: str) -> list[str]:
         return job_tags if job_tags else None
 
     elif BULLDOGJOB in search_link:
-        return {"class": "MuiBox-root css-vzlxkq"}
+        tags_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")}
+        tags_block = html.find(attrs=tags_container)
+        if tags_block:
+            job_tags = [span.text for span in tags_block.find_all("span")]
+            return job_tags if job_tags else []
 
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
@@ -102,7 +119,15 @@ def company(html, search_link: str) -> dict:
         return company.text if company else None
 
     elif BULLDOGJOB in search_link:
-        return {"class": "css-7e0395"}
+        title_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__title")}
+        title_block = html.find(attrs=title_container)
+        if title_block:
+            # Find the <h3> tag and then get the next <div> sibling
+            h3_tag = title_block.find("h3")
+            if h3_tag:
+                company_div = h3_tag.find_next_sibling("div")
+                if company_div:
+                    return company_div.text.strip()
 
     elif ROCKETJOBS in search_link:
         return "TO BE DONE --------------"
@@ -126,9 +151,9 @@ def logo(html, search_link: str) -> dict:
         return logo.get("src") if logo else None
 
     elif BULLDOGJOB in search_link:
-        logo_container = {"class": "MuiBox-root css-677aw9"}
+        logo_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__logo")}
         logo = html.find(attrs=logo_container)
-        return logo.get("src") if logo else None
+        return logo.find("img").get("src") if logo else None
 
     elif ROCKETJOBS in search_link:
         logo_container = "TO BE DONE --------------"
@@ -154,7 +179,15 @@ def location(html, search_link: str) -> dict:
         job_location = [job.text.strip() for job in job_location_elements]
         return job_location if job_location else None
     elif BULLDOGJOB in search_link:
-        location_container = {"class": "css-1o4wo1x"}
+        location_container = {
+            "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
+        }
+        details_block = html.find(attrs=location_container)
+        if details_block:
+            hidden_block = details_block.find("div", class_="hidden")
+            if hidden_block:
+                job_location = [span.text.strip() for span in hidden_block.find("span")]
+                return job_location if job_location else None
     elif ROCKETJOBS in search_link:
         location_container = "TO BE DONE --------------"
     else:
@@ -174,7 +207,11 @@ def salary(html, search_link: str) -> dict:
         return html.find(attrs=salary_container)
 
     elif BULLDOGJOB in search_link:
-        salary_container = {"class": "css-19u0lmu"}
+        salary_container = {
+            "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__salary")
+        }
+        salary = html.find(attrs=salary_container)
+        return salary if salary else ""
     elif ROCKETJOBS in search_link:
         salary_container = "TO BE DONE --------------"
     else:
