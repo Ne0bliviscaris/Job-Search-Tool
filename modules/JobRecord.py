@@ -79,10 +79,12 @@ class JobRecord:
             # Remove PLN, "zł" and anything inside parentheses like "(B2B)"
             processed_salary = (
                 salary_text.replace("PLN", "")
+                .replace("pln", "")
+                .replace("ZŁ", "")
+                .replace("zł", "")
                 .replace("–", "-")
                 .replace("\xa0", "")
                 .replace(",", "")
-                .replace("zł", "")
                 .strip()
             )
             # Remove anything in parentheses (e.g., "(B2B)")
@@ -100,10 +102,13 @@ class JobRecord:
 
             try:
                 # Split salary text into min and max salary if range is provided
-                if "-" in processed_salary:
-                    min_salary_text, max_salary_text = processed_salary.split("-")
-                    min_salary = int(min_salary_text.strip())
-                    max_salary = int(max_salary_text.strip())
+                salary_parts = processed_salary.split("-")
+                if len(salary_parts) >= 2:
+                    # If there are two or more parts, use the first two as min and max
+                    min_salary_text = salary_parts[0].strip()
+                    max_salary_text = salary_parts[1].strip()
+                    min_salary = int(min_salary_text)
+                    max_salary = int(max_salary_text)
                 else:
                     min_salary = max_salary = int(processed_salary.strip())
 
