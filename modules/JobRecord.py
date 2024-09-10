@@ -49,7 +49,7 @@ class JobRecord:
         """
         Fetch job record url
         """
-        url = self.html["href"]
+        url = self.html.get("href")
         return self.website + url if url else None
 
     def fetch_company_name(self):
