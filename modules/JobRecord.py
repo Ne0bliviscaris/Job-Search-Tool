@@ -74,7 +74,8 @@ class JobRecord:
         salary = containers.salary(self.html, self.website)
 
         if salary:
-            salary_text = salary.get_text(strip=True)
+            # Get the salary text from the salary tag
+            salary_text = salary if isinstance(salary, str) else salary.get_text(strip=True)
             # Remove PLN, "zł" and anything inside parentheses like "(B2B)"
             processed_salary = (
                 salary_text.replace("PLN", "")
