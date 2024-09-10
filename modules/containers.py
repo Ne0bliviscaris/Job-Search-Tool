@@ -217,7 +217,12 @@ def location(html, search_link: str) -> dict:
                 job_location = [span.text.strip() for span in hidden_block.find("span")]
                 return job_location if job_location else None
     elif ROCKETJOBS in search_link:
-        location_container = "TO BE DONE --------------"
+        MuiBox_block = html.find_all("div", class_="MuiBox-root")
+        location_elements = MuiBox_block[11].find_all("span")
+        if location_elements:
+            locations = [loc.text.strip() for loc in location_elements]
+            return " | ".join(locations)
+        return None
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -238,9 +243,25 @@ def salary(html, search_link: str) -> dict:
         salary_container = {
             "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__salary")
         }
-        salary = html.find(attrs=salary_container)
-        return salary if salary else ""
+        salary_elements = html.find(attrs=salary_container)
+        return salary_elements if salary_elements else ""
+
     elif ROCKETJOBS in search_link:
-        salary_container = "TO BE DONE --------------"
+        # All containers on site are MuiBox-root. Need to find the right one
+        MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+
+        # Salary is contained in the same parent div as the h3 tag with job title
+        h3_container = html.h3
+        if h3_container:
+            parent_div = h3_container.find_parent("div", class_=MuiBox_block)
+            # Salary is hidden in MuiBox-root inside another MuiBox-root inside the parent div with h3
+            if parent_div:
+                salary_div = parent_div.find("div", class_=MuiBox_block).find("div", class_=MuiBox_block)
+                if salary_div:
+                    salary_elements = salary_div.find_all("span")
+                    if salary_elements:
+                        salary = [pay.text.strip() for pay in salary_elements]
+                        return " - ".join(salary)
+        return ""
     else:
         raise ValueError(f"Unknown website: {search_link}")
