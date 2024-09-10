@@ -127,7 +127,7 @@ class JobRecord:
             "Url": self.url,
             "Company name": self.company_name,
             "Logo": self.logo,
-            "Location": ", ".join(self.location),
+            "Location": self.location,
             "Min salary": self.salary_min,
             "Max salary": self.salary_max,
             "Salary text": self.salary_text,
