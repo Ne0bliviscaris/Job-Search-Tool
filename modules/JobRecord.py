@@ -50,7 +50,12 @@ class JobRecord:
         Fetch job record url
         """
         url = self.html.get("href")
-        return self.website + url if url else None
+        if url:
+            if url.startswith("http"):
+                return url
+            else:
+                return self.website.rstrip("/") + "/" + url.lstrip("/")
+        return None
 
     def fetch_company_name(self):
         """
@@ -88,7 +93,7 @@ class JobRecord:
             processed_salary = re.sub(r"\(.*?\)", "", processed_salary)
 
             # Regular expression to handle 'k' notation (e.g., 4.5k, 5k)
-            def convert_k_notation(salary_text):
+            def convert_k_notation(salary_text: str) -> str:
                 return re.sub(r"(\d+(\.\d+)?)k", lambda x: str(int(float(x.group(1)) * 1000)), salary_text)
 
             # Apply 'k' notation conversion
@@ -97,15 +102,19 @@ class JobRecord:
             # Remove any non-digit or non-range characters
             processed_salary = "".join(filter(lambda x: x.isdigit() or x == "-", processed_salary))
 
-            # Split salary text into min and max salary if range is provided
-            if "-" in processed_salary:
-                min_salary_text, max_salary_text = processed_salary.split("-")
-                min_salary = int(min_salary_text.strip())
-                max_salary = int(max_salary_text.strip())
-            else:
-                min_salary = max_salary = int(processed_salary.strip())
+            try:
+                # Split salary text into min and max salary if range is provided
+                if "-" in processed_salary:
+                    min_salary_text, max_salary_text = processed_salary.split("-")
+                    min_salary = int(min_salary_text.strip())
+                    max_salary = int(max_salary_text.strip())
+                else:
+                    min_salary = max_salary = int(processed_salary.strip())
 
-            return min_salary, max_salary, salary_text
+                return min_salary, max_salary, salary_text
+            except ValueError:
+                # If conversion fails, return None for min and max, but return the original text
+                return None, None, salary_text
 
         return None, None, None
 
