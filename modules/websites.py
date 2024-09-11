@@ -16,7 +16,7 @@ search_links = {
     "rocketjobs_remote-data": "https://rocketjobs.pl/wszystkie-lokalizacje/bi-data/praca-zdalna_tak",
     "justjoinit_data-junior-remote": "https://justjoin.it/all-locations/data/experience-level_junior/remote_yes?orderBy=DESC&sortBy=newest",
     "solidjobs_data-regular-remote": "https://solid.jobs/offers/it;categories=Data%20Science;cities=Praca%20zdalna;experiences=Regular",
-    # "pracujpl_data-ai-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science",
+    "pracujpl_data-ai-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science",
     # "inhire_it-data-etl-ml-junior-remote": "https://inhire.io/?experiences=1_2,0_1&locations=1,39&roles=it,data_science,etl_developer,big_data,machine_learning_engineer",
 }
 
