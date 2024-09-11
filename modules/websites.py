@@ -3,6 +3,8 @@ THEPROTOCOL = "https://theprotocol.it"
 BULLDOGJOB = "https://bulldogjob.pl"
 ROCKETJOBS = "https://rocketjobs.pl"
 JUSTJOINIT = "https://justjoin.it"
+SOLIDJOBS = "https://solid.jobs"
+
 current_website = None
 
 search_links = {
@@ -11,6 +13,7 @@ search_links = {
     "bulldogjob_remote-data": "https://bulldogjob.pl/companies/jobs/s/locationDistance,50/role,data/city,Remote",
     "rocketjobs_remote-data": "https://rocketjobs.pl/wszystkie-lokalizacje/bi-data/praca-zdalna_tak",
     "justjoinit_data-junior-remote": "https://justjoin.it/all-locations/data/experience-level_junior/remote_yes?orderBy=DESC&sortBy=newest",
+    "solidjobs_data-regular-remote": "https://solid.jobs/offers/it;categories=Data%20Science;cities=Praca%20zdalna;experiences=Regular",
 }
 
 
@@ -28,6 +31,8 @@ def identify_website(search_link):
         current_website = ROCKETJOBS
     elif "justjoin" in search_link:
         current_website = JUSTJOINIT
+    elif "solid" in search_link:
+        current_website = SOLIDJOBS
     else:
         print("identify_website: Error: Website not recognized")
         current_website = "Error: Website not recognized"
