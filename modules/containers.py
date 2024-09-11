@@ -225,11 +225,19 @@ def location(html, search_link: str) -> dict:
             if hidden_block:
                 job_location = [span.text.strip() for span in hidden_block.find("span")]
                 return job_location if job_location else None
-    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
+    elif ROCKETJOBS in search_link:
         MuiBox_block = html.find_all("div", class_="MuiBox-root")
         location_elements = MuiBox_block[11].find_all("span")
         if location_elements:
             locations = [loc.text.strip() for loc in location_elements]
+            return " | ".join(locations)
+        return None
+    # Here JustJoinIT differs from RocketJobs by one index
+    elif JUSTJOINIT in search_link:
+        MuiBox_block = html.find_all("div", class_="MuiBox-root")
+        location_elements = MuiBox_block[11].find_all("span")
+        if location_elements:
+            locations = [loc.text.strip() for loc in location_elements[1:]]
             return " | ".join(locations)
         return None
     else:
