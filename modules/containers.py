@@ -1,5 +1,12 @@
 from websites import JUSTJOINIT  # Same structure as RocketJobs
-from websites import BULLDOGJOB, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL, identify_website
+from websites import (
+    BULLDOGJOB,
+    NOFLUFFJOBS,
+    ROCKETJOBS,
+    SOLIDJOBS,
+    THEPROTOCOL,
+    identify_website,
+)
 
 
 def search(search_link: str) -> str:
@@ -15,6 +22,8 @@ def search(search_link: str) -> str:
         return '[id="__next"]'
     elif ROCKETJOBS in current_website or JUSTJOINIT in current_website:
         return '[data-test-id="virtuoso-item-list"]'
+    elif SOLIDJOBS in current_website:
+        return '[class="scrollable-content"]'
     else:
         raise ValueError(f"Unknown website: {current_website}")
 
@@ -46,6 +55,10 @@ def detect_records(html, search_link) -> list[str]:
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         record_container = {"data-index": True}
         return [job for job in html.find_all(attrs=record_container)]
+
+    elif SOLIDJOBS in search_link:
+        record_container = "offer-list-item"
+        return [job for job in html.find_all(record_container)]
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -65,6 +78,10 @@ def url(record, search_link) -> str:
         url = record.get("href")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
+        url_a = record.find("a", href=True)
+        url = url_a.get("href")
+
+    elif SOLIDJOBS in search_link:
         url_a = record.find("a", href=True)
         url = url_a.get("href")
 
@@ -100,6 +117,10 @@ def job_title(html, search_link) -> str:
         title = html.h3
         return title.text if title else None
 
+    elif SOLIDJOBS in search_link:
+        title = html.find("h2")
+        return title.text.strip() if title else None
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -129,6 +150,11 @@ def tags(html, search_link: str) -> list[str]:
         tag_container = lambda class_name: class_name and class_name.startswith("skill-tag")
         tags = html.find_all(class_=tag_container)
         return [tag.text.strip() for tag in tags] if tags else []
+
+    elif SOLIDJOBS in search_link:
+        tags_block = html.find_all("solidjobs-skill-display")
+        job_tags = [tag.text.strip().replace("# ", "") for tag in tags_block]
+        return job_tags if job_tags else []
 
     else:
         raise ValueError(f"Unknown website: {search_link}")
@@ -170,6 +196,10 @@ def company(html, search_link: str) -> dict:
                 company_name = parent_div.span
                 return company_name.text.strip() if company_name else None
 
+    elif SOLIDJOBS in search_link:
+        company = html.find("a", {"mattooltip": "Kliknij, aby zobaczy pozostałe oferty firmy."})
+        return company.text.strip() if company else None
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -197,6 +227,10 @@ def logo(html, search_link: str) -> dict:
         logo = html.img
         return logo.get("src") if logo else None
 
+    if SOLIDJOBS in search_link:
+        logo = html.find("img")
+        return logo.get("src") if logo else None
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -210,11 +244,13 @@ def location(html, search_link: str) -> dict:
         job_location_elements = html.find_all(attrs=location_container)
         job_location = [job.text.strip() for job in job_location_elements]
         return job_location[0] if job_location else None
+
     elif THEPROTOCOL in search_link:
         location_container = {"data-test": "text-workModes"}
         job_location_elements = html.find_all(attrs=location_container)
         job_location = [job.text.strip() for job in job_location_elements]
         return job_location if job_location else None
+
     elif BULLDOGJOB in search_link:
         location_container = {
             "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
@@ -225,6 +261,7 @@ def location(html, search_link: str) -> dict:
             if hidden_block:
                 job_location = [span.text.strip() for span in hidden_block.find("span")]
                 return job_location if job_location else None
+
     elif ROCKETJOBS in search_link:
         MuiBox_block = html.find_all("div", class_="MuiBox-root")
         location_elements = MuiBox_block[11].find_all("span")
@@ -232,6 +269,7 @@ def location(html, search_link: str) -> dict:
             locations = [loc.text.strip() for loc in location_elements]
             return " | ".join(locations)
         return None
+
     # Here JustJoinIT differs from RocketJobs by one index
     elif JUSTJOINIT in search_link:
         MuiBox_block = html.find_all("div", class_="MuiBox-root")
@@ -240,6 +278,17 @@ def location(html, search_link: str) -> dict:
             locations = [loc.text.strip() for loc in location_elements[1:]]
             return " | ".join(locations)
         return None
+
+    elif SOLIDJOBS in search_link:
+        """
+        Returns location container content for SOLIDJOBS website
+        """
+        location_elements = html.find_all("a", {"mattooltip": True})
+        if location_elements:
+            location = location_elements[-1]
+            return location.text.strip()
+        return None
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -280,5 +329,10 @@ def salary(html, search_link: str) -> dict:
                         salary = [pay.text.strip() for pay in salary_elements]
                         return " - ".join(salary)
         return ""
+
+    elif SOLIDJOBS in search_link:
+        salary = html.find("span", class_="badge-salary")
+        return salary.text.strip() if salary else None
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
