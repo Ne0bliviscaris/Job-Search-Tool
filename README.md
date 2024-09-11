@@ -9,6 +9,8 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 # Changelog:
 #### 11.09.2024
 - Integrated JustJoinIT.pl site
+- Integrated Solid.jobs site
+- Integrated it.pracuj.pl site
 #### 10.09.2024
 - Integrated Rocketjobs.pl site
 - Integrated Bulldogjob.pl site
