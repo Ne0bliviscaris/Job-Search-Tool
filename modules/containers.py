@@ -1,7 +1,9 @@
 from websites import JUSTJOINIT  # Same structure as RocketJobs
 from websites import (
     BULLDOGJOB,
+    INHIRE,
     NOFLUFFJOBS,
+    PRACUJPL,
     ROCKETJOBS,
     SOLIDJOBS,
     THEPROTOCOL,
@@ -24,8 +26,12 @@ def search(search_link: str) -> str:
         return '[data-test-id="virtuoso-item-list"]'
     elif SOLIDJOBS in current_website:
         return '[class="scrollable-content"]'
+    elif PRACUJPL in current_website:
+        return '[data-test="section-offers"]'  # Placeholder
+    elif INHIRE in current_website:
+        return '[class="job-offer"]'  # Placeholder
     else:
-        raise ValueError(f"Unknown website: {current_website}")
+        return None
 
 
 def detect_records(html, search_link) -> list[str]:
@@ -59,8 +65,17 @@ def detect_records(html, search_link) -> list[str]:
     elif SOLIDJOBS in search_link:
         record_container = "offer-list-item"
         return [job for job in html.find_all(record_container)]
+
+    elif PRACUJPL in search_link:
+        record_container = {"data-test": "default-offer"}
+        return [job for job in html.find_all(attrs=record_container)]
+
+    elif INHIRE in search_link:
+        record_container = {"class": "job-offer"}  # Placeholder
+        return [job for job in html.find_all(attrs=record_container)]
+
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        return None
 
 
 def url(record, search_link) -> str:
@@ -83,6 +98,14 @@ def url(record, search_link) -> str:
 
     elif SOLIDJOBS in search_link:
         url_a = record.find("a", href=True)
+        url = url_a.get("href")
+
+    elif PRACUJPL in search_link:
+        url_a = record.find("a", {"data-test": "link-offer"})
+        url = url_a.get("href")
+
+    elif INHIRE in search_link:
+        url_a = record.find("a", href=True)  # Placeholder
         url = url_a.get("href")
 
     if url:
@@ -121,8 +144,16 @@ def job_title(html, search_link) -> str:
         title = html.find("h2")
         return title.text.strip() if title else None
 
+    elif PRACUJPL in search_link:
+        title = html.find("h2", {"data-test": "offer-title"})
+        return title.text.strip() if title else None
+
+    elif INHIRE in search_link:
+        title = html.find("h2", class_="job-title")  # Placeholder
+        return title.text.strip() if title else None
+
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        return None
 
 
 def tags(html, search_link: str) -> list[str]:
@@ -156,8 +187,18 @@ def tags(html, search_link: str) -> list[str]:
         job_tags = [tag.text.strip().replace("# ", "") for tag in tags_block]
         return job_tags if job_tags else []
 
+    elif PRACUJPL in search_link:
+        tags_block = html.find_all("span", {"data-test": "technologies-item"})
+        job_tags = [tag.text.strip() for tag in tags_block]
+        return job_tags if job_tags else []
+
+    elif INHIRE in search_link:
+        tags_block = html.find_all("span", class_="tag")  # Placeholder
+        job_tags = [tag.text.strip() for tag in tags_block]
+        return job_tags if job_tags else []
+
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        return []
 
 
 def company(html, search_link: str) -> dict:
@@ -200,8 +241,16 @@ def company(html, search_link: str) -> dict:
         company = html.find("a", {"mattooltip": "Kliknij, aby zobaczy pozostałe oferty firmy."})
         return company.text.strip() if company else None
 
+    elif PRACUJPL in search_link:
+        company = html.find("h3", {"data-test": "text-company-name"})
+        return company.text.strip() if company else None
+
+    elif INHIRE in search_link:
+        company = html.find("a", class_="company-name")  # Placeholder
+        return company.text.strip() if company else None
+
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        return None
 
 
 def logo(html, search_link: str) -> dict:
@@ -227,12 +276,20 @@ def logo(html, search_link: str) -> dict:
         logo = html.img
         return logo.get("src") if logo else None
 
-    if SOLIDJOBS in search_link:
+    elif SOLIDJOBS in search_link:
         logo = html.find("img")
         return logo.get("src") if logo else None
 
+    elif PRACUJPL in search_link:
+        logo = html.find("img", {"data-test": "image-responsive"})
+        return logo.get("src") if logo else None
+
+    elif INHIRE in search_link:
+        logo = html.find("img", class_="company-logo")  # Placeholder
+        return logo.get("src") if logo else None
+
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        return None
 
 
 def location(html, search_link: str) -> dict:
@@ -289,8 +346,17 @@ def location(html, search_link: str) -> dict:
             return location.text.strip()
         return None
 
+    elif PRACUJPL in search_link:
+        loc = html.find("h4", {"data-test": "text-region"})
+        location = loc.strong  # <strong> tag contains location
+        return location.text.strip() if location else None
+
+    elif INHIRE in search_link:
+        location = html.find("span", class_="location")  # Placeholder
+        return location.text.strip() if location else None
+
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        return None
 
 
 def salary(html, search_link: str) -> dict:
@@ -334,5 +400,13 @@ def salary(html, search_link: str) -> dict:
         salary = html.find("span", class_="badge-salary")
         return salary.text.strip() if salary else None
 
+    elif PRACUJPL in search_link:
+        salary = html.find("span", {"data-test": "offer-salary"})
+        return salary.text.strip() if salary else None
+
+    elif INHIRE in search_link:
+        salary = html.find("span", class_="salary")  # Placeholder
+        return salary.text.strip() if salary else None
+
     else:
-        raise ValueError(f"Unknown website: {search_link}")
+        return None
