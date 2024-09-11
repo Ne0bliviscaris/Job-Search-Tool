@@ -1,3 +1,4 @@
+from websites import JUSTJOINIT  # Same structure as RocketJobs
 from websites import BULLDOGJOB, NOFLUFFJOBS, ROCKETJOBS, THEPROTOCOL, identify_website
 
 
@@ -12,7 +13,7 @@ def search(search_link: str) -> str:
         return '[data-test="offersList"]'
     elif BULLDOGJOB in current_website:
         return '[id="__next"]'
-    elif ROCKETJOBS in current_website:
+    elif ROCKETJOBS in current_website or JUSTJOINIT in current_website:
         return '[data-test-id="virtuoso-item-list"]'
     else:
         raise ValueError(f"Unknown website: {current_website}")
@@ -42,7 +43,7 @@ def detect_records(html, search_link) -> list[str]:
         }
         return [job for job in html.find_all(attrs=record_container)]
 
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         record_container = {"data-index": True}
         return [job for job in html.find_all(attrs=record_container)]
     else:
@@ -63,7 +64,7 @@ def url(record, search_link) -> str:
     elif BULLDOGJOB in search_link:
         url = record.get("href")
 
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         url_a = record.find("a", href=True)
         url = url_a.get("href")
 
@@ -95,7 +96,7 @@ def job_title(html, search_link) -> str:
         if title_block:
             title = title_block.find("h3")
             return title.text if title else None
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         title = html.h3
         return title.text if title else None
 
@@ -124,7 +125,7 @@ def tags(html, search_link: str) -> list[str]:
             job_tags = [span.text for span in tags_block.find_all("span")]
             return job_tags if job_tags else []
 
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         tag_container = lambda class_name: class_name and class_name.startswith("skill-tag")
         tags = html.find_all(class_=tag_container)
         return [tag.text.strip() for tag in tags] if tags else []
@@ -160,7 +161,7 @@ def company(html, search_link: str) -> dict:
                 if company_div:
                     return company_div.text.strip()
 
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
         svg_icon = html.find("svg", {"data-testid": "ApartmentRoundedIcon"})
         if svg_icon:
@@ -192,7 +193,7 @@ def logo(html, search_link: str) -> dict:
         logo = html.find(attrs=logo_container)
         return logo.find("img").get("src") if logo else None
 
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         logo = html.img
         return logo.get("src") if logo else None
 
@@ -231,6 +232,14 @@ def location(html, search_link: str) -> dict:
             locations = [loc.text.strip() for loc in location_elements]
             return " | ".join(locations)
         return None
+    # Here JustJoinIT differs from RocketJobs by one index
+    elif JUSTJOINIT in search_link:
+        MuiBox_block = html.find_all("div", class_="MuiBox-root")
+        location_elements = MuiBox_block[11].find_all("span")
+        if location_elements:
+            locations = [loc.text.strip() for loc in location_elements[1:]]
+            return " | ".join(locations)
+        return None
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -254,7 +263,7 @@ def salary(html, search_link: str) -> dict:
         salary_elements = html.find(attrs=salary_container)
         return salary_elements if salary_elements else ""
 
-    elif ROCKETJOBS in search_link:
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         # All containers on site are MuiBox-root. Need to find the right one
         MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
 
