@@ -145,4 +145,4 @@ class JobRecord:
         """
         Extract the main domain from the website URL.
         """
-        return self.website.split("//")[-1].split(".")[0]
+        return self.website.split("//")[-1]
