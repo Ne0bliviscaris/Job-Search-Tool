@@ -4,15 +4,13 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 
 # TODO:
 - Multi website support
-- Save to file function
-- Sync with file
 - Move out of date files to archive
-- Add buttons to fetch records and save them to file
 
 # Changelog:
 #### 10.09.2024
-- Introduced bulldogjob.pl website
-- Minor improvements to handling data
+- Integrated Rocketjobs.pl site
+- Integrated Bulldogjob.pl site
+- Minor improvements to handling data extraction
 #### 09.09.2024
 - Massively reduced update time complexity by reusing one webdriver
 #### 06.09.2024

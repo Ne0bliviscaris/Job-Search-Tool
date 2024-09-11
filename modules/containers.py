@@ -13,7 +13,7 @@ def search(search_link: str) -> str:
     elif BULLDOGJOB in current_website:
         return '[id="__next"]'
     elif ROCKETJOBS in current_website:
-        return "TO BE DONE --------------"
+        return '[data-test-id="virtuoso-item-list"]'
     else:
         raise ValueError(f"Unknown website: {current_website}")
 
@@ -43,9 +43,36 @@ def detect_records(html, search_link) -> list[str]:
         return [job for job in html.find_all(attrs=record_container)]
 
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        record_container = {"data-index": True}
+        return [job for job in html.find_all(attrs=record_container)]
     else:
         raise ValueError(f"Unknown website: {search_link}")
+
+
+def url(record, search_link) -> str:
+    """
+    Returns url container content for each website
+    """
+    if NOFLUFFJOBS in search_link:
+        # url = record.get("a", href=True)
+        url = record.get("href")
+
+    elif THEPROTOCOL in search_link:
+        url = record.get("href")
+
+    elif BULLDOGJOB in search_link:
+        url = record.get("href")
+
+    elif ROCKETJOBS in search_link:
+        url_a = record.find("a", href=True)
+        url = url_a.get("href")
+
+    if url:
+        if url.startswith("http"):
+            return url
+        else:
+            return search_link.rstrip("/") + "/" + url.lstrip("/")
+    return None
 
 
 def job_title(html, search_link) -> str:
@@ -69,7 +96,9 @@ def job_title(html, search_link) -> str:
             title = title_block.find("h3")
             return title.text if title else None
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        title = html.h3
+        return title.text if title else None
+
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -96,7 +125,9 @@ def tags(html, search_link: str) -> list[str]:
             return job_tags if job_tags else []
 
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        tag_container = lambda class_name: class_name and class_name.startswith("skill-tag")
+        tags = html.find_all(class_=tag_container)
+        return [tag.text.strip() for tag in tags] if tags else []
 
     else:
         raise ValueError(f"Unknown website: {search_link}")
@@ -130,7 +161,13 @@ def company(html, search_link: str) -> dict:
                     return company_div.text.strip()
 
     elif ROCKETJOBS in search_link:
-        return "TO BE DONE --------------"
+        MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+        svg_icon = html.find("svg", {"data-testid": "ApartmentRoundedIcon"})
+        if svg_icon:
+            parent_div = svg_icon.find_parent("div", class_=MuiBox_block)
+            if parent_div:
+                company_name = parent_div.span
+                return company_name.text.strip() if company_name else None
 
     else:
         raise ValueError(f"Unknown website: {search_link}")
@@ -156,8 +193,7 @@ def logo(html, search_link: str) -> dict:
         return logo.find("img").get("src") if logo else None
 
     elif ROCKETJOBS in search_link:
-        logo_container = "TO BE DONE --------------"
-        logo = html.find(attrs=logo_container)
+        logo = html.img
         return logo.get("src") if logo else None
 
     else:
@@ -189,7 +225,12 @@ def location(html, search_link: str) -> dict:
                 job_location = [span.text.strip() for span in hidden_block.find("span")]
                 return job_location if job_location else None
     elif ROCKETJOBS in search_link:
-        location_container = "TO BE DONE --------------"
+        MuiBox_block = html.find_all("div", class_="MuiBox-root")
+        location_elements = MuiBox_block[11].find_all("span")
+        if location_elements:
+            locations = [loc.text.strip() for loc in location_elements]
+            return " | ".join(locations)
+        return None
     else:
         raise ValueError(f"Unknown website: {search_link}")
 
@@ -210,9 +251,25 @@ def salary(html, search_link: str) -> dict:
         salary_container = {
             "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__salary")
         }
-        salary = html.find(attrs=salary_container)
-        return salary if salary else ""
+        salary_elements = html.find(attrs=salary_container)
+        return salary_elements if salary_elements else ""
+
     elif ROCKETJOBS in search_link:
-        salary_container = "TO BE DONE --------------"
+        # All containers on site are MuiBox-root. Need to find the right one
+        MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+
+        # Salary is contained in the same parent div as the h3 tag with job title
+        h3_container = html.h3
+        if h3_container:
+            parent_div = h3_container.find_parent("div", class_=MuiBox_block)
+            # Salary is hidden in MuiBox-root inside another MuiBox-root inside the parent div with h3
+            if parent_div:
+                salary_div = parent_div.find("div", class_=MuiBox_block).find("div", class_=MuiBox_block)
+                if salary_div:
+                    salary_elements = salary_div.find_all("span")
+                    if salary_elements:
+                        salary = [pay.text.strip() for pay in salary_elements]
+                        return " - ".join(salary)
+        return ""
     else:
         raise ValueError(f"Unknown website: {search_link}")

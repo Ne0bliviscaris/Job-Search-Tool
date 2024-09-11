@@ -49,13 +49,8 @@ class JobRecord:
         """
         Fetch job record url
         """
-        url = self.html.get("href")
-        if url:
-            if url.startswith("http"):
-                return url
-            else:
-                return self.website.rstrip("/") + "/" + url.lstrip("/")
-        return None
+        url = containers.url(self.html, self.website)
+        return url if url else None
 
     def fetch_company_name(self):
         """
@@ -79,14 +74,17 @@ class JobRecord:
         salary = containers.salary(self.html, self.website)
 
         if salary:
-            salary_text = salary.get_text(strip=True)
+            # Get the salary text from the salary tag
+            salary_text = salary if isinstance(salary, str) else salary.get_text(strip=True)
             # Remove PLN, "zł" and anything inside parentheses like "(B2B)"
             processed_salary = (
                 salary_text.replace("PLN", "")
+                .replace("pln", "")
+                .replace("ZŁ", "")
+                .replace("zł", "")
                 .replace("–", "-")
                 .replace("\xa0", "")
                 .replace(",", "")
-                .replace("zł", "")
                 .strip()
             )
             # Remove anything in parentheses (e.g., "(B2B)")
@@ -104,10 +102,13 @@ class JobRecord:
 
             try:
                 # Split salary text into min and max salary if range is provided
-                if "-" in processed_salary:
-                    min_salary_text, max_salary_text = processed_salary.split("-")
-                    min_salary = int(min_salary_text.strip())
-                    max_salary = int(max_salary_text.strip())
+                salary_parts = processed_salary.split("-")
+                if len(salary_parts) >= 2:
+                    # If there are two or more parts, use the first two as min and max
+                    min_salary_text = salary_parts[0].strip()
+                    max_salary_text = salary_parts[1].strip()
+                    min_salary = int(min_salary_text)
+                    max_salary = int(max_salary_text)
                 else:
                     min_salary = max_salary = int(processed_salary.strip())
 
