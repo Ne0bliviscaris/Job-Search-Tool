@@ -1,7 +1,6 @@
 from websites import JUSTJOINIT  # Same structure as RocketJobs
 from websites import (
     BULLDOGJOB,
-    INHIRE,
     NOFLUFFJOBS,
     PRACUJPL,
     ROCKETJOBS,
@@ -12,9 +11,7 @@ from websites import (
 
 
 def search(search_link: str) -> str:
-    """
-    Returns search container for each website
-    """
+    """Returns search container for each website"""
     current_website = identify_website(search_link)
     if NOFLUFFJOBS in current_website:
         return "nfj-postings-list"
@@ -27,17 +24,13 @@ def search(search_link: str) -> str:
     elif SOLIDJOBS in current_website:
         return '[class="scrollable-content"]'
     elif PRACUJPL in current_website:
-        return '[data-test="section-offers"]'  # Placeholder
-    elif INHIRE in current_website:
-        return '[class="job-offer"]'  # Placeholder
+        return '[data-test="section-offers"]'
     else:
         return None
 
 
 def detect_records(html, search_link) -> list[str]:
-    """
-    Returns record container content for each website
-    """
+    """Returns record container content for each website"""
     if NOFLUFFJOBS in search_link:
         record_container = {"id": lambda id_name: id_name and id_name.startswith("nfjPostingListItem")}
         return [job for job in html.find_all(attrs=record_container)]
@@ -70,18 +63,12 @@ def detect_records(html, search_link) -> list[str]:
         record_container = {"data-test": "default-offer"}
         return [job for job in html.find_all(attrs=record_container)]
 
-    elif INHIRE in search_link:
-        record_container = {"class": "job-offer"}  # Placeholder
-        return [job for job in html.find_all(attrs=record_container)]
-
     else:
         return None
 
 
 def url(record, search_link) -> str:
-    """
-    Returns url container content for each website
-    """
+    """Returns url container content for each website"""
     if NOFLUFFJOBS in search_link:
         # url = record.get("a", href=True)
         url = record.get("href")
@@ -104,10 +91,6 @@ def url(record, search_link) -> str:
         url_a = record.find("a", {"data-test": "link-offer"})
         url = url_a.get("href")
 
-    elif INHIRE in search_link:
-        url_a = record.find("a", href=True)  # Placeholder
-        url = url_a.get("href")
-
     if url:
         if url.startswith("http"):
             return url
@@ -117,9 +100,7 @@ def url(record, search_link) -> str:
 
 
 def job_title(html, search_link) -> str:
-    """
-    Returns title container content for each website
-    """
+    """Returns title container content for each website"""
     if NOFLUFFJOBS in search_link:
         title_container = {"data-cy": "title position on the job offer listing"}
         title = html.find(attrs=title_container)
@@ -148,18 +129,12 @@ def job_title(html, search_link) -> str:
         title = html.find("h2", {"data-test": "offer-title"})
         return title.text.strip() if title else None
 
-    elif INHIRE in search_link:
-        title = html.find("h2", class_="job-title")  # Placeholder
-        return title.text.strip() if title else None
-
     else:
         return None
 
 
 def tags(html, search_link: str) -> list[str]:
-    """
-    Returns tags container content for each website
-    """
+    """Returns tags container content for each website"""
     if NOFLUFFJOBS in search_link:
         tags_container = {"data-cy": "category name on the job offer listing"}
         job_tags = [job.text for job in html.find_all(attrs=tags_container)]
@@ -192,19 +167,12 @@ def tags(html, search_link: str) -> list[str]:
         job_tags = [tag.text.strip() for tag in tags_block]
         return job_tags if job_tags else []
 
-    elif INHIRE in search_link:
-        tags_block = html.find_all("span", class_="tag")  # Placeholder
-        job_tags = [tag.text.strip() for tag in tags_block]
-        return job_tags if job_tags else []
-
     else:
         return []
 
 
 def company(html, search_link: str) -> dict:
-    """
-    Returns company name container content for each website
-    """
+    """Returns company name container content for each website"""
     if NOFLUFFJOBS in search_link:
         company_container = {
             "class": "tw-text-gray-60 company-name tw-w-[50%] desktop:tw-w-auto tw-mb-0 !tw-text-xs !desktop:tw-text-sm tw-font-semibold desktop:tw-font-normal"
@@ -245,18 +213,12 @@ def company(html, search_link: str) -> dict:
         company = html.find("h3", {"data-test": "text-company-name"})
         return company.text.strip() if company else None
 
-    elif INHIRE in search_link:
-        company = html.find("a", class_="company-name")  # Placeholder
-        return company.text.strip() if company else None
-
     else:
         return None
 
 
 def logo(html, search_link: str) -> dict:
-    """
-    Returns logo container content for each website
-    """
+    """Returns logo container content for each website"""
     if NOFLUFFJOBS in search_link:
         logo_container = {"alt": "Company logo"}
         logo = html.find(attrs=logo_container)
@@ -284,18 +246,12 @@ def logo(html, search_link: str) -> dict:
         logo = html.find("img", {"data-test": "image-responsive"})
         return logo.get("src") if logo else None
 
-    elif INHIRE in search_link:
-        logo = html.find("img", class_="company-logo")  # Placeholder
-        return logo.get("src") if logo else None
-
     else:
         return None
 
 
 def location(html, search_link: str) -> dict:
-    """
-    Returns location container content for each website
-    """
+    """Returns location container content for each website"""
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
         job_location_elements = html.find_all(attrs=location_container)
@@ -351,18 +307,12 @@ def location(html, search_link: str) -> dict:
         location = loc.strong  # <strong> tag contains location
         return location.text.strip() if location else None
 
-    elif INHIRE in search_link:
-        location = html.find("span", class_="location")  # Placeholder
-        return location.text.strip() if location else None
-
     else:
         return None
 
 
 def salary(html, search_link: str) -> dict:
-    """
-    Returns salary container content for each website
-    """
+    """Returns salary container content for each website"""
     if NOFLUFFJOBS in search_link:
         salary_container = {"data-cy": "salary ranges on the job offer listing"}
         return html.find(attrs=salary_container)
@@ -402,10 +352,6 @@ def salary(html, search_link: str) -> dict:
 
     elif PRACUJPL in search_link:
         salary = html.find("span", {"data-test": "offer-salary"})
-        return salary.text.strip() if salary else None
-
-    elif INHIRE in search_link:
-        salary = html.find("span", class_="salary")  # Placeholder
         return salary.text.strip() if salary else None
 
     else:
