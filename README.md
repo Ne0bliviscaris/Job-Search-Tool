@@ -26,8 +26,7 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
     - Note field for feedback
     - Mark as interesting, prefferable 1-5 stars ranking
 
-
-#### Future potential features:
+# Ideas for the future:
 - Scrape each interesting offer (3+ stars)
 - Fetch and unify requirements, additional info etc
 - Build RAG using my CV to analyze each offer in relation to my skills
