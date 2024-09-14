@@ -1,6 +1,6 @@
 import re
 
-import containers as containers
+import modules.containers as containers
 
 
 class JobRecord:
@@ -124,15 +124,15 @@ class JobRecord:
 
     def prepare_dataframe(self):
         record = {
-            "Title": self.title,
-            "Url": self.url,
-            "Company name": self.company_name,
-            "Logo": self.logo,
-            "Location": self.location,
-            "Min salary": self.salary_min,
-            "Max salary": self.salary_max,
-            "Salary text": self.salary_text,
-            "Website": self.host_site,
+            "title": self.title,
+            "url": self.url,
+            "company_name": self.company_name,
+            "logo": self.logo,
+            "location": self.location,
+            "min_salary": self.salary_min,
+            "max_salary": self.salary_max,
+            "salary_text": self.salary_text,
+            "website": self.host_site,
         }
 
         # Dodajemy tagi jako osobne kolumny
