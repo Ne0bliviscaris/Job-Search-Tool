@@ -26,6 +26,9 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
     - Note field for feedback
     - Mark as interesting, prefferable 1-5 stars ranking
 
+#### Move to docker container and host it remotely
+- Run updater on a scheduler
+
 # Ideas for the future:
 - Scrape each interesting offer (3+ stars)
 - Fetch and unify requirements, additional info etc
