@@ -1,5 +1,5 @@
-from websites import JUSTJOINIT  # Same structure as RocketJobs
-from websites import (
+from modules.websites import JUSTJOINIT  # Same structure as RocketJobs
+from modules.websites import (
     BULLDOGJOB,
     NOFLUFFJOBS,
     PRACUJPL,
