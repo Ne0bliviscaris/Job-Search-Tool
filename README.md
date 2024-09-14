@@ -3,10 +3,39 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 
 
 # TODO:
-- Multi website support
-- Move out of date files to archive
+#### Get proper search links
+#### Raw data extraction improvements:
+- Location extraction improvements - making sure that either a list or the proper location is extracted
+- Tags - merging into one field
+- Using || separator between list elements
+#### Synchronization ETL module:
+- Extract elements from raw CSV -> unify them across all sites
+- Use tag and location dictionaries to unify variable elements
+- Mark new offers as new
+- Move finished offers to archive
+- Gather additional data, like added time, removed time
+- Browseable archive file
+#### Records visualization:
+- Prepare record template - fetch one record from CSV, fill specific fields
+- Initially scrolled up, showing minimal info. Click, to show full record details
+
+- Add additional editable fields: 
+    - Mark as applied button - saves current time as time applied
+    - Application status - not applied, applied, rejected
+    - Feedback status - received or not received
+    - Note field for feedback
+    - Mark as interesting, prefferable 1-5 stars ranking
+
+
+#### Future potential features:
+- Scrape each interesting offer (3+ stars)
+- Fetch and unify requirements, additional info etc
+- Build RAG using my CV to analyze each offer in relation to my skills
+- RAG generate unified template from scraped offers
 
 # Changelog:
+#### 14.09.2024
+- Introduced Streamlit
 #### 11.09.2024
 - Integrated JustJoinIT.pl site
 - Integrated Solid.jobs site
