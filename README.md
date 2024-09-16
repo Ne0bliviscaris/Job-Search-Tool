@@ -1,23 +1,6 @@
 # Job-Search-Tool
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 
-# This branch:
-- location
-    - ['list elements']
-    - decide if filters change first location returned - otherwise make selenium extract hovered location block to force extract all locations
-        - Nofluffjobs sorts locations with filters - remote status integrated into locations
-        - Theprotocol stores only 1 location and separate remote status
-        - Bulldogjob does not sort locations with filters, remote as first location
-        - Rocketjobs sorts locations with filters - separate remote status
-        - Justjoinit sorts locations with filters - separate remote status
-        - Solidjobs stores only 1 location and separate remote status
-        - Pracuj stores only 1 location and separate remote status
-
-- salary extraction:
-    -  extract last part of salary string
-- tags:
-    - marge tags into one column
-
 # TODO:
 ## Data processing
 #### Location fetching adjustments
@@ -27,8 +10,6 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 #### Get proper search links
 #### Raw data extraction improvements:
 - Location extraction improvements - making sure that either a list or the proper location is extracted
-- Tags - merging into one field
-- Using || separator between list elements
 #### Synchronization ETL module:
 - Extract elements from raw CSV -> unify them across all sites
 - Use tag and location dictionaries to unify variable elements
@@ -63,6 +44,11 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 - RAG generate unified template from scraped offers
 
 # Changelog:
+#### 16.09.2024
+- Improvement in extracting job location. Added separate field for remote job status
+- Properly extracting salary details (currency etc) 
+- Fixed logo extraction from Nofluffjobs
+- Storing job tags as a string
 #### 14.09.2024
 - Introduced Streamlit
 #### 11.09.2024
