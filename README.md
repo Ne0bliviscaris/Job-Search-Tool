@@ -3,6 +3,11 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 
 
 # TODO:
+## Data processing
+#### Location fetching adjustments
+- If site puts selected location on first place - use only the first location
+- Else - fetch html with location block hovered to show extract list of all locations
+
 #### Get proper search links
 #### Raw data extraction improvements:
 - Location extraction improvements - making sure that either a list or the proper location is extracted
@@ -26,8 +31,14 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
     - Note field for feedback
     - Mark as interesting, prefferable 1-5 stars ranking
 
+## Cloud related issues
+#### Session and data access:
+- Introduce session for admin user
+- Columns not for public info available only for admin
+- Saving data/files available only for admin
 #### Move to docker container and host it remotely
 - Run updater on a scheduler
+
 
 # Ideas for the future:
 - Scrape each interesting offer (3+ stars)
