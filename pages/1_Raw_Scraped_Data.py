@@ -2,6 +2,9 @@ import streamlit as st
 
 import modules.data_collector as data_collector
 
+# Set page configuration
+st.set_page_config(layout="wide")
+
 st.title("All sites dataframe")
 collected_frame = data_collector.all_sites_frame()
 
