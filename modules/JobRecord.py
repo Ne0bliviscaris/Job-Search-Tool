@@ -13,6 +13,7 @@ class JobRecord:
         self.company_name = self.fetch_company_name()
         self.logo = self.fetch_logo()
         self.location = self.fetch_location()
+        self.remote_status = self.fetch_remote_status()
         self.salary_min, self.salary_max, self.salary_text = self.fetch_salary_range()
         self.host_site = self.host_site()
 
@@ -25,6 +26,7 @@ class JobRecord:
             f"Company name: {self.company_name}\n"
             f"Logo: {self.logo}\n"
             f"Location: {self.location}\n"
+            f"Remote status: {self.remote_status}\n"
             f"Min salary: {self.salary_min}\n"
             f"Max salary: {self.salary_max}\n"
             f"Salary text: {self.salary_text}\n"
@@ -129,6 +131,7 @@ class JobRecord:
             "company_name": self.company_name,
             "logo": self.logo,
             "location": self.location,
+            "remote_status": self.remote_status,
             "min_salary": self.salary_min,
             "max_salary": self.salary_max,
             "salary_text": self.salary_text,
@@ -146,3 +149,13 @@ class JobRecord:
         Extract the main domain from the website URL.
         """
         return self.website.split("//")[-1]
+
+    def fetch_remote_status(self) -> str:
+        """
+        Check if the job listing is remote.
+        """
+        if self.location:
+            status = containers.remote_status(self.html, self.website)
+            return status if status is not None else None
+        else:
+            return "Remote"
