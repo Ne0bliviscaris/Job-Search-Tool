@@ -1,7 +1,7 @@
 import streamlit
 import streamlit as st
 
-from modules.updater import update_all_sites
+from modules.updater.updater import update_all_sites
 
 streamlit.title("Update all sites")
 streamlit.write("This script will update all sites by downloading the latest HTML content.")
