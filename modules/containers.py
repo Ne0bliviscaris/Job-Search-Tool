@@ -14,7 +14,7 @@ def search(search_link: str) -> str:
     """Returns search container for each website"""
     current_website = identify_website(search_link)
     if NOFLUFFJOBS in current_website:
-        return "nfj-postings-list"
+        return '[class="list-container"]'
     elif THEPROTOCOL in current_website:
         return '[data-test="offersList"]'
     elif BULLDOGJOB in current_website:
