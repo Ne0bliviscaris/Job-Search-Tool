@@ -46,7 +46,7 @@ class JobRecord:
         Fetch job tags from the record
         """
         tags = containers.tags(self.html, self.website)
-        return tags if tags else []
+        return tags if tags else None
 
     def fetch_url(self):
         """
@@ -129,9 +129,8 @@ class JobRecord:
     def prepare_dataframe(self):
         record = {
             "title": self.title,
-            "url": self.url,
-            "company_name": self.company_name,
             "logo": self.logo,
+            "company_name": self.company_name,
             "location": self.location,
             "remote_status": self.remote_status,
             "min_salary": self.salary_min,
@@ -139,11 +138,9 @@ class JobRecord:
             "salary_details": self.salary_details,
             "salary_text": self.salary_text,
             "website": self.host_site,
+            "tags": self.tags,
+            "url": self.url,
         }
-
-        # Dodajemy tagi jako osobne kolumny
-        for i, tag in enumerate(self.tags):
-            record[f"Tag {i+1}"] = tag.strip()
 
         return record
 
