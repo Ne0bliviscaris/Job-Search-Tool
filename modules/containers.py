@@ -134,38 +134,38 @@ def job_title(html, search_link) -> str:
 
 
 def tags(html, search_link: str) -> str:
-    """Returns tags container content for each website as a string separated by |"""
+    """Returns tags container content for each website as a string separated by ' | '"""
     if NOFLUFFJOBS in search_link:
         tags_container = {"data-cy": "category name on the job offer listing"}
         job_tags = [job.text for job in html.find_all(attrs=tags_container)]
-        return "|".join(job_tags) if job_tags else ""
+        return " | ".join(job_tags) if job_tags else ""
 
     elif THEPROTOCOL in search_link:
         tags_container = {"data-test": "chip-expectedTechnology"}
         job_tags = [job.text for job in html.find_all(attrs=tags_container)]
-        return "|".join(job_tags) if job_tags else ""
+        return " | ".join(job_tags) if job_tags else ""
 
     elif BULLDOGJOB in search_link:
         tags_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")}
         tags_block = html.find(attrs=tags_container)
         if tags_block:
             job_tags = [span.text for span in tags_block.find_all("span")]
-            return "|".join(job_tags) if job_tags else ""
+            return " | ".join(job_tags) if job_tags else ""
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         tag_container = lambda class_name: class_name and class_name.startswith("skill-tag")
         tags = html.find_all(class_=tag_container)
-        return "|".join(tag.text.strip() for tag in tags) if tags else ""
+        return " | ".join(tag.text.strip() for tag in tags) if tags else ""
 
     elif SOLIDJOBS in search_link:
         tags_block = html.find_all("solidjobs-skill-display")
         job_tags = [tag.text.strip().replace("# ", "") for tag in tags_block]
-        return "|".join(job_tags) if job_tags else ""
+        return " | ".join(job_tags) if job_tags else ""
 
     elif PRACUJPL in search_link:
         tags_block = html.find_all("span", {"data-test": "technologies-item"})
         job_tags = [tag.text.strip() for tag in tags_block]
-        return "|".join(job_tags) if job_tags else ""
+        return " | ".join(job_tags) if job_tags else ""
 
     else:
         return None
@@ -258,7 +258,7 @@ def location(html, search_link: str) -> dict:
         return location.text if location else None
 
     elif THEPROTOCOL in search_link:
-        location_container = {"data-test": "text-workModes"}
+        location_container = {"data-test": "text-workplaces"}
         job_location_elements = html.find_all(attrs=location_container)
         location = [job.text for job in job_location_elements if job.text]
 
@@ -272,8 +272,7 @@ def location(html, search_link: str) -> dict:
             if not any(keyword in loc.lower() for keyword in remote_keywords + hybrid_keywords + stationary_keywords)
         ]
 
-        formatted_location = [loc.replace(",", " | ") for loc in location]
-        return " | ".join(formatted_location) if location else None
+        return " | ".join(location) if location else None
 
     elif BULLDOGJOB in search_link:
         location_container = {
