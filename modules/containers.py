@@ -254,15 +254,26 @@ def location(html, search_link: str) -> dict:
     """Returns location container content for each website"""
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
-        job_location_elements = html.find_all(attrs=location_container)
-        job_location = [job.text.strip() for job in job_location_elements]
-        return job_location[0] if job_location else None
+        location = html.find(attrs=location_container)
+        return location.text if location else None
 
     elif THEPROTOCOL in search_link:
         location_container = {"data-test": "text-workModes"}
         job_location_elements = html.find_all(attrs=location_container)
-        job_location = [job.text.strip() for job in job_location_elements]
-        return job_location if job_location else None
+        location = [job.text for job in job_location_elements if job.text]
+
+        # Separate field for remote status
+        remote_keywords = ["remote", "zdalna"]
+        hybrid_keywords = ["hybrid", "hybrydowa", "remote hybrid"]
+        stationary_keywords = ["stationary", "stacjonarna", "full office"]
+        location = [
+            loc
+            for loc in location
+            if not any(keyword in loc.lower() for keyword in remote_keywords + hybrid_keywords + stationary_keywords)
+        ]
+
+        formatted_location = [loc.replace(",", " | ") for loc in location]
+        return " | ".join(formatted_location) if location else None
 
     elif BULLDOGJOB in search_link:
         location_container = {
@@ -272,40 +283,46 @@ def location(html, search_link: str) -> dict:
         if details_block:
             hidden_block = details_block.find("div", class_="hidden")
             if hidden_block:
-                job_location = [span.text.strip() for span in hidden_block.find("span")]
-                return job_location if job_location else None
+                job_location = [span.text.strip() for span in hidden_block.find_all("span") if span.text.strip()]
+                # Remove "remote" from the location - separate field for remote status
+                job_location = [loc for loc in job_location if "remote" not in loc.lower()]
+                formatted_location = " | ".join(job_location).replace(",", " | ")
+                return formatted_location if formatted_location else None
 
     elif ROCKETJOBS in search_link:
         MuiBox_block = html.find_all("div", class_="MuiBox-root")
         location_elements = MuiBox_block[11].find_all("span")
         if location_elements:
-            locations = [loc.text.strip() for loc in location_elements]
-            return " | ".join(locations)
+            locations = [loc.text for loc in location_elements]
+            return locations[0]
         return None
 
     # Here JustJoinIT differs from RocketJobs by one index
     elif JUSTJOINIT in search_link:
         MuiBox_block = html.find_all("div", class_="MuiBox-root")
         location_elements = MuiBox_block[11].find_all("span")
-        if location_elements:
-            locations = [loc.text.strip() for loc in location_elements[1:]]
-            return " | ".join(locations)
-        return None
+        locations = [loc.text for loc in location_elements[1:]]
+        return locations[0]
 
     elif SOLIDJOBS in search_link:
         """
         Returns location container content for SOLIDJOBS website
         """
-        location_elements = html.find_all("a", {"mattooltip": True})
-        if location_elements:
-            location = location_elements[-1]
-            return location.text.strip()
+        location_container = html.find("div", class_="flex-row")
+        if location_container:
+            location_elements = location_container.find_all("i", {"aria-hidden": "true"})
+            if len(location_elements) > 1:
+                location = location_elements[1].parent
+                formatted_location = location.text.replace("100% zdalnie", "").replace("(", "").replace(")", "")
+                return formatted_location.strip()
         return None
 
     elif PRACUJPL in search_link:
         loc = html.find("h4", {"data-test": "text-region"})
-        location = loc.strong  # <strong> tag contains location
-        return location.text.strip() if location else None
+        if loc and loc.strong:
+            location = loc.strong.text.replace("Cała Polska (praca zdalna)", "").strip()
+            return location
+        return None
 
     else:
         return None
