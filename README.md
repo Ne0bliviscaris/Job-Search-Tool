@@ -1,12 +1,60 @@
 # Job-Search-Tool
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 
+Current dataframe state:
+
+![Raw Scraped Screenshot](screenshots/raw_scraped.png)
 
 # TODO:
-- Multi website support
-- Move out of date files to archive
+## Data processing
+#### Location fetching adjustments
+- If site puts selected location on first place - use only the first location
+- Else - fetch html with location block hovered to show extract list of all locations
+
+#### Get proper search links
+#### Raw data extraction improvements:
+- Location extraction improvements - making sure that either a list or the proper location is extracted
+#### Synchronization ETL module:
+- Extract elements from raw CSV -> unify them across all sites
+- Use tag and location dictionaries to unify variable elements
+- Mark new offers as new
+- Move finished offers to archive
+- Gather additional data, like added time, removed time
+- Browseable archive file
+#### Records visualization:
+- Prepare record template - fetch one record from CSV, fill specific fields
+- Initially scrolled up, showing minimal info. Click, to show full record details
+
+- Add additional editable fields: 
+    - Mark as applied button - saves current time as time applied
+    - Application status - not applied, applied, rejected
+    - Feedback status - received or not received
+    - Note field for feedback
+    - Mark as interesting, prefferable 1-5 stars ranking
+
+## Cloud related issues
+#### Session and data access:
+- Introduce session for admin user
+- Columns not for public info available only for admin
+- Saving data/files available only for admin
+#### Move to docker container and host it remotely
+- Run updater on a scheduler
+
+
+# Ideas for the future:
+- Scrape each interesting offer (3+ stars)
+- Fetch and unify requirements, additional info etc
+- Build RAG using my CV to analyze each offer in relation to my skills
+- RAG generate unified template from scraped offers
 
 # Changelog:
+#### 16.09.2024
+- Improvement in extracting job location. Added separate field for remote job status
+- Properly extracting salary details (currency etc) 
+- Fixed logo extraction from Nofluffjobs
+- Storing job tags as a string
+#### 14.09.2024
+- Introduced Streamlit
 #### 11.09.2024
 - Integrated JustJoinIT.pl site
 - Integrated Solid.jobs site

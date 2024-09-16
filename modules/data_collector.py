@@ -1,8 +1,9 @@
 import os
 
 import pandas as pd
-from data_processor import build_dataframe, html_to_soup, process_records
-from websites import search_links
+
+from modules.data_processor import build_dataframe, html_to_soup, process_records
+from modules.websites import search_links
 
 
 def set_filename(search_link):
@@ -41,15 +42,9 @@ def save_dataframe_to_csv(dataframe: pd.DataFrame, filename: str) -> None:
     dataframe.to_csv(filename, index=False)
 
 
-if __name__ == "__main__":
-    results = search_all_sites()
-    # print(results)
-
-    # records_frame = build_dataframe(results)
-    # print(records_frame)
-    # save_dataframe_to_csv(records_frame, "modules/sites/records.csv")
-    # columns = records_frame[["Title", "Website", "Min salary", "Salary text"]]
-    # print(columns)
-
-    # return a single JobRecord object
-    print(results[0][0])
+def all_sites_frame():
+    """
+    Return a DataFrame containing all job records from all sites.
+    """
+    search_results = search_all_sites()
+    return build_dataframe(search_results)

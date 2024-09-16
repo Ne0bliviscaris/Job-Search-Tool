@@ -1,8 +1,9 @@
 import pandas as pd
 from bs4 import BeautifulSoup
-from containers import detect_records
-from JobRecord import JobRecord
-from websites import identify_website
+
+from modules.containers import detect_records
+from modules.JobRecord import JobRecord
+from modules.websites import identify_website
 
 
 def process_records(soup_object, link):

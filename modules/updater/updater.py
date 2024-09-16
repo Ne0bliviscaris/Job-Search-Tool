@@ -1,9 +1,8 @@
 import os
 
-import containers as containers
-from data_collector import set_filename
-from selenium_utils import scrape, setup_webdriver
-from websites import search_links
+from modules.data_collector import set_filename
+from modules.selenium_utils import scrape, setup_webdriver
+from modules.websites import search_links
 
 
 def update_site(webdriver, link: str, search_link: str) -> str:
