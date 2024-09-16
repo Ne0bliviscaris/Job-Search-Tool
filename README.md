@@ -1,6 +1,16 @@
 # Job-Search-Tool
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 
+# This branch:
+- nofluffjobs - no logo
+
+- location
+    - ['list elements']
+    - decide if filters change first location returned - otherwise make selenium extract hovered location block to force extract all locations
+- salary extraction:
+    -  extract last part of salary string
+- tags:
+    - marge tags into one column
 
 # TODO:
 ## Data processing
