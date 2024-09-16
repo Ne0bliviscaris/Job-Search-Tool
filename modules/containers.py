@@ -311,6 +311,97 @@ def location(html, search_link: str) -> dict:
         return None
 
 
+def remote_status(html, search_link: str) -> str:
+    """Returns location container content for each website"""
+    if NOFLUFFJOBS in search_link:
+        location_container = {"data-cy": "location on the job offer listing"}
+        locations = html.find_all(attrs=location_container)
+        status = [loc.text.strip() for loc in locations]
+        if "remote" in status:
+            return "Remote"
+        elif "hybrid" in status:
+            return "Hybrid"
+        else:
+            return "Stationary"
+
+    elif THEPROTOCOL in search_link:
+        remote_container = {"data-test": "text-workModes"}
+        job_location_elements = html.find_all(attrs=remote_container)
+        job_location = [job.text.strip().lower() for job in job_location_elements]
+
+        remote_keywords = ["remote", "zdalna"]
+        hybrid_keywords = ["hybrid", "hybrydowa", "remote hybrid"]
+
+        for location in job_location:
+            if any(keyword in location for keyword in remote_keywords):
+                return "Remote"
+            elif any(keyword in location for keyword in hybrid_keywords):
+                return "Hybrid"
+            else:
+                return "Stationary"
+    elif BULLDOGJOB in search_link:
+        remote_container = {
+            "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
+        }
+        details_block = html.find(attrs=remote_container)
+        if details_block:
+            hidden_block = details_block.find("div", class_="hidden")
+            if hidden_block:
+                job_location = [span.text.strip().lower() for span in hidden_block.find_all("span")]
+                if "remote" in job_location:
+                    return "Remote"
+                else:
+                    return "Stationary"
+
+    elif ROCKETJOBS in search_link:
+        MuiBox_block = html.find_all("div", class_="MuiBox-root")
+        location = MuiBox_block[11].find_all("span")
+        if "Praca zdalna" in location[-1].text:
+            return "Remote"
+        else:
+            return "Stationary"
+
+    # Here JustJoinIT differs from RocketJobs by one index
+    elif JUSTJOINIT in search_link:
+        MuiBox_block = html.find_all("div", class_="MuiBox-root")
+        location = MuiBox_block[11].find_all("span")
+        if "remote" in location[-1].text:
+            return "Remote"
+        elif "hybryd" in location[-1].text:
+            return "Hybrid"
+        else:
+            return "Stationary"
+
+    elif SOLIDJOBS in search_link:
+        """
+        Returns location container content for SOLIDJOBS website
+        """
+        location = html.find_all("a", {"mattooltip": True})
+        remote_status = location[-1]
+        if "zdalna" in remote_status.text:
+            return "Remote"
+        elif "hybrydowa" in remote_status.text:
+            return "Hybrid"
+        else:
+            return "Stationary"
+
+    elif PRACUJPL in search_link:
+        additional_info_containers = lambda tag: tag.has_attr("data-test") and tag["data-test"].startswith(
+            "offer-additional-info"
+        )
+        additional_info = html.find_all(additional_info_containers)
+        status = additional_info[-1].text
+        if "zdalna" in status:
+            return "Remote"
+        elif "hybrydowa" in status:
+            return "Hybrid"
+        else:
+            return "Stationary"
+
+    else:
+        return None
+
+
 def salary(html, search_link: str) -> dict:
     """Returns salary container content for each website"""
     if NOFLUFFJOBS in search_link:
