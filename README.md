@@ -2,11 +2,17 @@
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 
 # This branch:
-- nofluffjobs - no logo
-
 - location
     - ['list elements']
     - decide if filters change first location returned - otherwise make selenium extract hovered location block to force extract all locations
+        - Nofluffjobs sorts locations with filters - remote status integrated into locations
+        - Theprotocol stores only 1 location and separate remote status
+        - Bulldogjob does not sort locations with filters, remote as first location
+        - Rocketjobs sorts locations with filters - separate remote status
+        - Justjoinit sorts locations with filters - separate remote status
+        - Solidjobs stores only 1 location and separate remote status
+        - Pracuj stores only 1 location and separate remote status
+
 - salary extraction:
     -  extract last part of salary string
 - tags:
