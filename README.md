@@ -1,6 +1,10 @@
 # Job-Search-Tool
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 
+Current dataframe state:
+
+![Raw Scraped Screenshot](screenshots/raw_scraped.png)
+
 # TODO:
 ## Data processing
 #### Location fetching adjustments
