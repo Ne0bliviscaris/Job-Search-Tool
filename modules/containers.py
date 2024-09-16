@@ -14,7 +14,7 @@ def search(search_link: str) -> str:
     """Returns search container for each website"""
     current_website = identify_website(search_link)
     if NOFLUFFJOBS in current_website:
-        return "nfj-postings-list"
+        return '[class="list-container"]'
     elif THEPROTOCOL in current_website:
         return '[data-test="offersList"]'
     elif BULLDOGJOB in current_website:
@@ -133,42 +133,42 @@ def job_title(html, search_link) -> str:
         return None
 
 
-def tags(html, search_link: str) -> list[str]:
-    """Returns tags container content for each website"""
+def tags(html, search_link: str) -> str:
+    """Returns tags container content for each website as a string separated by ' | '"""
     if NOFLUFFJOBS in search_link:
         tags_container = {"data-cy": "category name on the job offer listing"}
         job_tags = [job.text for job in html.find_all(attrs=tags_container)]
-        return job_tags if job_tags else None
+        return " | ".join(job_tags) if job_tags else ""
 
     elif THEPROTOCOL in search_link:
         tags_container = {"data-test": "chip-expectedTechnology"}
         job_tags = [job.text for job in html.find_all(attrs=tags_container)]
-        return job_tags if job_tags else None
+        return " | ".join(job_tags) if job_tags else ""
 
     elif BULLDOGJOB in search_link:
         tags_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")}
         tags_block = html.find(attrs=tags_container)
         if tags_block:
             job_tags = [span.text for span in tags_block.find_all("span")]
-            return job_tags if job_tags else []
+            return " | ".join(job_tags) if job_tags else ""
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         tag_container = lambda class_name: class_name and class_name.startswith("skill-tag")
         tags = html.find_all(class_=tag_container)
-        return [tag.text.strip() for tag in tags] if tags else []
+        return " | ".join(tag.text.strip() for tag in tags) if tags else ""
 
     elif SOLIDJOBS in search_link:
         tags_block = html.find_all("solidjobs-skill-display")
         job_tags = [tag.text.strip().replace("# ", "") for tag in tags_block]
-        return job_tags if job_tags else []
+        return " | ".join(job_tags) if job_tags else ""
 
     elif PRACUJPL in search_link:
         tags_block = html.find_all("span", {"data-test": "technologies-item"})
         job_tags = [tag.text.strip() for tag in tags_block]
-        return job_tags if job_tags else []
+        return " | ".join(job_tags) if job_tags else ""
 
     else:
-        return []
+        return None
 
 
 def company(html, search_link: str) -> dict:
@@ -254,15 +254,25 @@ def location(html, search_link: str) -> dict:
     """Returns location container content for each website"""
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
-        job_location_elements = html.find_all(attrs=location_container)
-        job_location = [job.text.strip() for job in job_location_elements]
-        return job_location[0] if job_location else None
+        location = html.find(attrs=location_container)
+        return location.text if location else None
 
     elif THEPROTOCOL in search_link:
-        location_container = {"data-test": "text-workModes"}
+        location_container = {"data-test": "text-workplaces"}
         job_location_elements = html.find_all(attrs=location_container)
-        job_location = [job.text.strip() for job in job_location_elements]
-        return job_location if job_location else None
+        location = [job.text for job in job_location_elements if job.text]
+
+        # Separate field for remote status
+        remote_keywords = ["remote", "zdalna"]
+        hybrid_keywords = ["hybrid", "hybrydowa", "remote hybrid"]
+        stationary_keywords = ["stationary", "stacjonarna", "full office"]
+        location = [
+            loc
+            for loc in location
+            if not any(keyword in loc.lower() for keyword in remote_keywords + hybrid_keywords + stationary_keywords)
+        ]
+
+        return " | ".join(location) if location else None
 
     elif BULLDOGJOB in search_link:
         location_container = {
@@ -272,40 +282,137 @@ def location(html, search_link: str) -> dict:
         if details_block:
             hidden_block = details_block.find("div", class_="hidden")
             if hidden_block:
-                job_location = [span.text.strip() for span in hidden_block.find("span")]
-                return job_location if job_location else None
+                job_location = [span.text.strip() for span in hidden_block.find_all("span") if span.text.strip()]
+                # Remove "remote" from the location - separate field for remote status
+                job_location = [loc for loc in job_location if "remote" not in loc.lower()]
+                formatted_location = " | ".join(job_location).replace(",", " | ")
+                return formatted_location if formatted_location else None
 
     elif ROCKETJOBS in search_link:
         MuiBox_block = html.find_all("div", class_="MuiBox-root")
         location_elements = MuiBox_block[11].find_all("span")
         if location_elements:
-            locations = [loc.text.strip() for loc in location_elements]
-            return " | ".join(locations)
+            locations = [loc.text for loc in location_elements]
+            return locations[0]
         return None
 
     # Here JustJoinIT differs from RocketJobs by one index
     elif JUSTJOINIT in search_link:
         MuiBox_block = html.find_all("div", class_="MuiBox-root")
         location_elements = MuiBox_block[11].find_all("span")
-        if location_elements:
-            locations = [loc.text.strip() for loc in location_elements[1:]]
-            return " | ".join(locations)
-        return None
+        locations = [loc.text for loc in location_elements[1:]]
+        return locations[0]
 
     elif SOLIDJOBS in search_link:
         """
         Returns location container content for SOLIDJOBS website
         """
-        location_elements = html.find_all("a", {"mattooltip": True})
-        if location_elements:
-            location = location_elements[-1]
-            return location.text.strip()
+        location_container = html.find("div", class_="flex-row")
+        if location_container:
+            location_elements = location_container.find_all("i", {"aria-hidden": "true"})
+            if len(location_elements) > 1:
+                location = location_elements[1].parent
+                formatted_location = location.text.replace("100% zdalnie", "").replace("(", "").replace(")", "")
+                return formatted_location.strip()
         return None
 
     elif PRACUJPL in search_link:
         loc = html.find("h4", {"data-test": "text-region"})
-        location = loc.strong  # <strong> tag contains location
-        return location.text.strip() if location else None
+        if loc and loc.strong:
+            location = loc.strong.text.replace("Cała Polska (praca zdalna)", "").strip()
+            return location
+        return None
+
+    else:
+        return None
+
+
+def remote_status(html, search_link: str) -> str:
+    """Returns location container content for each website"""
+    if NOFLUFFJOBS in search_link:
+        location_container = {"data-cy": "location on the job offer listing"}
+        locations = html.find_all(attrs=location_container)
+        status = [loc.text.strip() for loc in locations]
+        if "remote" in status:
+            return "Remote"
+        elif "hybrid" in status:
+            return "Hybrid"
+        else:
+            return "Stationary"
+
+    elif THEPROTOCOL in search_link:
+        remote_container = {"data-test": "text-workModes"}
+        job_location_elements = html.find_all(attrs=remote_container)
+        job_location = [job.text.strip().lower() for job in job_location_elements]
+
+        remote_keywords = ["remote", "zdalna"]
+        hybrid_keywords = ["hybrid", "hybrydowa", "remote hybrid"]
+
+        for location in job_location:
+            if any(keyword in location for keyword in remote_keywords):
+                return "Remote"
+            elif any(keyword in location for keyword in hybrid_keywords):
+                return "Hybrid"
+            else:
+                return "Stationary"
+    elif BULLDOGJOB in search_link:
+        remote_container = {
+            "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
+        }
+        details_block = html.find(attrs=remote_container)
+        if details_block:
+            hidden_block = details_block.find("div", class_="hidden")
+            if hidden_block:
+                job_location = [span.text.strip().lower() for span in hidden_block.find_all("span")]
+                if "remote" in job_location:
+                    return "Remote"
+                else:
+                    return "Stationary"
+
+    elif ROCKETJOBS in search_link:
+        MuiBox_block = html.find_all("div", class_="MuiBox-root")
+        location = MuiBox_block[11].find_all("span")
+        if "Praca zdalna" in location[-1].text:
+            return "Remote"
+        else:
+            return "Stationary"
+
+    # Here JustJoinIT differs from RocketJobs by one index
+    elif JUSTJOINIT in search_link:
+        MuiBox_block = html.find_all("div", class_="MuiBox-root")
+        location = MuiBox_block[11].find_all("span")
+        if "remote" in location[-1].text:
+            return "Remote"
+        elif "hybryd" in location[-1].text:
+            return "Hybrid"
+        else:
+            return "Stationary"
+
+    elif SOLIDJOBS in search_link:
+        """
+        Returns location container content for SOLIDJOBS website
+        """
+        location = html.find_all("a", {"mattooltip": True})
+        remote_status = location[-1]
+        if "zdalna" in remote_status.text:
+            return "Remote"
+        elif "hybrydowa" in remote_status.text:
+            return "Hybrid"
+        else:
+            return "Stationary"
+
+    elif PRACUJPL in search_link:
+        additional_info_containers = lambda tag: tag.has_attr("data-test") and tag["data-test"].startswith(
+            "offer-additional-info"
+        )
+        additional_info = html.find_all(additional_info_containers)
+        status = additional_info[-1].text
+        if "zdalna" in status:
+            return "Remote"
+        elif "hybrydowa" in status:
+            return "Hybrid"
+        else:
+            return "Stationary"
 
     else:
         return None

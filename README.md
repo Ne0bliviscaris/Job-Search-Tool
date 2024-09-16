@@ -1,6 +1,9 @@
 # Job-Search-Tool
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 
+Current dataframe state:
+
+![Raw Scraped Screenshot](screenshots/raw_scraped.png)
 
 # TODO:
 ## Data processing
@@ -11,8 +14,6 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 #### Get proper search links
 #### Raw data extraction improvements:
 - Location extraction improvements - making sure that either a list or the proper location is extracted
-- Tags - merging into one field
-- Using || separator between list elements
 #### Synchronization ETL module:
 - Extract elements from raw CSV -> unify them across all sites
 - Use tag and location dictionaries to unify variable elements
@@ -47,6 +48,11 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 - RAG generate unified template from scraped offers
 
 # Changelog:
+#### 16.09.2024
+- Improvement in extracting job location. Added separate field for remote job status
+- Properly extracting salary details (currency etc) 
+- Fixed logo extraction from Nofluffjobs
+- Storing job tags as a string
 #### 14.09.2024
 - Introduced Streamlit
 #### 11.09.2024
