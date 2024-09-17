@@ -2,6 +2,15 @@ import streamlit as st
 
 import modules.sync.sync as sync
 
+st.set_page_config(layout="wide")
+
+column_config = {
+    "url": st.column_config.LinkColumn("URL"),
+    "logo": st.column_config.ImageColumn("Logo", width=100),
+    "id": st.column_config.TextColumn("ID", width=10),
+}
+
+
 st.title("Synchronisation module")
 with st.expander("Plan: Create a synchronisation module"):
     st.markdown(
@@ -39,5 +48,14 @@ with st.expander("Class object to handle the data processing"):
             """
     )
 
-processed = sync.process_records()
-st.write(processed.head())
+
+current_dataset = sync.show_synced_records()
+st.dataframe(current_dataset, column_config=column_config)
+
+if st.button("Synchronize Records"):
+    sync.sync_records()
+
+archive = sync.show_archive()
+if not archive.empty:
+    with st.expander("Archive"):
+        st.dataframe(archive, column_config=column_config)
