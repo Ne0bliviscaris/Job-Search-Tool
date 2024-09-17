@@ -42,8 +42,7 @@ def sync_records():
     # If the record is new, mark it and add a timestamp
     for _, record in raw.iterrows():
         if record["id"] not in current_ids:
-            record["new"] = True
-            record["added_date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            record["added_date"] = datetime.now().strftime("%Y-%m-%d %H:%M")
             new_records.append(record)
 
     # If there are new records, append them to the synced DataFrame
