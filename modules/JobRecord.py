@@ -1,3 +1,4 @@
+import hashlib
 import re
 
 import modules.containers as containers
@@ -7,8 +8,9 @@ class JobRecord:
     def __init__(self, html, website):
         self.html = html
         self.website = website
-        self.title = self.fetch_job_title()
         self.url = self.fetch_url()
+        self.id = self.generate_id_from_url()
+        self.title = self.fetch_job_title()
         self.tags = self.fetch_job_tags()
         self.company_name = self.fetch_company_name()
         self.logo = self.fetch_logo()
@@ -19,6 +21,7 @@ class JobRecord:
 
     def __repr__(self):
         return (
+            f"Record ID: {self.id}\n"
             f"JobRecord:\n"
             f"Title: {self.title}\n"
             f"Url: {self.url}\n"
@@ -33,6 +36,12 @@ class JobRecord:
             f"Salary text: {self.salary_text}\n"
             f"Website: {self.host_site}"
         )
+
+    def generate_id_from_url(self) -> str:
+        """
+        Generate a unique ID based on the URL using SHA-256 hash.
+        """
+        return hashlib.sha256(self.url.encode()).hexdigest()
 
     def fetch_job_title(self) -> str:
         """
@@ -140,6 +149,7 @@ class JobRecord:
             "website": self.host_site,
             "tags": self.tags,
             "url": self.url,
+            "id": self.id,
         }
 
         return record
