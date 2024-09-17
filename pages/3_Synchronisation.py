@@ -1,22 +1,25 @@
 import streamlit as st
 
+import modules.sync.sync as sync
+
 st.title("Synchronisation module")
-
-st.markdown(
-    """
-            #### Plan: Create a synchronisation module
+with st.expander("Plan: Create a synchronisation module"):
+    st.markdown(
+        """
             - Extract data from records.csv and process them into a new file
-
-            #### Idea:
+            """
+    )
+with st.expander("Idea"):
+    st.markdown(
+        """
             - Sync function that will oversee the process:
                 - Create a class that will handle the data processing
                 - Function to move closed offers to the archive and add the date of closure
-
-                
-
-
-
-            #### Class features:
+            """
+    )
+with st.expander("Class object to handle the data processing"):
+    st.markdown(
+        """
             - Unify simillar job tags, split them into categories easy to use in filters
             - Enrich the data with additional information
                 - Date of creation
@@ -33,11 +36,8 @@ st.markdown(
                 - Feedback received
                 - Notes
                 - Personal rating
-                
-
-
-
-            
-            #### Create archive
             """
-)
+    )
+
+processed = sync.process_records()
+st.write(processed.head())
