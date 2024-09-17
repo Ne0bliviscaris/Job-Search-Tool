@@ -50,7 +50,11 @@ with st.expander("Class object to handle the data processing"):
 
 
 current_dataset = sync.show_synced_records()
-st.dataframe(current_dataset, column_config=column_config)
+if not current_dataset.empty:
+    st.dataframe(current_dataset, column_config=column_config)
+else:
+    st.write("No synced records to display")
+
 
 if st.button("Synchronize Records"):
     sync.sync_records()
@@ -59,3 +63,5 @@ archive = sync.show_archive()
 if not archive.empty:
     with st.expander("Archive"):
         st.dataframe(archive, column_config=column_config)
+else:
+    st.write("No archived records to display")
