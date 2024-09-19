@@ -49,6 +49,8 @@ def sync_records():
     if new_records:
         new_records_df = pd.DataFrame(new_records)
         synced_df = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
+    else:
+        synced_df = cleaned_current_file
 
     # Save the updated synced file
     synced_df.to_csv(SYNCED_FILE, index=False)
