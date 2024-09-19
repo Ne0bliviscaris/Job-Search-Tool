@@ -8,16 +8,16 @@ SYNCED_FILE = "modules/sites/synced_records.csv"
 ARCHIVE_FILE = "modules/sites/archived_records.csv"
 
 
-def load_csv(csv):
-    """
-    Load raw CSV file with job offers
-    Return empty DataFrame if file does not exist
-    """
-    try:
-        file = pd.read_csv(csv)
-        return file
-    except FileNotFoundError:
-        return pd.DataFrame()
+def load_csv(file):
+    """Load CSV file, return empty DataFrame if file does not exist."""
+    if os.path.exists(file):
+        return pd.read_csv(file)
+    return pd.DataFrame()
+
+
+def save_csv(dataframe, file_path, mode="w", header=True):
+    """Save DataFrame to CSV file."""
+    dataframe.to_csv(file_path, mode=mode, header=header, index=False)
 
 
 def sync_records():
@@ -32,25 +32,17 @@ def sync_records():
 
     # Archive missing records
     missing_ids = current_ids - raw_ids
-    if missing_ids:
-        cleaned_current_file = archive_records(current_file, missing_ids)
-    else:
-        cleaned_current_file = current_file
+    cleaned_current_file = archive_records(current_file, missing_ids) if missing_ids else current_file
 
     # # If the record is new, mark it and add a timestamp
     new_ids = raw_ids - current_ids
     new_records = raw[raw["id"].isin(new_ids)]
     if not new_records.empty:
         new_records = add_timestamp(new_records, "added_date")
-
-    # If there are new records, append them to the synced DataFrame
-    if not new_records.empty:
-        synced_df = pd.concat([cleaned_current_file, new_records], ignore_index=True)
-    else:
-        synced_df = cleaned_current_file
+        cleaned_current_file = pd.concat([cleaned_current_file, new_records], ignore_index=True)
 
     # Save the updated synced file
-    synced_df.to_csv(SYNCED_FILE, index=False)
+    cleaned_current_file.to_csv(SYNCED_FILE, index=False)
 
 
 def archive_records(synced, missing_ids):
@@ -60,12 +52,11 @@ def archive_records(synced, missing_ids):
     records_to_archive = synced[synced["id"].isin(missing_ids)]
 
     if not records_to_archive.empty:
-        # Add archived_date column
         records_to_archive = add_timestamp(records_to_archive, "archived_date")
 
         # Append records to the archive file, adding header if the file is empty
         is_empty_archive = not os.path.exists(ARCHIVE_FILE) or os.stat(ARCHIVE_FILE).st_size == 0
-        records_to_archive.to_csv(ARCHIVE_FILE, mode="a", header=is_empty_archive, index=False)
+        save_csv(records_to_archive, ARCHIVE_FILE, mode="a", header=is_empty_archive)
 
         # Remove archived records from synced
         synced = synced[~synced["id"].isin(missing_ids)]
@@ -73,20 +64,9 @@ def archive_records(synced, missing_ids):
     return synced
 
 
-def show_synced_records():
-    """
-    Load and display the synced records
-    """
-    synced = load_csv(SYNCED_FILE)
-    return pd.DataFrame(synced) if not synced.empty else pd.DataFrame()
-
-
-def show_archive():
-    """
-    Load and display the archived records
-    """
-    archived = load_csv(ARCHIVE_FILE)
-    return pd.DataFrame(archived) if not archived.empty else pd.DataFrame()
+def show_records(file):
+    """Load and display records from a CSV file."""
+    return load_csv(file)
 
 
 def add_timestamp(records_frame, column_name):
