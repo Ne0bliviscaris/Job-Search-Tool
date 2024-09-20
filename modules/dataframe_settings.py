@@ -1,6 +1,33 @@
 import pandas as pd
 import streamlit as st
 
+ALL_COLUMNS = [
+    # From JobRecords class
+    "title",
+    "logo",
+    "company_name",
+    "location",
+    "remote_status",
+    "min_salary",
+    "max_salary",
+    "salary_details",
+    "salary_text",
+    "website",
+    "tags",
+    "url",
+    # Custom added columns
+    "added_date",
+    "elapsed_days",
+    "application_status",
+    "application_date",
+    "feedback_received",
+    "time_until_feedback",
+    "notes",
+    "personal_rating",
+    "archived_date",
+]
+
+
 MAIN_FRAME_COLUMNS = [
     "title",
     "logo",
