@@ -46,7 +46,7 @@ def sync_records():
     cleaned_current_file = archive_records(current_file, missing_records)
     archived_count = len(missing_records)
 
-    # If the record is new, add custom records
+    # If the record is new, add custom columns
     initial_new_count = len(new_records)
     synced_file = process_new_records(cleaned_current_file, new_records, update)
     final_new_count = len(synced_file) - len(cleaned_current_file)
