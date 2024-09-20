@@ -8,11 +8,12 @@ column_config = {
     "url": st.column_config.LinkColumn("URL"),
     "logo": st.column_config.ImageColumn("Logo", width=100),
     "id": st.column_config.TextColumn("ID", width=10),
+    "added_date": st.column_config.DateColumn("Added Date"),
 }
 
 
-st.title("Synchronisation module")
-with st.expander("Plan: Create a synchronisation module"):
+st.title("Synchronization module")
+with st.expander("Plan: Create a synchronization module"):
     st.markdown(
         """
             - Extract data from records.csv and process them into a new file
@@ -57,7 +58,10 @@ else:
 
 
 if st.button("Synchronize Records"):
-    sync.sync_records()
+    archived_count, added_count = sync.sync_records()
+    st.success(
+        f"Records synchronized successfully!\n{added_count} records added, \n{archived_count} records archived."
+    )
 
 archive = sync.show_records(sync.ARCHIVE_FILE)
 if not archive.empty:
