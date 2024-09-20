@@ -3,6 +3,8 @@ from datetime import datetime
 
 import pandas as pd
 
+from modules.dataframe_settings import ALL_COLUMNS
+
 RAW_FILE = "modules/sites/records.csv"
 SYNCED_FILE = "modules/sites/synced_records.csv"
 ARCHIVE_FILE = "modules/sites/archived_records.csv"
@@ -13,7 +15,7 @@ def load_csv(file):
     """Load CSV file, return empty DataFrame if file does not exist."""
     if os.path.exists(file):
         return pd.read_csv(file)
-    return pd.DataFrame()
+    return pd.DataFrame(columns=ALL_COLUMNS)
 
 
 def save_csv(dataframe, file_path, mode="w", header=True):
@@ -116,6 +118,7 @@ def changed_records():
     """Load files and return missing and new records."""
     update = load_csv(RAW_FILE)
     current_file = load_csv(SYNCED_FILE)
+
     current_records = set_columns(current_file) if not current_file.empty else set()
     update_records = set_columns(update)
 
@@ -134,7 +137,7 @@ def add_timestamp(records_frame, column_name):
     """
     Add a timestamp to the records DataFrame
     """
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    timestamp = datetime.now().strftime("%d-%m-%Y")
     records_frame[column_name] = timestamp
     records_frame[column_name] = pd.to_datetime(records_frame[column_name])
     return records_frame
