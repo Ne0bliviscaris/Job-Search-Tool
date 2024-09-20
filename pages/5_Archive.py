@@ -2,7 +2,7 @@ import os
 
 import streamlit as st
 
-from modules.dataframe_settings import column_conversions, handle_missing_columns
+from modules.dataframe_settings import column_conversions
 from modules.sync.sync import ARCHIVE_FILE, load_csv
 
 
@@ -14,7 +14,6 @@ def archive_frame():
     if os.path.exists(ARCHIVE_FILE):
         archive = load_csv(ARCHIVE_FILE)
         if not archive.empty:
-            archive = handle_missing_columns(archive)
             archive = column_conversions(archive, archive=True)
 
 
