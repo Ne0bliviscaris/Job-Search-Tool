@@ -44,15 +44,43 @@ def sync_records():
 
     # Archive missing records
     cleaned_current_file = archive_records(current_file, missing_records)
+    archived_count = len(missing_records)
 
-    # If the record is new, add a timestamp
-    new_records_df = filter_records(update, new_records)
-    if not new_records_df.empty:
-        new_records_df = add_timestamp(new_records_df, "added_date")
-        cleaned_current_file = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
+    # If the record is new, add custom records
+    initial_new_count = len(new_records)
+    synced_file = process_new_records(cleaned_current_file, new_records, update)
+    final_new_count = len(synced_file) - len(cleaned_current_file)
 
     # Save the updated synced file
-    cleaned_current_file.to_csv(SYNCED_FILE, index=False)
+    synced_file.to_csv(SYNCED_FILE, index=False)
+
+    return archived_count, final_new_count
+
+
+def process_new_records(cleaned_current_file, new_records, update):
+    """
+    Process new records adding custom columns and timestamp
+    """
+    new_records_df = filter_records(update, new_records)
+    if not new_records_df.empty:
+        new_records_df = add_custom_columns(new_records_df)
+        merged_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
+        return merged_frame
+    return cleaned_current_file
+
+
+def add_custom_columns(new_records_df):
+    """
+    Add custom columns to the records DataFrame
+    """
+    new_records_df = add_timestamp(new_records_df, "added_date")
+    new_records_df["applied"] = False
+    new_records_df["application_date"] = pd.NaT
+    new_records_df["feedback_received"] = False
+    new_records_df["notes"] = pd.StringDtype()
+    new_records_df["personal_rating"] = pd.Series([pd.NA, 1, 2, 3, 4, 5])
+
+    return new_records_df
 
 
 def archive_records(current_file, missing_records):
@@ -106,5 +134,7 @@ def add_timestamp(records_frame, column_name):
     """
     Add a timestamp to the records DataFrame
     """
-    records_frame[column_name] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    records_frame[column_name] = timestamp
+    records_frame[column_name] = pd.to_datetime(records_frame[column_name])
     return records_frame
