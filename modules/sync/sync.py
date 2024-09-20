@@ -65,24 +65,10 @@ def process_new_records(cleaned_current_file, new_records, update):
     """
     new_records_df = filter_records(update, new_records)
     if not new_records_df.empty:
-        new_records_df = add_custom_columns(new_records_df)
+        new_records_df = add_timestamp(new_records_df, "added_date")
         merged_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
         return merged_frame
     return cleaned_current_file
-
-
-def add_custom_columns(new_records_df):
-    """
-    Add custom columns to the records DataFrame
-    """
-    new_records_df = add_timestamp(new_records_df, "added_date")
-    new_records_df["applied"] = False
-    new_records_df["application_date"] = pd.NaT
-    new_records_df["feedback_received"] = False
-    new_records_df["notes"] = pd.StringDtype()
-    new_records_df["personal_rating"] = pd.Series([pd.NA, 1, 2, 3, 4, 5])
-
-    return new_records_df
 
 
 def archive_records(current_file, missing_records):
