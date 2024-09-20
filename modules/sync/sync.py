@@ -128,11 +128,6 @@ def changed_records():
     return missing_records, new_records, current_file, update
 
 
-def show_records(file) -> pd.DataFrame:
-    """Load and display records from a CSV file."""
-    return load_csv(file)
-
-
 def add_timestamp(records_frame, column_name):
     """
     Add a timestamp to the records DataFrame

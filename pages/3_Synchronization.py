@@ -1,6 +1,6 @@
 import streamlit as st
 
-import modules.sync.sync as sync
+from modules.sync.sync import ARCHIVE_FILE, SYNCED_FILE, load_csv, sync_records
 
 st.set_page_config(layout="wide")
 
@@ -50,7 +50,7 @@ with st.expander("Class object to handle the data processing"):
     )
 
 
-current_dataset = sync.show_records(sync.SYNCED_FILE)
+current_dataset = load_csv(SYNCED_FILE)
 if not current_dataset.empty:
     st.dataframe(current_dataset, column_config=column_config)
 else:
@@ -58,12 +58,12 @@ else:
 
 
 if st.button("Synchronize Records"):
-    archived_count, added_count = sync.sync_records()
+    archived_count, added_count = sync_records()
     st.success(
         f"Records synchronized successfully!\n{added_count} records added, \n{archived_count} records archived."
     )
 
-archive = sync.show_records(sync.ARCHIVE_FILE)
+archive = load_csv(ARCHIVE_FILE)
 if not archive.empty:
     with st.expander("Archive"):
         st.dataframe(archive, column_config=column_config)
