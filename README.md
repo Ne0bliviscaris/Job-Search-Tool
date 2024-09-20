@@ -46,6 +46,9 @@ Current dataframe state:
 - RAG generate unified template from scraped offers
 
 # Changelog:
+#### 20.09.2024
+- Synchronization module improvements
+- Forcing file structure for synchronization
 #### 19.09.2024
 - Working sync module with archive
 #### 16.09.2024
