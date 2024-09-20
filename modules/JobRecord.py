@@ -1,3 +1,4 @@
+import hashlib
 import re
 
 import modules.containers as containers
@@ -7,8 +8,8 @@ class JobRecord:
     def __init__(self, html, website):
         self.html = html
         self.website = website
-        self.title = self.fetch_job_title()
         self.url = self.fetch_url()
+        self.title = self.fetch_job_title()
         self.tags = self.fetch_job_tags()
         self.company_name = self.fetch_company_name()
         self.logo = self.fetch_logo()

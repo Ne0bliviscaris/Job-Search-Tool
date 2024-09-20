@@ -18,9 +18,7 @@ Current dataframe state:
 - Extract elements from raw CSV -> unify them across all sites
 - Use tag and location dictionaries to unify variable elements
 - Mark new offers as new
-- Move finished offers to archive
-- Gather additional data, like added time, removed time
-- Browseable archive file
+- Gather additional data - application status, feedback etc
 #### Records visualization:
 - Prepare record template - fetch one record from CSV, fill specific fields
 - Initially scrolled up, showing minimal info. Click, to show full record details
@@ -48,6 +46,11 @@ Current dataframe state:
 - RAG generate unified template from scraped offers
 
 # Changelog:
+#### 20.09.2024
+- Synchronization module improvements
+- Forcing file structure for synchronization
+#### 19.09.2024
+- Working sync module with archive
 #### 16.09.2024
 - Improvement in extracting job location. Added separate field for remote job status
 - Properly extracting salary details (currency etc) 
