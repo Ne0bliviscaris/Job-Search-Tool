@@ -39,6 +39,7 @@ MAIN_FRAME_COLUMNS = [
     "min_salary",
     "max_salary",
     "salary_details",
+    "salary_text",
     "website",
     "tags",
     "url",
