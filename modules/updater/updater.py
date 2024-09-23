@@ -34,6 +34,7 @@ def update_all_sites() -> None:
     for link_name, search_link in search_links.items():
         update_site(web_driver, link_name, search_link)
         print(f"Downloaded {link_name}")
+    print("All links downloaded")
 
 
 if __name__ == "__main__":
