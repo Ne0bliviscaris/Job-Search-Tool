@@ -1,15 +1,11 @@
 import streamlit as st
 
+from modules.dataframe_settings import set_column_config
 from modules.sync.sync import ARCHIVE_FILE, SYNCED_FILE, load_csv, sync_records
 
 st.set_page_config(layout="wide")
 
-column_config = {
-    "url": st.column_config.LinkColumn("URL"),
-    "logo": st.column_config.ImageColumn("Logo", width=100),
-    "id": st.column_config.TextColumn("ID", width=10),
-    "added_date": st.column_config.DateColumn("Added Date"),
-}
+column_config = set_column_config()
 
 
 st.title("Synchronization module")
