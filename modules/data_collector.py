@@ -6,43 +6,40 @@ from modules.data_processor import build_dataframe, html_to_soup, process_record
 from modules.websites import search_links
 
 
-def set_filename(search_link):
+def set_filename(link: str) -> str:
     """
     Generate a readable filename based on the combined link
     """
-    return os.path.join("modules/sites", f"{search_link}.html")
+    return os.path.join("modules/sites", f"{link}.html")
 
 
-def search_all_sites():
+def search_all_sites() -> list:
     """
     Search all websites in search_links
     """
-    all_search_results = []
-    for link, search_link in search_links.items():
-        search_result = search_site(link)
-        all_search_results.append(search_result)
-    return all_search_results
+    # Use list comprehension to simplify the loop
+    return [search_site(link) for link in search_links.keys()]
 
 
-def search_site(search_link):
+def search_site(link: str) -> list:
     """
     Get HTML block containing job search results from a file
     """
-    filename = set_filename(search_link)
+    filename = set_filename(link)
     soup = html_to_soup(filename)
-    if soup is None:
-        return []
-    return process_records(soup, search_link)
+
+    job_records = process_records(soup, search_links[link]) if soup is not None else []
+    return job_records
 
 
-def save_dataframe_to_csv(dataframe: pd.DataFrame, filename: str) -> None:
+def save_dataframe_to_csv(dataframe: pd.DataFrame, file_path: str) -> None:
     """
     Save the given DataFrame to a CSV file.
     """
-    dataframe.to_csv(filename, index=False)
+    dataframe.to_csv(file_path, index=False)
 
 
-def all_sites_frame():
+def all_sites_dataframe() -> pd.DataFrame:
     """
     Return a DataFrame containing all job records from all sites.
     """
