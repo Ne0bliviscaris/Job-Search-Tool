@@ -1,8 +1,12 @@
 # Job-Search-Tool
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 
-Current dataframe state:
+---
+### Current dataframe state:
 
+Synchronization module with additional fields - date found, application and feedback status, additional notes
+![Synced records](screenshots/synced_records.png)
+Unified data extracted from multiple websites
 ![Raw Scraped Screenshot](screenshots/raw_scraped.png)
 
 # TODO:
@@ -15,10 +19,7 @@ Current dataframe state:
 #### Raw data extraction improvements:
 - Location extraction improvements - making sure that either a list or the proper location is extracted
 #### Synchronization ETL module:
-- Extract elements from raw CSV -> unify them across all sites
 - Use tag and location dictionaries to unify variable elements
-- Mark new offers as new
-- Gather additional data - application status, feedback etc
 #### Records visualization:
 - Prepare record template - fetch one record from CSV, fill specific fields
 - Initially scrolled up, showing minimal info. Click, to show full record details
@@ -46,6 +47,9 @@ Current dataframe state:
 - RAG generate unified template from scraped offers
 
 # Changelog:
+<details>
+<summary><strong>Click to see the details</strong></summary>
+
 #### 20.09.2024
 - Synchronization module improvements
 - Forcing file structure for synchronization
@@ -87,3 +91,5 @@ The point of failure was rendering site in mobile version by default
 - Added function to turn records into dataframe
 #### 26.08.2024
 - Introduced JobRecord class to handle HTML records
+
+</details>
