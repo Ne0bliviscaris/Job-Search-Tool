@@ -6,8 +6,6 @@ JUSTJOINIT = "https://justjoin.it"
 SOLIDJOBS = "https://solid.jobs"
 PRACUJPL = "https://it.pracuj.pl"
 
-current_website = None
-
 search_links = {
     "nofluffjobs_data-ai-trainee-junior": "https://nofluffjobs.com/pl/artificial-intelligence?criteria=category%3Ddata%20seniority%3Dtrainee,junior",
     "theprotocol_big-data-ai-ml-junior-assistant-trainee": "https://theprotocol.it/filtry/big-data-science,ai-ml;sp/junior,assistant,trainee;p",
@@ -18,26 +16,23 @@ search_links = {
     "pracujpl_data-ai-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science",
 }
 
+websites = {
+    "nofluffjobs": NOFLUFFJOBS,
+    "bulldogjob": BULLDOGJOB,
+    "theprotocol": THEPROTOCOL,
+    "rocketjobs": ROCKETJOBS,
+    "justjoin": JUSTJOINIT,
+    "solid": SOLIDJOBS,
+    "pracuj": PRACUJPL,
+}
+
 
 def identify_website(search_link: str) -> str:
     """
     Set current website based on search link
     """
-    if "nofluffjobs" in search_link:
-        current_website = NOFLUFFJOBS
-    elif "bulldogjob" in search_link:
-        current_website = BULLDOGJOB
-    elif "theprotocol" in search_link:
-        current_website = THEPROTOCOL
-    elif "rocketjobs" in search_link:
-        current_website = ROCKETJOBS
-    elif "justjoin" in search_link:
-        current_website = JUSTJOINIT
-    elif "solid" in search_link:
-        current_website = SOLIDJOBS
-    elif "pracuj" in search_link:
-        current_website = PRACUJPL
-    else:
-        current_website = "Error: Website not recognized"
-
-    return current_website
+    # Iterate over the website_map to find the matching website
+    for key, website in websites.items():
+        if key in search_link:
+            return website
+    return "Error: Website not recognized"

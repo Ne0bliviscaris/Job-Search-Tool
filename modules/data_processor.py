@@ -21,8 +21,7 @@ def build_dataframe(records):
     """
     records_list = [item for sublist in records for item in sublist]
     flattened_records = [record.prepare_dataframe() for record in records_list]
-    df = pd.DataFrame(flattened_records)
-    return df
+    return pd.DataFrame(flattened_records)
 
 
 def html_to_soup(filename):
