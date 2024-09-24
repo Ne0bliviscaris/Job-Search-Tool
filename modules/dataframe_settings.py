@@ -28,7 +28,6 @@ ALL_COLUMNS = [
     "archived_date",
 ]
 
-
 MAIN_FRAME_COLUMNS = [
     # From JobRecords class
     "title",
@@ -80,32 +79,40 @@ def set_column_config(archive=False):
     date_format = "DD-MM-YYYY"
     date_column = lambda name: st.column_config.DateColumn(name, format=date_format)
     application_statuses = ["Not applied", "Applied", "Interview", "Hired"]
-    return {
+
+    static_columns = {
         "title": st.column_config.TextColumn("Title", disabled=True),
-        "logo": st.column_config.ImageColumn("Logo", width=100),
         "company_name": st.column_config.TextColumn("Company Name", disabled=True),
         "location": st.column_config.TextColumn("Location", disabled=True),
         "remote_status": st.column_config.TextColumn("Remote Status", disabled=True),
-        "min_salary": st.column_config.NumberColumn("Min Salary", disabled=True),
-        "max_salary": st.column_config.NumberColumn("Max Salary", disabled=True),
         "salary_details": st.column_config.TextColumn("Salary Details", disabled=True),
         "salary_text": st.column_config.TextColumn("Salary Text", disabled=True),
-        "website": st.column_config.LinkColumn("Website", disabled=True),
         "tags": st.column_config.TextColumn("Tags", disabled=True),
+        "logo": st.column_config.ImageColumn("Logo", width=100),
+        "min_salary": st.column_config.NumberColumn("Min Salary", disabled=True),
+        "max_salary": st.column_config.NumberColumn("Max Salary", disabled=True),
+        "elapsed_days": st.column_config.NumberColumn("Elapsed Days", disabled=True),
+        "website": st.column_config.LinkColumn("Website", disabled=True),
         "url": st.column_config.LinkColumn("URL", width=100, disabled=True),
         "added_date": date_column("Added date"),
         "archived_date": date_column("Archived date"),
-        "elapsed_days": st.column_config.NumberColumn("Elapsed Days", disabled=True),
+    }
+
+    editable_columns = {
         "application_status": st.column_config.SelectboxColumn(
             "Application Status", options=application_statuses, default="Not applied", disabled=archive
         ),
-        "application_date": date_column("Application date"),
-        "feedback_received": st.column_config.CheckboxColumn("Feedback received", disabled=archive),
-        "feedback_date": date_column("Feedback date"),
-        "time_until_feedback": st.column_config.NumberColumn("Time Until Feedback", disabled=archive),
         "notes": st.column_config.TextColumn("Notes", disabled=archive),
         "personal_rating": st.column_config.NumberColumn("Personal Rating", disabled=False),
+        "time_until_feedback": st.column_config.NumberColumn("Time Until Feedback", disabled=archive),
+        "feedback_received": st.column_config.CheckboxColumn("Feedback received", disabled=archive),
+        "application_date": date_column("Application date"),
+        "feedback_date": date_column("Feedback date"),
     }
+
+    # Combine both dictionaries
+    column_config = {**static_columns, **editable_columns}
+    return column_config
 
 
 def column_conversions(frame, archive=False):
