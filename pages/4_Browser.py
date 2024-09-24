@@ -12,11 +12,11 @@ def main_frame():
     """Main function to display the job offers browser as dataframe."""
     st.title("Active job offers")
     if os.path.exists(SYNCED_FILE):
-        main_frame = load_csv(SYNCED_FILE)
-        if not main_frame.empty:
-            edited_df = column_conversions(main_frame)
+        raw_frame = load_csv(SYNCED_FILE)
+        if not raw_frame.empty:
+            main_frame = column_conversions(raw_frame)
             if st.button("Save Changes"):
-                save_csv(edited_df, SYNCED_FILE)
+                save_csv(main_frame, SYNCED_FILE)
                 st.success("Changes saved successfully!")
 
 
