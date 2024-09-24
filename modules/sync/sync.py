@@ -49,16 +49,17 @@ def sync_records():
 
     # Archive missing records
     cleaned_current_file = archive_records(current_file, missing_records)
-    archived_count = len(missing_records)
 
     # If the record is new, add custom columns
     synced_file = process_new_records(cleaned_current_file, new_records, update)
-    final_new_count = len(synced_file) - len(cleaned_current_file)
 
     # Save the updated synced file
     save_csv(synced_file, SYNCED_FILE)
 
-    return archived_count, final_new_count
+    # Return the archived and new records as DataFrames
+    missing_records = filter_records(current_file, missing_records)
+    new_records = filter_records(update, new_records)
+    return missing_records, new_records
 
 
 def process_new_records(cleaned_current_file: pd.DataFrame, new_records: set, update: pd.DataFrame) -> pd.DataFrame:
