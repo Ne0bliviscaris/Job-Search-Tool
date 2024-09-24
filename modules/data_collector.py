@@ -44,4 +44,6 @@ def all_sites_dataframe() -> pd.DataFrame:
     Return a DataFrame containing all job records from all sites.
     """
     search_results = search_all_sites()
-    return build_dataframe(search_results)
+    all_records_frame = build_dataframe(search_results)
+    cleaned_frame = all_records_frame.drop_duplicates()
+    return cleaned_frame
