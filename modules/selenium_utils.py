@@ -29,12 +29,13 @@ def setup_webdriver() -> webdriver.Chrome:
 
     # Chrome options
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")  # Run Chrome in headless mode - no window is displayed
+    options.add_argument("--headless=old")  # Run Chrome in headless mode - no window is displayed
     options.add_argument("--disable-gpu")  # Disable GPU (optional but recommended in headless mode)
     # options.add_argument("--disable-software-rasterizer")
     options.add_argument("--no-sandbox")  # Disable sandbox (optional but may help in some cases)
     options.add_argument("--disable-dev-shm-usage")  # Disable shared memory (optional but may help in some cases)
     options.add_argument("window-size=1920,1080")  # Always force PC version of the website
+    options.add_argument("--window-position=-2400,-2400")  # In case blank window is displayed, move it off-screen
 
     # Return WebDriver instance
     return webdriver.Chrome(service=webdriver_service, options=options)

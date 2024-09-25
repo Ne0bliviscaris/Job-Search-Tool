@@ -6,7 +6,7 @@ from modules.JobRecord import JobRecord
 from modules.websites import identify_website
 
 
-def process_records(soup_object, link):
+def process_records(soup_object: BeautifulSoup, link: str) -> list[JobRecord]:
     """
     Process HTML soup into JobRecord objects
     """
@@ -15,22 +15,16 @@ def process_records(soup_object, link):
     return [JobRecord(record, current_website) for record in records]
 
 
-def build_dataframe(records):
-    """
-    Convert a flattened list of JobRecord objects to a pandas DataFrame
-    """
+def build_dataframe(records: list[list[JobRecord]]) -> pd.DataFrame:
+    """Convert a flattened list of JobRecord objects to a pandas DataFrame"""
     records_list = [item for sublist in records for item in sublist]
     flattened_records = [record.prepare_dataframe() for record in records_list]
-    df = pd.DataFrame(flattened_records)
-    return df
+    return pd.DataFrame(flattened_records)
 
 
-def html_to_soup(filename):
+def html_to_soup(filename: str) -> BeautifulSoup:
     """
     Convert HTML file to BeautifulSoup object
     """
-    PRINTS = False
-    if PRINTS:
-        print(f"[data_processor.py - html_to_soup] Reading HTML from: {filename}")
     with open(filename, "r", encoding="utf-8") as file:
         return BeautifulSoup(file, "html.parser")

@@ -89,7 +89,7 @@ def url(record, search_link) -> str:
 
     elif PRACUJPL in search_link:
         url_a = record.find("a", {"data-test": "link-offer"})
-        url = url_a.get("href")
+        url = url_a.get("href") if url_a else None
 
     if url:
         if url.startswith("http"):

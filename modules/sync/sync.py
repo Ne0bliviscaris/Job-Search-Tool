@@ -11,7 +11,7 @@ ARCHIVE_FILE = "modules/sites/archived_records.csv"
 COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text"]
 
 
-def load_csv(file):
+def load_csv(file: str) -> pd.DataFrame:
     """Load CSV file, return empty DataFrame if file does not exist."""
     if os.path.exists(file):
         return pd.read_csv(file)
@@ -23,12 +23,15 @@ def save_csv(dataframe, file_path, mode="w", header=True):
     dataframe.to_csv(file_path, mode=mode, header=header, index=False)
 
 
-def set_columns(file):
+def set_columns(file: pd.DataFrame) -> set:
     """Set columns for the DataFrame."""
-    return set(file[COLUMNS_TO_COMPARE].apply(tuple, axis=1))
+    columns_to_compare = file[COLUMNS_TO_COMPARE]
+    rows_as_tuples = columns_to_compare.apply(tuple, axis=1)
+    rows_to_compare = set(rows_as_tuples)
+    return rows_to_compare
 
 
-def filter_records(df, records):
+def filter_records(df, records) -> pd.DataFrame:
     """Returns only df records matching given records.
     Compares content of columns specified in COLUMNS_TO_COMPARE."""
     columns = df[COLUMNS_TO_COMPARE]
@@ -46,49 +49,31 @@ def sync_records():
 
     # Archive missing records
     cleaned_current_file = archive_records(current_file, missing_records)
-    archived_count = len(missing_records)
 
     # If the record is new, add custom columns
-    initial_new_count = len(new_records)
     synced_file = process_new_records(cleaned_current_file, new_records, update)
-    final_new_count = len(synced_file) - len(cleaned_current_file)
 
     # Save the updated synced file
-    synced_file.to_csv(SYNCED_FILE, index=False)
+    save_csv(synced_file, SYNCED_FILE)
 
-    return archived_count, final_new_count
+    # Return the archived and new records as DataFrames
+    missing_records = filter_records(current_file, missing_records)
+    new_records = filter_records(update, new_records)
+    return missing_records, new_records
 
 
-def process_new_records(cleaned_current_file, new_records, update):
-    """
-    Process new records adding custom columns and timestamp
-    """
+def process_new_records(cleaned_current_file: pd.DataFrame, new_records: set, update: pd.DataFrame) -> pd.DataFrame:
+    """Process new records adding custom columns and timestamp."""
     new_records_df = filter_records(update, new_records)
     if not new_records_df.empty:
-        new_records_df = add_custom_columns(new_records_df)
+        new_records_df = add_timestamp(new_records_df, "added_date")
         merged_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
         return merged_frame
     return cleaned_current_file
 
 
-def add_custom_columns(new_records_df):
-    """
-    Add custom columns to the records DataFrame
-    """
-    new_records_df = add_timestamp(new_records_df, "added_date")
-    new_records_df["applied"] = False
-    new_records_df["application_date"] = pd.NaT
-    new_records_df["feedback_received"] = False
-    new_records_df["notes"] = pd.StringDtype()
-    new_records_df["personal_rating"] = pd.Series([pd.NA, 1, 2, 3, 4, 5])
-
-    return new_records_df
-
-
-def archive_records(current_file, missing_records):
-    """
-    Archive missing records from synced file
-    """
+def archive_records(current_file: pd.DataFrame, missing_records: set) -> pd.DataFrame:
+    """Archive missing records from synced file."""
     records_to_archive = filter_records(current_file, missing_records)
 
     if not records_to_archive.empty:
@@ -104,17 +89,18 @@ def archive_records(current_file, missing_records):
     return current_file
 
 
-def remove_archived_records(df, records_to_remove):
-    """
-    Remove records from DataFrame based on compared columns content.
-    """
+def remove_archived_records(df: pd.DataFrame, records_to_remove: set) -> pd.DataFrame:
+    """Remove records from DataFrame based on compared columns content."""
     columns = df[COLUMNS_TO_COMPARE]
     rows_as_tuples = columns.apply(tuple, axis=1)
+
+    # Filter out rows that are in records_to_remove
     not_in_records_to_remove = ~rows_as_tuples.isin(records_to_remove)
-    return df[not_in_records_to_remove]
+    cleaned_df = df[not_in_records_to_remove]
+    return cleaned_df
 
 
-def changed_records():
+def changed_records() -> tuple:
     """Load files and return missing and new records."""
     update = load_csv(RAW_FILE)
     current_file = load_csv(SYNCED_FILE)
@@ -129,9 +115,7 @@ def changed_records():
 
 
 def add_timestamp(records_frame, column_name):
-    """
-    Add a timestamp to the records DataFrame
-    """
+    """Add a timestamp to the records DataFrame."""
     timestamp = datetime.now().strftime("%d-%m-%Y")
     records_frame[column_name] = timestamp
     records_frame[column_name] = pd.to_datetime(records_frame[column_name])

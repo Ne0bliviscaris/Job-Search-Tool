@@ -1,51 +1,90 @@
 # Job-Search-Tool
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
+<br><br>
 
-Current dataframe state:
+# Current progress:
+<details>
+  <summary>Synchronization module with additional fields - date found, application and feedback status, additional notes</summary>
+  
+  ![Synced records](screenshots/synced_records.png)
+</details>
 
-![Raw Scraped Screenshot](screenshots/raw_scraped.png)
+---
+<details>
+  <summary>Synchronization module panel</summary>
+---
+
+  ![Synced records](screenshots/sync_module.png)
+</details>
+
+---
+
+<details>
+  <summary>Unified data extracted from multiple websites</summary>
+  
+  ![Raw Scraped Screenshot](screenshots/raw_scraped.png)
+</details>
+
+---
+<br><br>
 
 # TODO:
-## Data processing
-#### Location fetching adjustments
-- If site puts selected location on first place - use only the first location
-- Else - fetch html with location block hovered to show extract list of all locations
 
-#### Get proper search links
-#### Raw data extraction improvements:
-- Location extraction improvements - making sure that either a list or the proper location is extracted
-#### Synchronization ETL module:
-- Extract elements from raw CSV -> unify them across all sites
-- Use tag and location dictionaries to unify variable elements
-- Mark new offers as new
-- Gather additional data - application status, feedback etc
-#### Records visualization:
-- Prepare record template - fetch one record from CSV, fill specific fields
-- Initially scrolled up, showing minimal info. Click, to show full record details
+<details>
+  <summary>Data processing</summary>
 
-- Add additional editable fields: 
-    - Mark as applied button - saves current time as time applied
-    - Application status - not applied, applied, rejected
-    - Feedback status - received or not received
-    - Note field for feedback
-    - Mark as interesting, prefferable 1-5 stars ranking
+  #### Location fetching adjustments
+  - If site puts selected location on first place - use only the first location
+  - Else - fetch html with location block hovered to show extract list of all locations
 
-## Cloud related issues
-#### Session and data access:
-- Introduce session for admin user
-- Columns not for public info available only for admin
-- Saving data/files available only for admin
-#### Move to docker container and host it remotely
-- Run updater on a scheduler
+  #### Get proper search links
+  #### Raw data extraction improvements:
+  - Location extraction improvements - making sure that either a list or the proper location is extracted
+  #### Synchronization ETL module:
+  - Use tag and location dictionaries to unify variable elements
+  #### Records visualization:
+  - Prepare record template - fetch one record from CSV, fill specific fields
+  - Initially scrolled up, showing minimal info. Click, to show full record details
 
+</details>
+
+<details>
+  <summary>Cloud related issues</summary>
+
+  #### Session and data access:
+  - Introduce session for admin user
+  - Columns not for public info available only for admin
+  - Saving data/files available only for admin
+  #### Move to docker container and host it remotely
+  - Run updater on a scheduler
+
+</details>
+
+---
+
+<br><br>
 
 # Ideas for the future:
-- Scrape each interesting offer (3+ stars)
-- Fetch and unify requirements, additional info etc
-- Build RAG using my CV to analyze each offer in relation to my skills
-- RAG generate unified template from scraped offers
+<details>
+  <summary>Ideas for the future</summary>
+
+  - Scrape each interesting offer (3+ stars)
+  - Fetch and unify requirements, additional info etc
+  - Build RAG using CV to analyze each offer in relation to skills
+  - Use RAG with scraped offers to generate unified offer template
+</details>
+
+---
+<br><br>
 
 # Changelog:
+<details>
+<summary><strong>Click to see the details</strong></summary>
+
+#### 25.09.2024
+- Refactoring
+- Minor tweaks and bugfixes
+- Synchronization tab shows only changed records
 #### 20.09.2024
 - Synchronization module improvements
 - Forcing file structure for synchronization
@@ -87,3 +126,5 @@ The point of failure was rendering site in mobile version by default
 - Added function to turn records into dataframe
 #### 26.08.2024
 - Introduced JobRecord class to handle HTML records
+
+</details>
