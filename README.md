@@ -7,7 +7,7 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 Synchronization module with additional fields - date found, application and feedback status, additional notes
 ![Synced records](screenshots/synced_records.png)
 Synchronization module panel
-![Synced records](screenshots/synced_module.png)
+![Synced records](screenshots/sync_module.png)
 Unified data extracted from multiple websites
 ![Raw Scraped Screenshot](screenshots/raw_scraped.png)
 
