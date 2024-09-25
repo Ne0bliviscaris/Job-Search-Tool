@@ -1,6 +1,8 @@
 import pandas as pd
 import streamlit as st
 
+pd.set_option("future.no_silent_downcasting", True)
+
 ALL_COLUMNS = [
     # From JobRecords class
     "title",
@@ -142,7 +144,7 @@ def convert_date_columns(frame):
 def fill_missing_values(frame):
     """Fill missing values and convert types."""
     frame["notes"] = frame["notes"].fillna("").astype(str)
-    frame["feedback_received"] = frame["feedback_received"].astype(bool)
+    frame["feedback_received"] = frame["feedback_received"].fillna(False).astype(bool)
     frame["application_status"] = frame["application_status"].fillna("Not applied").astype(str)
     return frame
 
