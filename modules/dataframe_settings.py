@@ -93,12 +93,11 @@ def set_column_config(archive=False):
         "max_salary": st.column_config.NumberColumn("Max Salary", disabled=True),
         "elapsed_days": st.column_config.NumberColumn("Elapsed Days", disabled=True),
         "website": st.column_config.LinkColumn("Website", disabled=True),
-        "url": st.column_config.LinkColumn("URL", width=100, disabled=True),
         "added_date": date_column("Added date"),
         "archived_date": date_column("Archived date"),
     }
 
-    editable_columns = {
+    conditionally_editable_columns = {
         "application_status": st.column_config.SelectboxColumn(
             "Application Status", options=application_statuses, default="Not applied", disabled=archive
         ),
@@ -108,10 +107,11 @@ def set_column_config(archive=False):
         "feedback_received": st.column_config.CheckboxColumn("Feedback received", disabled=archive),
         "application_date": date_column("Application date"),
         "feedback_date": date_column("Feedback date"),
+        "url": st.column_config.LinkColumn("URL", width=100, disabled=archive),
     }
 
     # Combine both dictionaries
-    column_config = {**static_columns, **editable_columns}
+    column_config = {**static_columns, **conditionally_editable_columns}
     return column_config
 
 
