@@ -6,6 +6,8 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 
 Synchronization module with additional fields - date found, application and feedback status, additional notes
 ![Synced records](screenshots/synced_records.png)
+Synchronization module panel
+![Synced records](screenshots/synced_module.png)
 Unified data extracted from multiple websites
 ![Raw Scraped Screenshot](screenshots/raw_scraped.png)
 
@@ -23,13 +25,6 @@ Unified data extracted from multiple websites
 #### Records visualization:
 - Prepare record template - fetch one record from CSV, fill specific fields
 - Initially scrolled up, showing minimal info. Click, to show full record details
-
-- Add additional editable fields: 
-    - Mark as applied button - saves current time as time applied
-    - Application status - not applied, applied, rejected
-    - Feedback status - received or not received
-    - Note field for feedback
-    - Mark as interesting, prefferable 1-5 stars ranking
 
 ## Cloud related issues
 #### Session and data access:
@@ -50,6 +45,10 @@ Unified data extracted from multiple websites
 <details>
 <summary><strong>Click to see the details</strong></summary>
 
+#### 25.09.2024
+- Refactoring
+- Minor tweaks and bugfixes
+- Synchronization tab shows only changed records
 #### 20.09.2024
 - Synchronization module improvements
 - Forcing file structure for synchronization
