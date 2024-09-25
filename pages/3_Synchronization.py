@@ -1,7 +1,7 @@
 import streamlit as st
 
 from modules.dataframe_settings import set_column_config
-from modules.sync.sync import ARCHIVE_FILE, SYNCED_FILE, load_csv, sync_records
+from modules.sync.sync import sync_records
 
 st.set_page_config(layout="wide")
 
