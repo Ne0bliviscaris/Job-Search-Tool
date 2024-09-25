@@ -30,11 +30,12 @@ def update_all_sites() -> None:
     """
     Download HTML content for all search links and save them to files.
     """
-    web_driver = setup_webdriver()
-    for link_name, search_link in search_links.items():
-        update_site(web_driver, link_name, search_link)
-        print(f"Downloaded {link_name}")
-    print("All links downloaded")
+
+    with setup_webdriver() as web_driver:
+        for link_name, search_link in search_links.items():
+            update_site(web_driver, link_name, search_link)
+            print(f"Downloaded {link_name}")
+        print("All links downloaded")
 
 
 if __name__ == "__main__":
