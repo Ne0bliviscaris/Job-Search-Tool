@@ -1,4 +1,5 @@
 import os
+import time
 
 from modules.data_collector import set_filename
 from modules.selenium_utils import scrape, setup_webdriver
@@ -38,5 +39,22 @@ def update_all_sites() -> None:
         print("All links downloaded")
 
 
+def streamlit_update_all(st) -> None:
+    """
+    Download HTML content for all search links and save them to files.
+    """
+
+    with setup_webdriver() as web_driver:
+        status_box = st.empty()
+        for link_name, search_link in search_links.items():
+            update_site(web_driver, link_name, search_link)
+            status_box.success(f"Downloaded: {link_name}")
+            time.sleep(3)  # Wait for 2 seconds before clearing the message
+            status_box.empty()
+        status_box.success("Processing websites")
+        time.sleep(3)
+        status_box.empty()
+
+
 if __name__ == "__main__":
-    update_all_sites()
+    streamlit_update_all()
