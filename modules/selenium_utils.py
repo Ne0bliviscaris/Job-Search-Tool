@@ -10,11 +10,15 @@ def get_container(driver: webdriver.Chrome, search_link: str) -> str:
     Get the HTML content of the search container using Selenium
     """
     search_container = containers.search(search_link)
+    if not search_container:
+        print(f"No results for: {search_link}")
+        return ""
     try:
         search_block = driver.find_element(By.CSS_SELECTOR, search_container)
         return search_block.get_attribute("outerHTML")
     except Exception as e:
-        raise RuntimeError(f"Selenium_utils.get_container: Failed to find the element: {e}")
+        print(f"No results for: {search_link}")
+        return ""
 
 
 def setup_webdriver() -> webdriver.Chrome:
