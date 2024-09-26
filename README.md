@@ -3,10 +3,10 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 <br><br>
 
 # Demonstration:
-  <video width="600" controls>
-    <source src="demo/Job-Search-Tool-Demo.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+
+https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
+
+
 
 ---
 <br><br>
