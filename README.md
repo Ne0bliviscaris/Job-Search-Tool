@@ -2,28 +2,11 @@
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 <br><br>
 
-# Current progress:
-<details>
-  <summary>Synchronization module with additional fields - date found, application and feedback status, additional notes</summary>
-  
-  ![Synced records](screenshots/synced_records.png)
-</details>
-
----
-<details>
-  <summary>Synchronization module panel</summary>
----
-
-  ![Synced records](screenshots/sync_module.png)
-</details>
-
----
-
-<details>
-  <summary>Unified data extracted from multiple websites</summary>
-  
-  ![Raw Scraped Screenshot](screenshots/raw_scraped.png)
-</details>
+# Demonstration:
+  <video width="600" controls>
+    <source src="demo/Job-Search-Tool-Demo.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 
 ---
 <br><br>
