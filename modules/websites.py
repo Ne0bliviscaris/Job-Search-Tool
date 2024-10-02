@@ -10,7 +10,7 @@ search_links = {
     # # Remote offers
     "nofluffjobs_data-ai-trainee-junior-remote": "https://nofluffjobs.com/pl/praca-zdalna/artificial-intelligence?criteria=category%3Ddata%20seniority%3Dtrainee,junior",
     "theprotocol_python-big-data-ai-ml-junior-assistant-trainee-remote": "https://theprotocol.it/filtry/python;t/big-data-science,ai-ml;sp/junior,assistant,trainee;p/zdalna;rw",
-    "bulldogjob_data-remote": "https://bulldogjob.pl/companies/jobs/s/locationDistance,50/role,data/city,Remote",
+    "bulldogjob_data-junior-remote": "https://bulldogjob.pl/companies/jobs/s/role,data/city,Remote/experienceLevel,junior,intern",
     "rocketjobs_data-junior-remote": "https://rocketjobs.pl/wszystkie-lokalizacje/bi-data/doswiadczenie_staz-junior/praca-zdalna_tak",
     "justjoinit_data-junior-remote": "https://justjoin.it/all-locations/data/experience-level_junior/remote_yes?orderBy=DESC&sortBy=newest",
     "justjoinit_ai-junior-remote": "https://justjoin.it/all-locations/ai/experience-level_junior/remote_yes?orderBy=DESC&sortBy=newest",
