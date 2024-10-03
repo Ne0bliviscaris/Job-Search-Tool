@@ -35,11 +35,13 @@ def setup_webdriver() -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=old")  # Run Chrome in headless mode - no window is displayed
     options.add_argument("--disable-gpu")  # Disable GPU (optional but recommended in headless mode)
-    # options.add_argument("--disable-software-rasterizer")
     options.add_argument("--no-sandbox")  # Disable sandbox (optional but may help in some cases)
     options.add_argument("--disable-dev-shm-usage")  # Disable shared memory (optional but may help in some cases)
     options.add_argument("window-size=1920,1080")  # Always force PC version of the website
     options.add_argument("--window-position=-2400,-2400")  # In case blank window is displayed, move it off-screen
+    options.add_argument("--log-level=2")  # Hide unnecessary logs
+    options.add_argument("--disable-webgl")  # Disable WebGL
+    options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})
 
     # Return WebDriver instance
     return webdriver.Chrome(service=webdriver_service, options=options)
@@ -50,6 +52,5 @@ def scrape(web_driver, search_link: str) -> str:
     Scrape given link using Selenium
     """
     web_driver.get(search_link)
-    web_driver.implicitly_wait(10)
     html_content = get_container(web_driver, search_link)
     return html_content
