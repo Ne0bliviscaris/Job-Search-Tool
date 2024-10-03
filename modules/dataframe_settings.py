@@ -69,6 +69,7 @@ ARCHIVE_COLUMNS = [
     "url",
     "website",
     "added_date",
+    "elapsed_days",
     "application_date",
     "feedback_received",
     "notes",
