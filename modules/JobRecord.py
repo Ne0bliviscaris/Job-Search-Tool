@@ -140,10 +140,10 @@ class JobRecord:
             "max_salary": self.salary_max,
             "salary_details": self.salary_details,
             "salary_text": self.salary_text,
-            "website": self.host_site,
             "tags": self.tags,
             "url": self.url,
             "added_date": self.added_date,
+            "website": self.host_site,
         }
 
         return record
