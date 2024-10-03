@@ -256,7 +256,7 @@ def location(html, search_link: str) -> dict:
         location_container = {"data-cy": "location on the job offer listing"}
         location = html.find(attrs=location_container)
         if location:
-            if "zdalnie" not in location.text:
+            if "Zdalnie" not in location.text:
                 return location.text
         return None
 
