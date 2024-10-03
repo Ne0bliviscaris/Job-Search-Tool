@@ -1,22 +1,25 @@
+# Requests.get viable
 NOFLUFFJOBS = "https://nofluffjobs.com"
-THEPROTOCOL = "https://theprotocol.it"
+PRACUJPL = "https://it.pracuj.pl"
 BULLDOGJOB = "https://bulldogjob.pl"
+# Selenium required
+THEPROTOCOL = "https://theprotocol.it"
 ROCKETJOBS = "https://rocketjobs.pl"
 JUSTJOINIT = "https://justjoin.it"
 SOLIDJOBS = "https://solid.jobs"
-PRACUJPL = "https://it.pracuj.pl"
 
 search_links = {
     # # Remote offers
     "nofluffjobs_data-ai-trainee-junior-remote": "https://nofluffjobs.com/pl/praca-zdalna/artificial-intelligence?criteria=category%3Ddata%20seniority%3Dtrainee,junior",
-    "theprotocol_python-big-data-ai-ml-junior-assistant-trainee-remote": "https://theprotocol.it/filtry/python;t/big-data-science,ai-ml;sp/junior,assistant,trainee;p/zdalna;rw",
+    "pracujpl_data-ai-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science",
+    "pracujpl_data-ai-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science",
     "bulldogjob_data-junior-remote": "https://bulldogjob.pl/companies/jobs/s/role,data/city,Remote/experienceLevel,junior,intern",
+    "theprotocol_python-big-data-ai-ml-junior-assistant-trainee-remote": "https://theprotocol.it/filtry/python;t/big-data-science,ai-ml;sp/junior,assistant,trainee;p/zdalna;rw",
     "rocketjobs_data-junior-remote": "https://rocketjobs.pl/wszystkie-lokalizacje/bi-data/doswiadczenie_staz-junior/praca-zdalna_tak",
     "justjoinit_data-junior-remote": "https://justjoin.it/all-locations/data/experience-level_junior/remote_yes?orderBy=DESC&sortBy=newest",
     "justjoinit_ai-junior-remote": "https://justjoin.it/all-locations/ai/experience-level_junior/remote_yes?orderBy=DESC&sortBy=newest",
     "solidjobs_data-junior-remote": "https://solid.jobs/offers/it;cities=Praca%20zdalna;categories=Data%20Science;experiences=Junior",
-    "pracujpl_data-ai-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science",
-    "pracujpl_data-ai-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science",
+    #
     # # Hybrid/local offers
     # "nofluffjobs_data-ai-trainee-junior-poznan": "https://nofluffjobs.com/pl/hybrid/artificial-intelligence?criteria=city%3Dpoznan%20category%3Ddata%20seniority%3Dtrainee,junior",
     # "theprotocol_python-big-data-ai-ml-junior-assistant-trainee-poznan": "https://theprotocol.it/filtry/python;t/big-data-science,ai-ml;sp/junior,assistant,trainee;p/poznan;wp/hybrydowa,zdalna;rw",
