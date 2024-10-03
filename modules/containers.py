@@ -255,7 +255,10 @@ def location(html, search_link: str) -> dict:
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
         location = html.find(attrs=location_container)
-        return location.text if location else None
+        if location:
+            if "zdalnie" not in location.text:
+                return location.text
+        return None
 
     elif THEPROTOCOL in search_link:
         location_container = {"data-test": "text-workplaces"}
@@ -301,7 +304,7 @@ def location(html, search_link: str) -> dict:
         MuiBox_block = html.find_all("div", class_="MuiBox-root")
         location_elements = MuiBox_block[11].find_all("span")
         locations = [loc.text for loc in location_elements[1:]]
-        return locations[0]
+        return locations[0] if not "Poland (Remote)" in locations[0] else None
 
     elif SOLIDJOBS in search_link:
         """
