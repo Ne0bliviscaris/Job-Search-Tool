@@ -11,9 +11,7 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 - Fix website links
 - Introduce faster scraping method wherever possible
 - Move filling 'added date' column to JobRecord class
-- Fix location fetching: 
-    - " zdalnie" (NFJ)
-    - "Poland (Remote)" (Justjoin)
+
 
 ---
 <br><br>
