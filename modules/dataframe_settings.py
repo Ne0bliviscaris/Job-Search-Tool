@@ -14,9 +14,9 @@ ALL_COLUMNS = [
     "max_salary",
     "salary_details",
     "salary_text",
-    "website",
     "tags",
     "url",
+    "website",
     # Custom added columns
     "added_date",
     "elapsed_days",
@@ -41,10 +41,12 @@ MAIN_FRAME_COLUMNS = [
     "max_salary",
     "salary_details",
     "salary_text",
-    "website",
     "tags",
     "url",
+    "website",
     # Custom added columns
+    "notes",
+    "personal_rating",
     "added_date",
     "elapsed_days",
     "application_status",
@@ -52,8 +54,6 @@ MAIN_FRAME_COLUMNS = [
     "feedback_received",
     "feedback_date",
     "time_until_feedback",
-    "notes",
-    "personal_rating",
 ]
 
 ARCHIVE_COLUMNS = [
@@ -66,8 +66,10 @@ ARCHIVE_COLUMNS = [
     "max_salary",
     "salary_details",
     "tags",
-    "added_date",
     "url",
+    "website",
+    "added_date",
+    "elapsed_days",
     "application_date",
     "feedback_received",
     "notes",

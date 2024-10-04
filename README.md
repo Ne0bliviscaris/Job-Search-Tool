@@ -6,8 +6,6 @@ Organizer for job searching across multiple sites. Fetch offers, measure recruit
 
 https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 
-
-
 ---
 <br><br>
 
@@ -63,6 +61,10 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 # Changelog:
 <details>
 <summary><strong>Click to see the details</strong></summary>
+
+#### 04.10.2024
+- Updated download links
+- Minor performance and data processing tweaks
 
 #### 25.09.2024
 - Refactoring

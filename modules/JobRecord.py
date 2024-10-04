@@ -1,5 +1,5 @@
-import hashlib
 import re
+from datetime import datetime
 
 import modules.containers as containers
 
@@ -17,6 +17,7 @@ class JobRecord:
         self.remote_status = self.fetch_remote_status()
         self.salary_min, self.salary_max, self.salary_details, self.salary_text = self.fetch_salary_range()
         self.host_site = self.host_site()
+        self.added_date = self.current_date()
 
     def __repr__(self):
         return (
@@ -33,6 +34,7 @@ class JobRecord:
             f"Salary details: {self.salary_details}\n"
             f"Salary text: {self.salary_text}\n"
             f"Website: {self.host_site}"
+            f"Added date: {self.current_date}"
         )
 
     def fetch_job_title(self) -> str:
@@ -138,9 +140,10 @@ class JobRecord:
             "max_salary": self.salary_max,
             "salary_details": self.salary_details,
             "salary_text": self.salary_text,
-            "website": self.host_site,
             "tags": self.tags,
             "url": self.url,
+            "added_date": self.added_date,
+            "website": self.host_site,
         }
 
         return record
@@ -160,3 +163,8 @@ class JobRecord:
 
         status = containers.remote_status(self.html, self.website)
         return status if status else None
+
+    def current_date(self) -> datetime.date:
+        """Returns current date as datetime object"""
+        current_date = datetime.now().date()
+        return current_date

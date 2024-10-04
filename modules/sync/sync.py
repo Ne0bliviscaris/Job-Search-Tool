@@ -66,9 +66,8 @@ def process_new_records(cleaned_current_file: pd.DataFrame, new_records: set, up
     """Process new records adding custom columns and timestamp."""
     new_records_df = filter_records(update, new_records)
     if not new_records_df.empty:
-        new_records_df = add_timestamp(new_records_df, "added_date")
-        merged_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
-        return merged_frame
+        merged_new_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
+        return merged_new_frame
     return cleaned_current_file
 
 
