@@ -23,7 +23,7 @@ def save_csv(dataframe, file_path, mode="w", header=True):
     dataframe.to_csv(file_path, mode=mode, header=header, index=False)
 
 
-def set_columns(file: pd.DataFrame) -> set:
+def compare_content(file: pd.DataFrame) -> set:
     """Set columns for the DataFrame."""
     columns_to_compare = file[COLUMNS_TO_COMPARE]
     rows_as_tuples = columns_to_compare.apply(tuple, axis=1)
@@ -104,8 +104,8 @@ def changed_records() -> tuple:
     update = load_csv(RAW_FILE)
     current_file = load_csv(SYNCED_FILE)
 
-    current_records = set_columns(current_file) if not current_file.empty else set()
-    update_records = set_columns(update)
+    current_records = compare_content(current_file) if not current_file.empty else set()
+    update_records = compare_content(update)
 
     missing_records = current_records - update_records
     new_records = update_records - current_records
