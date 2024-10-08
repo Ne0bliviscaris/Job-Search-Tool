@@ -63,6 +63,7 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 <summary><strong>Click to see the details</strong></summary>
 
 #### 08.10.2024
+- Moved Selenium Chromedriver to Docker container
 - Properly extracting link to multi-location offers from Pracuj.pl (remote offers only)
 - Created framework for additional actions upon scraping website
 

@@ -22,15 +22,12 @@ def get_container(driver: webdriver.Chrome, search_link: str) -> str:
         return ""
 
 
-def setup_webdriver() -> webdriver.Chrome:
+def setup_webdriver():
     """
     Setup and return a Selenium WebDriver instance
     """
-    # Local path to chromedriver - static - change if needed
-    chromedriver_path = "C:\\Users\\Dragon\\Downloads\\chromedriver-win64\\chromedriver.exe"
-    # Create and start ChromeDriver service
-    webdriver_service = Service(chromedriver_path)
-    webdriver_service.start()
+    # Path to container with Chrome
+    docker_chrome_url = "http://localhost:4444/wd/hub"
 
     # Chrome options
     options = webdriver.ChromeOptions()
@@ -42,10 +39,10 @@ def setup_webdriver() -> webdriver.Chrome:
     options.add_argument("--window-position=-2400,-2400")  # In case blank window is displayed, move it off-screen
     options.add_argument("--log-level=2")  # Hide unnecessary logs
     options.add_argument("--disable-webgl")  # Disable WebGL
-    options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})
+    options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})  # Disable images
 
     # Return WebDriver instance
-    return webdriver.Chrome(service=webdriver_service, options=options)
+    return webdriver.Remote(command_executor=docker_chrome_url, options=options)
 
 
 def scrape(web_driver, search_link: str) -> str:
