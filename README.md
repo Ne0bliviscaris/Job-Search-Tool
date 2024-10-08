@@ -9,6 +9,10 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 ---
 <br><br>
 
+# Tasks for this branch:
+- move to Selenium on Docker
+
+
 # TODO:
 
 <details>
