@@ -174,9 +174,8 @@ def tags(html, search_link: str) -> str:
 def company(html, search_link: str) -> dict:
     """Returns company name container content for each website"""
     if NOFLUFFJOBS in search_link:
-        company_container = {
-            "class": "tw-text-gray-60 company-name tw-w-[50%] desktop:tw-w-auto tw-mb-0 !tw-text-xs !desktop:tw-text-sm tw-font-semibold desktop:tw-font-normal"
-        }
+        class_name = lambda x: x and x.startswith("company-name")
+        company_container = {"class": class_name}
         company = html.find(attrs=company_container)
         return company.text if company else None
 
@@ -186,7 +185,9 @@ def company(html, search_link: str) -> dict:
         return company.text if company else None
 
     elif BULLDOGJOB in search_link:
-        title_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__title")}
+        # Company container is first div after job title
+        title_class = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
+        title_container = {"class": title_class}
         title_block = html.find(attrs=title_container)
         if title_block:
             # Find the <h3> tag and then get the next <div> sibling
@@ -197,10 +198,11 @@ def company(html, search_link: str) -> dict:
                     return company_div.text.strip()
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-        svg_icon = html.find("svg", {"data-testid": "ApartmentRoundedIcon"})
+        company_icon = {"data-testid": "ApartmentRoundedIcon"}
+        svg_icon = html.find("svg", company_icon)
         if svg_icon:
-            parent_div = svg_icon.find_parent("div", class_=MuiBox_block)
+            parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+            parent_div = svg_icon.find_parent("div", class_=parent_block_class)
             if parent_div:
                 company_name = parent_div.span
                 return company_name.text.strip() if company_name else None
@@ -291,20 +293,17 @@ def location(html, search_link: str) -> dict:
                 formatted_location = " | ".join(job_location).replace(",", " | ")
                 return formatted_location if formatted_location else None
 
-    elif ROCKETJOBS in search_link:
-        MuiBox_block = html.find_all("div", class_="MuiBox-root")
-        location_elements = MuiBox_block[11].find_all("span")
-        if location_elements:
-            locations = [loc.text for loc in location_elements]
-            return locations[0]
-        return None
-
-    # Here JustJoinIT differs from RocketJobs by one index
-    elif JUSTJOINIT in search_link:
-        MuiBox_block = html.find_all("div", class_="MuiBox-root")
-        location_elements = MuiBox_block[11].find_all("span")
-        locations = [loc.text for loc in location_elements[1:]]
-        return locations[0] if not "Poland (Remote)" in locations[0] else None
+    elif ROCKETJOBS or JUSTJOINIT in search_link:
+        # <span> within parent folder of location icon
+        company_icon = {"data-testid": "PlaceOutlinedIcon"}
+        svg_icon = html.find("svg", company_icon)
+        if svg_icon:
+            parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+            parent_div = svg_icon.find_parent("div", class_=parent_block_class)
+            if parent_div:
+                company_name = parent_div.span
+                if company_name:
+                    return company_name.text.strip() if not "Poland (Remote)" in company_name.text.strip() else None
 
     elif SOLIDJOBS in search_link:
         """
@@ -342,7 +341,6 @@ def remote_status(html, search_link: str) -> str:
             return "Hybrid"
         else:
             return "Stationary"
-
     elif THEPROTOCOL in search_link:
         remote_container = {"data-test": "text-workModes"}
         job_location_elements = html.find_all(attrs=remote_container)
@@ -371,30 +369,24 @@ def remote_status(html, search_link: str) -> str:
                     return "Remote"
                 else:
                     return "Stationary"
-
-    elif ROCKETJOBS in search_link:
-        MuiBox_block = html.find_all("div", class_="MuiBox-root")
-        location = MuiBox_block[11].find_all("span")
-        if "Praca zdalna" in location[-1].text:
-            return "Remote"
-        else:
-            return "Stationary"
-
-    # Here JustJoinIT differs from RocketJobs by one index
-    elif JUSTJOINIT in search_link:
-        MuiBox_block = html.find_all("div", class_="MuiBox-root")
-        location = MuiBox_block[11].find_all("span")
-        if "remote" in location[-1].text:
-            return "Remote"
-        elif "hybryd" in location[-1].text:
-            return "Hybrid"
-        else:
-            return "Stationary"
-
+    elif ROCKETJOBS or JUSTJOINIT in search_link:
+        # <span> within parent folder of remote status icon
+        company_icon = {"data-testid": "PlaceOutlinedIcon"}
+        svg_icon = html.find("svg", company_icon)
+        if svg_icon:
+            parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+            parent_div = svg_icon.find_parent("div", class_=parent_block_class)
+            parents_parent = parent_div.find_parent("div", class_=parent_block_class)
+            if parents_parent:
+                remote_status = parents_parent.text.lower()
+                if remote_status:
+                    if "zdalnie" in remote_status or "remote" in remote_status:
+                        return "Remote"
+                    elif "hybryd" in remote_status or "hybrydowa" in remote_status:
+                        return "Hybrid"
+                    else:
+                        return "Stationary"
     elif SOLIDJOBS in search_link:
-        """
-        Returns location container content for SOLIDJOBS website
-        """
         location = html.find_all("a", {"mattooltip": True})
         remote_status = location[-1]
         if "zdalna" in remote_status.text:
