@@ -84,7 +84,8 @@ def url(record, search_link) -> str:
         url = url_a.get("href")
 
     elif PRACUJPL in search_link:
-        url_a = record.find("a", {"data-test": "link-offer"})
+        container = {"data-test": "link-offer"}
+        url_a = record.find("a", container)
         url = url_a.get("href") if url_a else None
 
     if url:
