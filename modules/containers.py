@@ -152,7 +152,8 @@ def tags(html, search_link: str) -> str:
 
     elif SOLIDJOBS in search_link:
         tags_block = html.find_all("solidjobs-skill-display")
-        tags_list = [tag.text.replace("#", "") for tag in tags_block]
+        if tags_block:
+            tags_list = [tag.text.replace("#", "") for tag in tags_block]
 
     elif PRACUJPL in search_link:
         container = {"data-test": "technologies-item"}
@@ -200,37 +201,35 @@ def company(html, search_link: str) -> str:
     return company.text if company else None
 
 
-def logo(html, search_link: str) -> dict:
+def logo(html, search_link: str) -> str:
     """Returns logo container content for each website"""
     if NOFLUFFJOBS in search_link:
         logo_container = {"alt": "Company logo"}
         logo = html.find(attrs=logo_container)
-        return logo.get("src") if logo else None
+        logo_src = logo.get("src")
 
     elif THEPROTOCOL in search_link:
         logo_container = {"data-test": "icon-companyLogo"}
         logo = html.find(attrs=logo_container)
-        return logo.get("src") if logo else None
+        logo_src = logo.get("src")
 
     elif BULLDOGJOB in search_link:
         logo_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__logo")}
         logo = html.find(attrs=logo_container)
-        return logo.find("img").get("src") if logo else None
+        logo_src = logo.img.get("src")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        logo = html.img
-        return logo.get("src") if logo else None
+        logo_src = html.img.get("src")
 
     elif SOLIDJOBS in search_link:
         logo = html.find("img")
-        return logo.get("src") if logo else None
+        logo_src = logo.get("src")
 
     elif PRACUJPL in search_link:
         logo = html.find("img", {"data-test": "image-responsive"})
-        return logo.get("src") if logo else None
+        logo_src = logo.get("src")
 
-    else:
-        return None
+    return logo_src if logo_src else None
 
 
 def location(html, search_link: str) -> dict:
