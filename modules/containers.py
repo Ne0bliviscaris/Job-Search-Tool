@@ -32,37 +32,33 @@ def search(search_link: str) -> str:
 def detect_records(html, search_link) -> list[str]:
     """Returns record container content for each website"""
     if NOFLUFFJOBS in search_link:
-        record_container = {"id": lambda id_name: id_name and id_name.startswith("nfjPostingListItem")}
-        return [job for job in html.find_all(attrs=record_container)]
+        block_name = lambda id_name: id_name and id_name.startswith("nfjPostingListItem")
+        record_container = {"id": block_name}
+        records = html.find_all(attrs=record_container)
 
     elif THEPROTOCOL in search_link:
         record_container = {"data-test": "list-item-offer"}
-        return [job for job in html.find_all(attrs=record_container)]
+        records = html.find_all(attrs=record_container)
 
     elif BULLDOGJOB in search_link:
-        record_container = {
-            "class": lambda class_name: (
-                class_name
-                and class_name.startswith("JobListItem_item")
-                and all(
-                    excluded not in class_name for excluded in ["logo", "title", "details", "salary", "tags", "save"]
-                )
-            )
-        }
-        return [job for job in html.find_all(attrs=record_container)]
+        block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item")
+        record_container = {"class": block_name}
+        records = html.find_all("a", attrs=record_container)
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         record_container = {"data-index": True}
-        return [job for job in html.find_all(attrs=record_container)]
+        records = html.find_all(attrs=record_container)
 
     elif SOLIDJOBS in search_link:
-        record_container = "offer-list-item"
-        return [job for job in html.find_all(record_container)]
+        block_name = "sj-offer-list-item"  # <sj-offer-list-item> block
+        records = html.find_all(block_name)
 
     elif PRACUJPL in search_link:
         record_container = {"data-test": "default-offer"}
-        return [job for job in html.find_all(attrs=record_container)]
+        records = html.find_all(attrs=record_container)
 
+    if records is not None:
+        return [job for job in records]
     else:
         return None
 
