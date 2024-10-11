@@ -99,35 +99,30 @@ def url(record, search_link) -> str:
 def job_title(html, search_link) -> str:
     """Returns title container content for each website"""
     if NOFLUFFJOBS in search_link:
-        title_container = {"data-cy": "title position on the job offer listing"}
-        title = html.find(attrs=title_container)
-        return title.text if title else None
+        container = {"data-cy": "title position on the job offer listing"}
+        title = html.find(attrs=container)
 
     elif THEPROTOCOL in search_link:
-        title_container = {"data-test": "text-jobTitle"}
-        title = html.find(attrs=title_container)
-        return title.text if title else None
+        container = {"data-test": "text-jobTitle"}
+        title = html.find(attrs=container)
 
     elif BULLDOGJOB in search_link:
-        title_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__title")}
-        title_block = html.find(attrs=title_container)
-        if title_block:
-            title = title_block.find("h3")
-            return title.text if title else None
+        block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
+        container = {"class": block_name}
+        title_block = html.find(attrs=container)
+        title = title_block.h3
+
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         title = html.h3
-        return title.text if title else None
 
     elif SOLIDJOBS in search_link:
-        title = html.find("h2")
-        return title.text.strip() if title else None
+        title = html.h2
 
     elif PRACUJPL in search_link:
-        title = html.find("h2", {"data-test": "offer-title"})
-        return title.text.strip() if title else None
+        container = {"data-test": "offer-title"}
+        title = html.find("h2", container)
 
-    else:
-        return None
+    return title.text if title else None
 
 
 def tags(html, search_link: str) -> str:
