@@ -129,38 +129,38 @@ def tags(html, search_link: str) -> str:
     """Returns tags container content for each website as a string separated by ' | '"""
     if NOFLUFFJOBS in search_link:
         tags_container = {"data-cy": "category name on the job offer listing"}
-        job_tags = [job.text for job in html.find_all(attrs=tags_container)]
-        return " | ".join(job_tags) if job_tags else ""
+        tags = html.find_all(attrs=tags_container)
+        tags_list = [tag.text for tag in tags]
 
     elif THEPROTOCOL in search_link:
         tags_container = {"data-test": "chip-expectedTechnology"}
-        job_tags = [job.text for job in html.find_all(attrs=tags_container)]
-        return " | ".join(job_tags) if job_tags else ""
+        tags = html.find_all(attrs=tags_container)
+        tags_list = [tag.text for tag in tags]
 
     elif BULLDOGJOB in search_link:
-        tags_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")}
+        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")
+        tags_container = {"class": name}
+
         tags_block = html.find(attrs=tags_container)
         if tags_block:
-            job_tags = [span.text for span in tags_block.find_all("span")]
-            return " | ".join(job_tags) if job_tags else ""
+            tags_list = [span.text for span in tags_block.find_all("span")]
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        tag_container = lambda class_name: class_name and class_name.startswith("skill-tag")
-        tags = html.find_all(class_=tag_container)
-        return " | ".join(tag.text.strip() for tag in tags) if tags else ""
+        name = lambda class_name: class_name and class_name.startswith("skill-tag")
+        tags = html.find_all(class_=name)
+        tags_list = [tag.text for tag in tags]
 
     elif SOLIDJOBS in search_link:
         tags_block = html.find_all("solidjobs-skill-display")
-        job_tags = [tag.text.strip().replace("# ", "") for tag in tags_block]
-        return " | ".join(job_tags) if job_tags else ""
+        tags_list = [tag.text.replace("#", "") for tag in tags_block]
 
     elif PRACUJPL in search_link:
-        tags_block = html.find_all("span", {"data-test": "technologies-item"})
-        job_tags = [tag.text.strip() for tag in tags_block]
-        return " | ".join(job_tags) if job_tags else ""
+        container = {"data-test": "technologies-item"}
+        tags_block = html.find_all("span", container)
+        tags_list = [tag.text.strip() for tag in tags_block]
 
-    else:
-        return None
+    merged_tags = " | ".join(tags_list)
+    return merged_tags if tags_list else None
 
 
 def company(html, search_link: str) -> dict:
