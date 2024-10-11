@@ -1,6 +1,7 @@
 import streamlit as st
 
-from modules.data_collector import all_sites_dataframe, save_dataframe_to_csv
+from modules.data_collector import all_sites_dataframe
+from modules.data_processor import save_dataframe_to_csv
 from modules.dataframe_settings import set_column_config
 from modules.sync.sync import sync_records
 from modules.updater.updater import update_all_sites
