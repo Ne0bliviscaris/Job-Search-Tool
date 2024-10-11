@@ -163,52 +163,41 @@ def tags(html, search_link: str) -> str:
     return merged_tags if tags_list else None
 
 
-def company(html, search_link: str) -> dict:
+def company(html, search_link: str) -> str:
     """Returns company name container content for each website"""
     if NOFLUFFJOBS in search_link:
-        class_name = lambda x: x and x.startswith("company-name")
-        company_container = {"class": class_name}
+        name = lambda x: x and x.startswith("company-name")
+        company_container = {"class": name}
         company = html.find(attrs=company_container)
-        return company.text if company else None
 
     elif THEPROTOCOL in search_link:
         company_container = {"data-test": "text-employerName"}
         company = html.find(attrs=company_container)
-        return company.text if company else None
 
     elif BULLDOGJOB in search_link:
         # Company container is first div after job title
-        title_class = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
-        title_container = {"class": title_class}
-        title_block = html.find(attrs=title_container)
-        if title_block:
-            # Find the <h3> tag and then get the next <div> sibling
-            h3_tag = title_block.find("h3")
-            if h3_tag:
-                company_div = h3_tag.find_next_sibling("div")
-                if company_div:
-                    return company_div.text.strip()
+        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
+        title_company_container = {"class": name}
+        title_company_block = html.find(attrs=title_company_container)
+        # Find the <h3> tag with offer title and get the <div> sibling
+        title_container = title_company_block.h3
+        company = title_container.find_next_sibling("div")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         company_icon = {"data-testid": "ApartmentRoundedIcon"}
         svg_icon = html.find("svg", company_icon)
         if svg_icon:
-            parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-            parent_div = svg_icon.find_parent("div", class_=parent_block_class)
-            if parent_div:
-                company_name = parent_div.span
-                return company_name.text.strip() if company_name else None
+            parent_name = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+            parent_div = svg_icon.find_parent("div", class_=parent_name)
+            company = parent_div.span
 
     elif SOLIDJOBS in search_link:
         company = html.find("a", {"mattooltip": "Kliknij, aby zobaczy pozostałe oferty firmy."})
-        return company.text.strip() if company else None
 
     elif PRACUJPL in search_link:
         company = html.find("h3", {"data-test": "text-company-name"})
-        return company.text.strip() if company else None
 
-    else:
-        return None
+    return company.text if company else None
 
 
 def logo(html, search_link: str) -> dict:
