@@ -1,7 +1,7 @@
 import os
 import time
 
-from modules.data_collector import set_filename
+from modules.data_processor import set_filename
 from modules.selenium_utils import scrape, setup_webdriver
 from modules.websites import search_links
 
