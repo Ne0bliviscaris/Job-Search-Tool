@@ -232,48 +232,42 @@ def logo(html, search_link: str) -> str:
     return logo_src if logo_src else None
 
 
-def location(html, search_link: str) -> dict:
+remote_work_dict = {
+    "Remote": [
+        "remote",
+        "zdalna",
+        "zdalnie",
+        "poland (remote)",
+        "100% zdalnie",
+        " 100% zdalnie",
+        "cała polska (praca zdalna)",
+    ],
+    "Hybrid": ["hybrid", "hybrydowa", "remote hybrid", "hybryd"],
+    "Stationary": ["stationary", "stacjonarna", "full office"],
+}
+
+
+def location(html, search_link: str) -> str:
     """Returns location container content for each website"""
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
         location = html.find(attrs=location_container)
         if location:
-            if "Zdalnie" not in location.text:
-                return location.text
-        return None
+            location = location.text
 
     elif THEPROTOCOL in search_link:
         location_container = {"data-test": "text-workplaces"}
-        job_location_elements = html.find_all(attrs=location_container)
-        location = [job.text for job in job_location_elements if job.text]
-
-        # Separate field for remote status
-        remote_keywords = ["remote", "zdalna"]
-        hybrid_keywords = ["hybrid", "hybrydowa", "remote hybrid"]
-        stationary_keywords = ["stationary", "stacjonarna", "full office"]
-        location = [
-            loc
-            for loc in location
-            if not any(keyword in loc.lower() for keyword in remote_keywords + hybrid_keywords + stationary_keywords)
-        ]
-
-        return " | ".join(location) if location else None
+        location = html.find(attrs=location_container)
 
     elif BULLDOGJOB in search_link:
-        location_container = {
-            "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
-        }
-        details_block = html.find(attrs=location_container)
+        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
+        details_block = html.find(attrs={"class": name})
         if details_block:
-            hidden_block = details_block.find("div", class_="hidden")
-            if hidden_block:
-                job_location = [span.text.strip() for span in hidden_block.find_all("span") if span.text.strip()]
-                # Remove "remote" from the location - separate field for remote status
-                job_location = [loc for loc in job_location if "remote" not in loc.lower()]
-                formatted_location = " | ".join(job_location).replace(",", " | ")
-                return formatted_location if formatted_location else None
+            location_block = details_block.div
+            if location_block:
+                location = location_block.text
 
-    elif ROCKETJOBS or JUSTJOINIT in search_link:
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         # <span> within parent folder of location icon
         company_icon = {"data-testid": "PlaceOutlinedIcon"}
         svg_icon = html.find("svg", company_icon)
@@ -281,32 +275,28 @@ def location(html, search_link: str) -> dict:
             parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
             parent_div = svg_icon.find_parent("div", class_=parent_block_class)
             if parent_div:
-                company_name = parent_div.span
-                if company_name:
-                    return company_name.text.strip() if not "Poland (Remote)" in company_name.text.strip() else None
+                location = parent_div.span
+                if location:
+                    location = location.text
 
     elif SOLIDJOBS in search_link:
-        """
-        Returns location container content for SOLIDJOBS website
-        """
         location_container = html.find("div", class_="flex-row")
         if location_container:
-            location_elements = location_container.find_all("i", {"aria-hidden": "true"})
-            if len(location_elements) > 1:
-                location = location_elements[1].parent
-                formatted_location = location.text.replace("100% zdalnie", "").replace("(", "").replace(")", "")
-                return formatted_location.strip()
-        return None
+            location_span = location_container.find_all("span")[1]
+            if location_span:
+                location = location_span.text.replace("100% zdalnie ", "").replace("(", "").replace(")", "").strip()
 
     elif PRACUJPL in search_link:
         loc = html.find("h4", {"data-test": "text-region"})
         if loc and loc.strong:
-            location = loc.strong.text.replace("Cała Polska (praca zdalna)", "").strip()
-            return location
-        return None
+            location = loc.strong.text
 
-    else:
-        return None
+    # Remove remote status from location
+    if location:
+        if any(location.lower() in keywords for keywords in remote_work_dict.values()):
+            location = ""
+
+    return location.strip() if location is not None else None
 
 
 def remote_status(html, search_link: str) -> str:
