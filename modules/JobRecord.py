@@ -33,8 +33,8 @@ class JobRecord:
             f"Max salary: {self.salary_max}\n"
             f"Salary details: {self.salary_details}\n"
             f"Salary text: {self.salary_text}\n"
-            f"Website: {self.host_site}"
-            f"Added date: {self.current_date}"
+            f"Website: {self.host_site}\n"
+            f"Added date: {self.added_date}"
         )
 
     def fetch_job_title(self) -> str:
