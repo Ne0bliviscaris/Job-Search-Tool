@@ -20,3 +20,17 @@ def pracujpl_confirm_cookies(webdriver):
         element.click()
     except Exception as e:
         pass
+
+
+def nofluffjobs_check_if_results_exist(webdriver):
+    """Check if results exist on No Fluff Jobs."""
+    empty_search = "nfj-no-offers-found-header"
+    try:
+        no_offers_block = webdriver.find_element(By.CSS_SELECTOR, empty_search)
+        if no_offers_block:
+            no_offers_text = no_offers_block.text
+            if "Brak wyników wyszukiwania" in no_offers_text:
+                print("No offers found for No Fluff Jobs")
+                return True
+    except Exception as e:
+        pass

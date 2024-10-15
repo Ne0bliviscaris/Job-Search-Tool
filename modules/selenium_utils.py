@@ -3,14 +3,19 @@ from selenium.webdriver.common.by import By
 
 import modules.containers as containers
 import modules.site_specific_actions as site_specific_actions
-from modules.websites import PRACUJPL
+from modules.websites import NOFLUFFJOBS, PRACUJPL
 
 
 def scrape(web_driver, search_link: str) -> str:
     """Scrape given link using Selenium."""
     web_driver.get(search_link)
     perform_additional_action(web_driver, search_link)
-    html_content = get_search_container(web_driver, search_link)
+    stop_scraping = evaluate_stop_conditions(web_driver, search_link)
+
+    if stop_scraping is not True:
+        html_content = get_search_container(web_driver, search_link)
+    else:
+        html_content = ""
     return html_content
 
 
@@ -35,6 +40,13 @@ def perform_additional_action(driver: webdriver.Chrome, search_link: str):
     if PRACUJPL in search_link:
         site_specific_actions.pracujpl_confirm_cookies(driver)
         site_specific_actions.pracujpl_click_multi_location_offer(driver)
+
+
+def evaluate_stop_conditions(web_driver, search_link: str) -> bool:
+    """Check if the stop conditions are met."""
+    if NOFLUFFJOBS in search_link:
+        return site_specific_actions.nofluffjobs_check_if_results_exist(web_driver)
+    return False
 
 
 def setup_webdriver():
