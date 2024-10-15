@@ -205,30 +205,30 @@ def logo(html, search_link: str) -> str:
     """Returns logo container content for each website"""
     if NOFLUFFJOBS in search_link:
         logo_container = {"alt": "Company logo"}
-        logo = html.find(attrs=logo_container)
-        logo_src = logo.get("src")
+        if logo_container:
+            logo = html.find(attrs=logo_container)
 
     elif THEPROTOCOL in search_link:
         logo_container = {"data-test": "icon-companyLogo"}
-        logo = html.find(attrs=logo_container)
-        logo_src = logo.get("src")
+        if logo_container:
+            logo = html.find(attrs=logo_container)
 
     elif BULLDOGJOB in search_link:
         logo_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__logo")}
-        logo = html.find(attrs=logo_container)
-        logo_src = logo.img.get("src")
+        if logo_container:
+            logo = html.find(attrs=logo_container).img
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        logo_src = html.img.get("src")
+        logo = html.img
 
     elif SOLIDJOBS in search_link:
         logo = html.find("img")
-        logo_src = logo.get("src")
 
     elif PRACUJPL in search_link:
         logo = html.find("img", {"data-test": "image-responsive"})
-        logo_src = logo.get("src")
 
+    if logo:
+        logo_src = logo.get("src")
     return logo_src if logo_src else None
 
 
@@ -239,8 +239,9 @@ remote_work_dict = {
         "zdalnie",
         "poland (remote)",
         "100% zdalnie",
-        " 100% zdalnie",
         "cała polska (praca zdalna)",
+        ", Fully remote",
+        "fully remotefully remote",
     ],
     "Hybrid": ["hybrid", "hybrydowa", "remote hybrid", "hybryd"],
     "Stationary": ["stationary", "stacjonarna", "full office"],
@@ -293,6 +294,7 @@ def location(html, search_link: str) -> str:
 
     # Remove remote status from location
     if location:
+        location.strip()
         if any(location.lower() in keywords for keywords in remote_work_dict.values()):
             location = ""
 
@@ -301,70 +303,40 @@ def location(html, search_link: str) -> str:
 
 def remote_status(html, search_link: str) -> str:
     """Returns location container content for each website"""
+
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
-        locations = html.find_all(attrs=location_container)
-        status = [loc.text.strip() for loc in locations]
-        if "remote" in status:
-            return "Remote"
-        elif "hybrid" in status:
-            return "Hybrid"
-        else:
-            return "Stationary"
+        location = html.find(attrs=location_container)
+        if location:
+            status = location.text
+
     elif THEPROTOCOL in search_link:
         remote_container = {"data-test": "text-workModes"}
-        job_location_elements = html.find_all(attrs=remote_container)
-        job_location = [job.text.strip().lower() for job in job_location_elements]
+        remote_status = html.find(attrs=remote_container).text
+        if remote_status:
+            status = remote_status.lower()
 
-        remote_keywords = ["remote", "zdalna"]
-        hybrid_keywords = ["hybrid", "hybrydowa", "remote hybrid"]
-
-        for location in job_location:
-            if any(keyword in location for keyword in remote_keywords):
-                return "Remote"
-            elif any(keyword in location for keyword in hybrid_keywords):
-                return "Hybrid"
-            else:
-                return "Stationary"
     elif BULLDOGJOB in search_link:
-        remote_container = {
-            "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
-        }
-        details_block = html.find(attrs=remote_container)
+        remote_container = lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
+        details_block = html.find(attrs={"class": remote_container})
         if details_block:
-            hidden_block = details_block.find("div", class_="hidden")
-            if hidden_block:
-                job_location = [span.text.strip().lower() for span in hidden_block.find_all("span")]
-                if "remote" in job_location:
-                    return "Remote"
-                else:
-                    return "Stationary"
-    elif ROCKETJOBS or JUSTJOINIT in search_link:
+            first_block = details_block.div
+            if first_block:
+                status = first_block.text
+
+    elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         # <span> within parent folder of remote status icon
-        company_icon = {"data-testid": "PlaceOutlinedIcon"}
-        svg_icon = html.find("svg", company_icon)
-        if svg_icon:
-            parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-            parent_div = svg_icon.find_parent("div", class_=parent_block_class)
-            parents_parent = parent_div.find_parent("div", class_=parent_block_class)
-            if parents_parent:
-                remote_status = parents_parent.text.lower()
-                if remote_status:
-                    if "zdalnie" in remote_status or "remote" in remote_status:
-                        return "Remote"
-                    elif "hybryd" in remote_status or "hybrydowa" in remote_status:
-                        return "Hybrid"
-                    else:
-                        return "Stationary"
+        location_icon = {"style": "display: block;"}
+        location = html.find("div", location_icon)
+        if location:
+            parent_div = location.find_parent("div")
+            if parent_div:
+                status = parent_div.text.lower()
+
     elif SOLIDJOBS in search_link:
-        location = html.find_all("a", {"mattooltip": True})
+        location = html.find_all("span", {"mattooltip": True})
         remote_status = location[-1]
-        if "zdalna" in remote_status.text:
-            return "Remote"
-        elif "hybrydowa" in remote_status.text:
-            return "Hybrid"
-        else:
-            return "Stationary"
+        status = remote_status.text.strip()
 
     elif PRACUJPL in search_link:
         additional_info_containers = lambda tag: tag.has_attr("data-test") and tag["data-test"].startswith(
@@ -372,15 +344,15 @@ def remote_status(html, search_link: str) -> str:
         )
         additional_info = html.find_all(additional_info_containers)
         status = additional_info[-1].text
-        if "zdalna" in status:
-            return "Remote"
-        elif "hybrydowa" in status:
-            return "Hybrid"
-        else:
-            return "Stationary"
+
+    if status:
+        status = status.lower()
+        for key, keywords in remote_work_dict.items():
+            if any(keyword in status for keyword in keywords):
+                return key
 
     else:
-        return None
+        return "No status"
 
 
 def salary(html, search_link: str) -> dict:

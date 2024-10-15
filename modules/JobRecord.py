@@ -158,9 +158,6 @@ class JobRecord:
         """
         Check if the job listing is remote.
         """
-        if not self.location:
-            return "Remote"
-
         status = containers.remote_status(self.html, self.website)
         return status if status else None
 
