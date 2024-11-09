@@ -258,7 +258,11 @@ def location(html, search_link: str) -> str:
 
     elif THEPROTOCOL in search_link:
         location_container = {"data-test": "text-workplaces"}
-        location = html.find(attrs=location_container)
+        location_container = html.find(attrs=location_container)
+        if location_container:
+            location = location_container.text
+        else:
+            location = None
 
     elif BULLDOGJOB in search_link:
         name = lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
@@ -285,12 +289,14 @@ def location(html, search_link: str) -> str:
         if location_container:
             location_span = location_container.find_all("span")[1]
             if location_span:
-                location = location_span.text.replace("100% zdalnie ", "").replace("(", "").replace(")", "").strip()
+                location = location_span.text.replace("100% zdalnie ", "").replace("(", "").replace(")", "")
 
     elif PRACUJPL in search_link:
         loc = html.find("h4", {"data-test": "text-region"})
         if loc and loc.strong:
             location = loc.strong.text
+        else:
+            location = None
 
     # Remove remote status from location
     if location:
@@ -298,7 +304,7 @@ def location(html, search_link: str) -> str:
         if any(location.lower() in keywords for keywords in remote_work_dict.values()):
             location = ""
 
-    return location.strip() if location is not None else None
+    return location if location is not None else None
 
 
 def remote_status(html, search_link: str) -> str:
@@ -357,46 +363,44 @@ def remote_status(html, search_link: str) -> str:
 
 def salary(html, search_link: str) -> dict:
     """Returns salary container content for each website"""
+    salary = None
     if NOFLUFFJOBS in search_link:
         salary_container = {"data-cy": "salary ranges on the job offer listing"}
-        return html.find(attrs=salary_container)
+        salary = html.find(attrs=salary_container)
 
     elif THEPROTOCOL in search_link:
         salary_container = {"data-test": "text-salary"}
-        return html.find(attrs=salary_container)
+        salary = html.find(attrs=salary_container)
 
     elif BULLDOGJOB in search_link:
-        salary_container = {
-            "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__salary")
-        }
-        salary_elements = html.find(attrs=salary_container)
-        return salary_elements if salary_elements else ""
+        salary_container = lambda class_name: class_name and class_name.startswith("JobListItem_item__salary")
+        container = html.find(attrs={"class": salary_container})
+        if container:
+            salary = container.text
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         # All containers on site are MuiBox-root. Need to find the right one
         MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-
         # Salary is contained in the same parent div as the h3 tag with job title
         h3_container = html.h3
         if h3_container:
             parent_div = h3_container.find_parent("div", class_=MuiBox_block)
-            # Salary is hidden in MuiBox-root inside another MuiBox-root inside the parent div with h3
+            # Salary is in <span> inside the parent div of <h3>
             if parent_div:
-                salary_div = parent_div.find("div", class_=MuiBox_block).find("div", class_=MuiBox_block)
-                if salary_div:
-                    salary_elements = salary_div.find_all("span")
-                    if salary_elements:
-                        salary = [pay.text.strip() for pay in salary_elements]
-                        return " - ".join(salary)
-        return ""
+                salary_elements = parent_div.find_all("span")
+                if salary_elements:
+                    elements = [pay.text.strip() for pay in salary_elements]
+                    if elements:
+                        salary = " - ".join(elements)
 
     elif SOLIDJOBS in search_link:
-        salary = html.find("span", class_="badge-salary")
-        return salary.text.strip() if salary else None
+        salary_container = html.find("sj-salary-display")
+        if salary_container:
+            salary = salary_container.text.strip()
 
     elif PRACUJPL in search_link:
-        salary = html.find("span", {"data-test": "offer-salary"})
-        return salary.text.strip() if salary else None
+        salary_container = html.find("span", {"data-test": "offer-salary"})
+        if salary_container:
+            salary = salary_container.text.strip()
 
-    else:
-        return None
+    return salary if salary else None
