@@ -289,7 +289,7 @@ def location(html, search_link: str) -> str:
         if location_container:
             location_span = location_container.find_all("span")[1]
             if location_span:
-                location = location_span.text.replace("100% zdalnie ", "").replace("(", "").replace(")", "")
+                location = location_span.text.replace("100% zdalnie ", "").replace("(", "").replace(")", "").strip()
 
     elif PRACUJPL in search_link:
         loc = html.find("h4", {"data-test": "text-region"})
