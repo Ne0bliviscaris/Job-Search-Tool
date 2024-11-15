@@ -122,7 +122,7 @@ def job_title(html, search_link) -> str:
         container = {"data-test": "offer-title"}
         title = html.find("h2", container)
 
-    return title.text if title else None
+    return title.text.strip() if title else None
 
 
 def tags(html, search_link: str) -> str:
@@ -254,7 +254,7 @@ def location(html, search_link: str) -> str:
         location_container = {"data-cy": "location on the job offer listing"}
         location = html.find(attrs=location_container)
         if location:
-            location = location.text
+            location = location.text.strip()
 
     elif THEPROTOCOL in search_link:
         location_container = {"data-test": "text-workplaces"}
