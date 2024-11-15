@@ -50,3 +50,24 @@ def split_salary(processed_salary):
         min_salary = max_salary = int(processed_salary.strip())
 
     return min_salary, max_salary
+
+
+def remove_remote_status(location: str, remote_work_dict: dict) -> str:
+    """Remove remote work indicators from location string"""
+    if not location:
+        return None
+
+    location = location.strip()
+    parts = location.split(" | ")
+
+    # Remove remote indicators
+    filtered_parts = [
+        part.strip()
+        for part in parts
+        if not any(kw in part.lower() for keywords in remote_work_dict.values() for kw in keywords)
+    ]
+
+    # Join remaining locations
+    clean_location = " | ".join(filtered_parts)
+
+    return clean_location if clean_location else None
