@@ -1,5 +1,5 @@
 from modules.dicts import remote_work_dict
-from modules.helper_functions import remove_remote_status
+from modules.helper_functions import process_remote_status, remove_remote_status
 from modules.websites import JUSTJOINIT  # Same structure as RocketJobs
 from modules.websites import (
     BULLDOGJOB,
@@ -309,56 +309,70 @@ def location(html, search_link: str) -> str:
 
 def remote_status(html, search_link: str) -> str:
     """Returns location container content for each website"""
-
+    status = None
     if NOFLUFFJOBS in search_link:
-        location_container = {"data-cy": "location on the job offer listing"}
-        location = html.find(attrs=location_container)
-        if location:
-            status = location.text
+        try:
+            location_container = {"data-cy": "location on the job offer listing"}
+            location = html.find(attrs=location_container)
+            if location:
+                status = location.text
+        except:
+            print("Error fetching data from record: NOFLUFFJOBS -> Location")
 
     elif THEPROTOCOL in search_link:
-        remote_container = {"data-test": "text-workModes"}
-        remote_status = html.find(attrs=remote_container).text
-        if remote_status:
-            status = remote_status.lower()
+        try:
+            remote_container = {"data-test": "text-workModes"}
+            remote_status = html.find(attrs=remote_container)
+            if remote_status:
+                status = remote_status.text.lower()
+        except:
+            print("Error fetching data from record: THEPROTOCOL -> Location")
 
     elif BULLDOGJOB in search_link:
-        remote_container = lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
-        details_block = html.find(attrs={"class": remote_container})
-        if details_block:
-            first_block = details_block.div
-            if first_block:
-                status = first_block.text
+        try:
+            container_name = "JobListItem_item__details"
+            remote_container = lambda class_name: class_name and class_name.startswith(container_name)
+            details_block = html.find(attrs={"class": remote_container})
+            if details_block:
+                first_block = details_block.div
+                if first_block:
+                    status = first_block.text
+        except:
+            print("Error fetching data from record: BULLDOGJOB -> Location")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         # <span> within parent folder of remote status icon
-        location_icon = {"style": "display: block;"}
-        location = html.find("div", location_icon)
-        if location:
-            parent_div = location.find_parent("div")
-            if parent_div:
-                status = parent_div.text.lower()
+        try:
+            location_icon = {"style": "display: block;"}
+            location = html.find("div", location_icon)
+            if location:
+                parent_div = location.find_parent("div")
+                if parent_div:
+                    status = parent_div.text.lower()
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"Error fetching data from record: {website} -> Location")
 
     elif SOLIDJOBS in search_link:
-        location = html.find_all("span", {"mattooltip": True})
-        remote_status = location[-1]
-        status = remote_status.text.strip()
+        try:
+            location = html.find_all("span", {"mattooltip": True})
+            remote_status = location[-1]
+            status = remote_status.text.strip()
+        except:
+            print("Error fetching data from record: SOLIDJOBS -> Location")
 
     elif PRACUJPL in search_link:
-        additional_info_containers = lambda tag: tag.has_attr("data-test") and tag["data-test"].startswith(
-            "offer-additional-info"
-        )
-        additional_info = html.find_all(additional_info_containers)
-        status = additional_info[-1].text
+        try:
+            tag_name = "offer-additional-info"
+            additional_info_containers = lambda tag: tag.has_attr("data-test") and tag["data-test"].startswith(
+                tag_name
+            )
+            additional_info = html.find_all(additional_info_containers)
+            status = additional_info[-1].text
+        except:
+            print("Error fetching data from record: PRACUJPL -> Location")
 
-    if status:
-        status = status.lower()
-        for key, keywords in remote_work_dict.items():
-            if any(keyword in status for keyword in keywords):
-                return key
-
-    else:
-        return "No status"
+    return process_remote_status(status)
 
 
 def salary(html, search_link: str) -> dict:

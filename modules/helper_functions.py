@@ -1,5 +1,7 @@
 import re
 
+from modules.dicts import remote_work_dict
+
 # Salary processing for JobRecord class
 
 
@@ -52,7 +54,7 @@ def split_salary(processed_salary):
     return min_salary, max_salary
 
 
-def remove_remote_status(location: str, remote_work_dict: dict) -> str:
+def remove_remote_status(location: str) -> str:
     """Remove remote work indicators from location string"""
     if not location:
         return None
@@ -71,3 +73,16 @@ def remove_remote_status(location: str, remote_work_dict: dict) -> str:
     clean_location = " | ".join(filtered_parts)
 
     return clean_location if clean_location else None
+
+
+def process_remote_status(status: str) -> str:
+    """Process remote work status and return standardized format"""
+    if not status:
+        return "No status"
+
+    status = status.lower()
+    for key, keywords in remote_work_dict.items():
+        if any(keyword in status for keyword in keywords):
+            return key
+
+    return "No status"
