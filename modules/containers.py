@@ -379,42 +379,62 @@ def salary(html, search_link: str) -> dict:
     """Returns salary container content for each website"""
     salary = None
     if NOFLUFFJOBS in search_link:
-        salary_container = {"data-cy": "salary ranges on the job offer listing"}
-        salary = html.find(attrs=salary_container)
+        try:
+            salary_container = {"data-cy": "salary ranges on the job offer listing"}
+            salary = html.find(attrs=salary_container)
+        except:
+            print("Error fetching data from record: NOFLUFFJOBS -> Salary")
 
     elif THEPROTOCOL in search_link:
-        salary_container = {"data-test": "text-salary"}
-        salary = html.find(attrs=salary_container)
+        try:
+            salary_container = {"data-test": "text-salary"}
+            salary = html.find(attrs=salary_container)
+        except:
+            print("Error fetching data from record: THEPROTOCOL -> Salary")
 
     elif BULLDOGJOB in search_link:
-        salary_container = lambda class_name: class_name and class_name.startswith("JobListItem_item__salary")
-        container = html.find(attrs={"class": salary_container})
-        if container:
-            salary = container.text
+        try:
+            container_name = "JobListItem_item__salary"
+            salary_container = lambda class_name: class_name and class_name.startswith(container_name)
+            container = html.find(attrs={"class": salary_container})
+            if container:
+                salary = container.text
+        except:
+            print("Error fetching data from record: BULLDOGJOB -> Salary")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        # All containers on site are MuiBox-root. Need to find the right one
-        MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-        # Salary is contained in the same parent div as the h3 tag with job title
-        h3_container = html.h3
-        if h3_container:
-            parent_div = h3_container.find_parent("div", class_=MuiBox_block)
-            # Salary is in <span> inside the parent div of <h3>
-            if parent_div:
-                salary_elements = parent_div.find_all("span")
-                if salary_elements:
-                    elements = [pay.text.strip() for pay in salary_elements]
-                    if elements:
-                        salary = " - ".join(elements)
+        try:
+            # All containers on site are MuiBox-root. Need to find the right one
+            MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+            # Salary is contained in the same parent div as the h3 tag with job title
+            h3_container = html.h3
+            if h3_container:
+                parent_div = h3_container.find_parent("div", class_=MuiBox_block)
+                # Salary is in <span> inside the parent div of <h3>
+                if parent_div:
+                    salary_elements = parent_div.find_all("span")
+                    if salary_elements:
+                        elements = [pay.text.strip() for pay in salary_elements]
+                        if elements:
+                            salary = " - ".join(elements)
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"Error fetching data from record: {website} -> Salary")
 
     elif SOLIDJOBS in search_link:
-        salary_container = html.find("sj-salary-display")
-        if salary_container:
-            salary = salary_container.text.strip()
+        try:
+            salary_container = html.find("sj-salary-display")
+            if salary_container:
+                salary = salary_container.text.strip()
+        except:
+            print("Error fetching data from record: SOLIDJOBS -> Salary")
 
     elif PRACUJPL in search_link:
-        salary_container = html.find("span", {"data-test": "offer-salary"})
-        if salary_container:
-            salary = salary_container.text.strip()
+        try:
+            salary_container = html.find("span", {"data-test": "offer-salary"})
+            if salary_container:
+                salary = salary_container.text.strip()
+        except:
+            print("Error fetching data from record: PRACUJPL -> Salary")
 
-    return salary if salary else None
+    return salary
