@@ -1,3 +1,4 @@
+from modules.helper_functions import remove_remote_status
 from modules.websites import JUSTJOINIT  # Same structure as RocketJobs
 from modules.websites import (
     BULLDOGJOB,
@@ -250,61 +251,78 @@ remote_work_dict = {
 
 def location(html, search_link: str) -> str:
     """Returns location container content for each website"""
+    location = None
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
-        location = html.find(attrs=location_container)
-        if location:
-            location = location.text.strip()
+        location_block = html.find(attrs=location_container).span
+        try:
+            location = location_block.text.strip()
+        except:
+            print("NOFLUFFJOBS record: Location not found")
 
     elif THEPROTOCOL in search_link:
-        location_container = {"data-test": "text-workplaces"}
-        location_container = html.find(attrs=location_container)
-        if location_container:
-            location = location_container.text
-        else:
-            location = None
+        try:
+            location_container = {"data-test": "text-workplaces"}
+            location_block = html.find(attrs=location_container)
+            if location_block:
+                location = location_block.text
+        except:
+            print("THEPROTOCOL record: Location not found")
 
     elif BULLDOGJOB in search_link:
         name = lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
         details_block = html.find(attrs={"class": name})
-        if details_block:
-            location_block = details_block.div
+        try:
+            location_block = details_block.div.div
             if location_block:
-                location = location_block.text
+                spans = location_block.find_all("span")
+                location_texts = [span.text.strip() for span in spans]
+                location = " | ".join(location_texts)
+
+            # if location_block:
+            #     location = location_block.text
+        except:
+            print("BULLDOGJOB record: Location not found")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         # <span> within parent folder of location icon
-        company_icon = {"data-testid": "PlaceOutlinedIcon"}
-        svg_icon = html.find("svg", company_icon)
-        if svg_icon:
-            parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-            parent_div = svg_icon.find_parent("div", class_=parent_block_class)
-            if parent_div:
-                location = parent_div.span
-                if location:
-                    location = location.text
+        try:
+            company_icon = {"data-testid": "PlaceOutlinedIcon"}
+            svg_icon = html.find("svg", company_icon)
+            if svg_icon:
+                parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+                parent_div = svg_icon.find_parent("div", class_=parent_block_class)
+                if parent_div:
+                    location_raw = parent_div.span
+                    if location_raw:
+                        location = location_raw.text
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"{website} record: Location not found")
 
     elif SOLIDJOBS in search_link:
-        location_container = html.find("div", class_="flex-row")
-        if location_container:
-            location_span = location_container.find_all("span")[1]
-            if location_span:
-                location = location_span.text.replace("100% zdalnie ", "").replace("(", "").replace(")", "").strip()
+        try:
+            location_container = html.find("div", class_="flex-row")
+            if location_container:
+                location_span = location_container.find_all("span")[1]
+                if location_span:
+                    location = (
+                        location_span.text.replace("100% zdalnie ", "").replace("(", "").replace(")", "").strip()
+                    )
+        except:
+            print("SOLIDJOBS record: Location not found")
 
     elif PRACUJPL in search_link:
-        loc = html.find("h4", {"data-test": "text-region"})
-        if loc and loc.strong:
-            location = loc.strong.text
-        else:
-            location = None
+        try:
+            loc = html.find("h4", {"data-test": "text-region"})
+            if loc and loc.strong:
+                location = loc.strong.text
+        except:
+            print("PRACUJPL record: Location not found")
 
-    # Remove remote status from location
-    if location:
-        location.strip()
-        if any(location.lower() in keywords for keywords in remote_work_dict.values()):
-            location = ""
+    location = remove_remote_status(location, remote_work_dict)
 
-    return location if location is not None else None
+    return location
 
 
 def remote_status(html, search_link: str) -> str:
