@@ -100,29 +100,50 @@ def url(record, search_link) -> str:
 
 def job_title(html, search_link) -> str:
     """Returns title container content for each website"""
+    title = None
+
     if NOFLUFFJOBS in search_link:
-        container = {"data-cy": "title position on the job offer listing"}
-        title = html.find(attrs=container)
+        try:
+            container = {"data-cy": "title position on the job offer listing"}
+            title = html.find(attrs=container)
+        except:
+            print("Error fetching data from record: NOFLUFFJOBS -> Title")
 
     elif THEPROTOCOL in search_link:
-        container = {"data-test": "text-jobTitle"}
-        title = html.find(attrs=container)
+        try:
+            container = {"data-test": "text-jobTitle"}
+            title = html.find(attrs=container)
+        except:
+            print("Error fetching data from record: THEPROTOCOL -> Title")
 
     elif BULLDOGJOB in search_link:
-        block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
-        container = {"class": block_name}
-        title_block = html.find(attrs=container)
-        title = title_block.h3
+        try:
+            block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
+            container = {"class": block_name}
+            title_block = html.find(attrs=container)
+            title = title_block.h3
+        except:
+            print("Error fetching data from record: BULLDOGJOB -> Title")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        title = html.h3
+        try:
+            title = html.h3
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"Error fetching data from record: {website} -> Title")
 
     elif SOLIDJOBS in search_link:
-        title = html.h2
+        try:
+            title = html.h2
+        except:
+            print("Error fetching data from record: SOLIDJOBS -> Title")
 
     elif PRACUJPL in search_link:
-        container = {"data-test": "offer-title"}
-        title = html.find("h2", container)
+        try:
+            container = {"data-test": "offer-title"}
+            title = html.find("h2", container)
+        except:
+            print("Error fetching data from record: PRACUJPL -> Title")
 
     return title.text.strip() if title else None
 
