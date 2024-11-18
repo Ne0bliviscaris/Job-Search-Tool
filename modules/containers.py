@@ -129,41 +129,61 @@ def job_title(html, search_link) -> str:
 
 def tags(html, search_link: str) -> str:
     """Returns tags container content for each website as a string separated by ' | '"""
+    tags_list = []
+
     if NOFLUFFJOBS in search_link:
-        tags_container = {"data-cy": "category name on the job offer listing"}
-        tags = html.find_all(attrs=tags_container)
-        tags_list = [tag.text for tag in tags]
+        try:
+            tags_container = {"data-cy": "category name on the job offer listing"}
+            tags = html.find_all(attrs=tags_container)
+            tags_list = [tag.text for tag in tags]
+        except:
+            print("Error fetching data from record: NOFLUFFJOBS -> Tags")
 
     elif THEPROTOCOL in search_link:
-        tags_container = {"data-test": "chip-expectedTechnology"}
-        tags = html.find_all(attrs=tags_container)
-        tags_list = [tag.text for tag in tags]
+        try:
+            tags_container = {"data-test": "chip-expectedTechnology"}
+            tags = html.find_all(attrs=tags_container)
+            tags_list = [tag.text for tag in tags]
+        except:
+            print("Error fetching data from record: THEPROTOCOL -> Tags")
 
     elif BULLDOGJOB in search_link:
-        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")
-        tags_container = {"class": name}
-
-        tags_block = html.find(attrs=tags_container)
-        if tags_block:
-            tags_list = [span.text for span in tags_block.find_all("span")]
+        try:
+            name = lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")
+            tags_container = {"class": name}
+            tags_block = html.find(attrs=tags_container)
+            if tags_block:
+                tags_list = [span.text for span in tags_block.find_all("span")]
+        except:
+            print("Error fetching data from record: BULLDOGJOB -> Tags")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        name = lambda class_name: class_name and class_name.startswith("skill-tag")
-        tags = html.find_all(class_=name)
-        tags_list = [tag.text for tag in tags]
+        try:
+            name = lambda class_name: class_name and class_name.startswith("skill-tag")
+            tags = html.find_all(class_=name)
+            tags_list = [tag.text for tag in tags]
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"Error fetching data from record: {website} -> Tags")
 
     elif SOLIDJOBS in search_link:
-        tags_block = html.find_all("solidjobs-skill-display")
-        if tags_block:
-            tags_list = [tag.text.replace("#", "") for tag in tags_block]
+        try:
+            tags_block = html.find_all("solidjobs-skill-display")
+            if tags_block:
+                tags_list = [tag.text.replace("#", "") for tag in tags_block]
+        except:
+            print("Error fetching data from record: SOLIDJOBS -> Tags")
 
     elif PRACUJPL in search_link:
-        container = {"data-test": "technologies-item"}
-        tags_block = html.find_all("span", container)
-        tags_list = [tag.text.strip() for tag in tags_block]
+        try:
+            container = {"data-test": "technologies-item"}
+            tags_block = html.find_all("span", container)
+            tags_list = [tag.text.strip() for tag in tags_block]
+        except:
+            print("Error fetching data from record: PRACUJPL -> Tags")
 
-    merged_tags = " | ".join(tags_list)
-    return merged_tags if tags_list else None
+    merged_tags = " | ".join(tags_list) if tags_list else None
+    return merged_tags
 
 
 def company(html, search_link: str) -> str:
