@@ -31,7 +31,7 @@ def get_search_container(driver: webdriver.Chrome, search_link: str) -> str:
         search_block = driver.find_element(By.CSS_SELECTOR, search_container)
         return search_block.get_attribute("outerHTML")
     except Exception as e:
-        print(f"Search container empty or not recognized for: {search_link}")
+        print(f"No offers found: {search_link}")
         return ""
 
 

@@ -30,7 +30,7 @@ def nofluffjobs_check_if_results_exist(webdriver):
         if no_offers_block:
             no_offers_text = no_offers_block.text
             if "Brak wyników wyszukiwania" in no_offers_text:
-                print("No offers found for No Fluff Jobs")
+                print(f"No offers found for NoFluffJobs: {webdriver.current_url}")
                 return True
     except Exception as e:
         pass

@@ -1,4 +1,3 @@
-from modules.dicts import remote_work_dict
 from modules.helper_functions import process_remote_status, remove_remote_status
 from modules.websites import JUSTJOINIT  # Same structure as RocketJobs
 from modules.websites import (
@@ -308,6 +307,7 @@ def company(html, search_link: str) -> str:
 def logo(html, search_link: str) -> str:
     """Returns logo container content for each website"""
     logo = None
+    logo_src = None
     if NOFLUFFJOBS in search_link:
         try:
             logo_container = {"alt": "Company logo"}
