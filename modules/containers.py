@@ -33,31 +33,52 @@ def search(search_link: str) -> str:
 
 def detect_records(html, search_link) -> list[str]:
     """Returns record container content for each website"""
+    records = None
+
     if NOFLUFFJOBS in search_link:
-        block_name = lambda id_name: id_name and id_name.startswith("nfjPostingListItem")
-        record_container = {"id": block_name}
-        records = html.find_all(attrs=record_container)
+        try:
+            block_name = lambda id_name: id_name and id_name.startswith("nfjPostingListItem")
+            record_container = {"id": block_name}
+            records = html.find_all(attrs=record_container)
+        except:
+            print("Error detecting records: NOFLUFFJOBS")
 
     elif THEPROTOCOL in search_link:
-        record_container = {"data-test": "list-item-offer"}
-        records = html.find_all(attrs=record_container)
+        try:
+            record_container = {"data-test": "list-item-offer"}
+            records = html.find_all(attrs=record_container)
+        except:
+            print("Error detecting records: THEPROTOCOL")
 
     elif BULLDOGJOB in search_link:
-        block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item")
-        record_container = {"class": block_name}
-        records = html.find_all("a", attrs=record_container)
+        try:
+            block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item")
+            record_container = {"class": block_name}
+            records = html.find_all("a", attrs=record_container)
+        except:
+            print("Error detecting records: BULLDOGJOB")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        record_container = {"data-index": True}
-        records = html.find_all(attrs=record_container)
+        try:
+            record_container = {"data-index": True}
+            records = html.find_all(attrs=record_container)
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"Error detecting records: {website}")
 
     elif SOLIDJOBS in search_link:
-        block_name = "sj-offer-list-item"  # <sj-offer-list-item> block
-        records = html.find_all(block_name)
+        try:
+            block_name = "sj-offer-list-item"  # <sj-offer-list-item> block
+            records = html.find_all(block_name)
+        except:
+            print("Error detecting records: SOLIDJOBS")
 
     elif PRACUJPL in search_link:
-        record_container = {"data-test": "default-offer"}
-        records = html.find_all(attrs=record_container)
+        try:
+            record_container = {"data-test": "default-offer"}
+            records = html.find_all(attrs=record_container)
+        except:
+            print("Error detecting records: PRACUJPL")
 
     if records is not None:
         return [job for job in records]
