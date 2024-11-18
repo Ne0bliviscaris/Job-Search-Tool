@@ -168,37 +168,58 @@ def tags(html, search_link: str) -> str:
 
 def company(html, search_link: str) -> str:
     """Returns company name container content for each website"""
+    company = None
+
     if NOFLUFFJOBS in search_link:
-        name = lambda x: x and x.startswith("company-name")
-        company_container = {"class": name}
-        company = html.find(attrs=company_container)
+        try:
+            name = lambda x: x and x.startswith("company-name")
+            company_container = {"class": name}
+            company = html.find(attrs=company_container)
+        except:
+            print("Error fetching data from record: NOFLUFFJOBS -> Company")
 
     elif THEPROTOCOL in search_link:
-        company_container = {"data-test": "text-employerName"}
-        company = html.find(attrs=company_container)
+        try:
+            company_container = {"data-test": "text-employerName"}
+            company = html.find(attrs=company_container)
+        except:
+            print("Error fetching data from record: THEPROTOCOL -> Company")
 
     elif BULLDOGJOB in search_link:
-        # Company container is first div after job title
-        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
-        title_company_container = {"class": name}
-        title_company_block = html.find(attrs=title_company_container)
-        # Find the <h3> tag with offer title and get the <div> sibling
-        title_container = title_company_block.h3
-        company = title_container.find_next_sibling("div")
+        try:
+            # Company container is first div after job title
+            name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
+            title_company_container = {"class": name}
+            title_company_block = html.find(attrs=title_company_container)
+            # Find the <h3> tag with offer title and get the <div> sibling
+            title_container = title_company_block.h3
+            company = title_container.find_next_sibling("div")
+        except:
+            print("Error fetching data from record: BULLDOGJOB -> Company")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        company_icon = {"data-testid": "ApartmentRoundedIcon"}
-        svg_icon = html.find("svg", company_icon)
-        if svg_icon:
-            parent_name = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-            parent_div = svg_icon.find_parent("div", class_=parent_name)
-            company = parent_div.span
+        try:
+            company_icon = {"data-testid": "ApartmentRoundedIcon"}
+            svg_icon = html.find("svg", company_icon)
+            if svg_icon:
+                parent_name = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+                parent_div = svg_icon.find_parent("div", class_=parent_name)
+                company = parent_div.span
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"Error fetching data from record: {website} -> Company")
 
     elif SOLIDJOBS in search_link:
-        company = html.find("a", {"mattooltip": "Kliknij, aby zobaczy pozostałe oferty firmy."})
+        try:
+            company = html.find("a", {"mattooltip": "Kliknij, aby zobaczy pozostałe oferty firmy."})
+        except:
+            print("Error fetching data from record: SOLIDJOBS -> Company")
 
     elif PRACUJPL in search_link:
-        company = html.find("h3", {"data-test": "text-company-name"})
+        try:
+            company = html.find("h3", {"data-test": "text-company-name"})
+        except:
+            print("Error fetching data from record: PRACUJPL -> Company")
 
     return company.text if company else None
 
