@@ -205,32 +205,55 @@ def company(html, search_link: str) -> str:
 
 def logo(html, search_link: str) -> str:
     """Returns logo container content for each website"""
+    logo = None
     if NOFLUFFJOBS in search_link:
-        logo_container = {"alt": "Company logo"}
-        if logo_container:
-            logo = html.find(attrs=logo_container)
+        try:
+            logo_container = {"alt": "Company logo"}
+            if logo_container:
+                logo = html.find(attrs=logo_container)
+        except:
+            print("Error fetching data from record: NOFLUFFJOBS -> Logo")
 
     elif THEPROTOCOL in search_link:
-        logo_container = {"data-test": "icon-companyLogo"}
-        if logo_container:
-            logo = html.find(attrs=logo_container)
+        try:
+            logo_container = {"data-test": "icon-companyLogo"}
+            if logo_container:
+                logo = html.find(attrs=logo_container)
+        except:
+            print("Error fetching data from record: THEPROTOCOL -> Logo")
 
     elif BULLDOGJOB in search_link:
-        logo_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__logo")}
-        if logo_container:
-            logo = html.find(attrs=logo_container).img
+        try:
+            logo_container = {
+                "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__logo")
+            }
+            if logo_container:
+                logo = html.find(attrs=logo_container).img
+        except:
+            print("Error fetching data from record: BULLDOGJOB -> Logo")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        logo = html.img
+        try:
+            logo = html.img
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"Error fetching data from record: {website} -> Logo")
 
     elif SOLIDJOBS in search_link:
-        logo = html.find("img")
+        try:
+            logo = html.find("img")
+        except:
+            print("Error fetching data from record: SOLIDJOBS -> Logo")
 
     elif PRACUJPL in search_link:
-        logo = html.find("img", {"data-test": "image-responsive"})
+        try:
+            logo = html.find("img", {"data-test": "image-responsive"})
+        except:
+            print("Error fetching data from record: PRACUJPL -> Logo")
 
     if logo:
         logo_src = logo.get("src")
+
     return logo_src if logo_src else None
 
 
@@ -317,7 +340,7 @@ def remote_status(html, search_link: str) -> str:
             if location:
                 status = location.text
         except:
-            print("Error fetching data from record: NOFLUFFJOBS -> Location")
+            print("Error fetching data from record: NOFLUFFJOBS -> Remote status")
 
     elif THEPROTOCOL in search_link:
         try:
@@ -326,7 +349,7 @@ def remote_status(html, search_link: str) -> str:
             if remote_status:
                 status = remote_status.text.lower()
         except:
-            print("Error fetching data from record: THEPROTOCOL -> Location")
+            print("Error fetching data from record: THEPROTOCOL -> Remote status")
 
     elif BULLDOGJOB in search_link:
         try:
@@ -338,7 +361,7 @@ def remote_status(html, search_link: str) -> str:
                 if first_block:
                     status = first_block.text
         except:
-            print("Error fetching data from record: BULLDOGJOB -> Location")
+            print("Error fetching data from record: BULLDOGJOB -> Remote status")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
         # <span> within parent folder of remote status icon
@@ -351,7 +374,7 @@ def remote_status(html, search_link: str) -> str:
                     status = parent_div.text.lower()
         except:
             website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
-            print(f"Error fetching data from record: {website} -> Location")
+            print(f"Error fetching data from record: {website} -> Remote status")
 
     elif SOLIDJOBS in search_link:
         try:
@@ -359,7 +382,7 @@ def remote_status(html, search_link: str) -> str:
             remote_status = location[-1]
             status = remote_status.text.strip()
         except:
-            print("Error fetching data from record: SOLIDJOBS -> Location")
+            print("Error fetching data from record: SOLIDJOBS -> Remote status")
 
     elif PRACUJPL in search_link:
         try:
@@ -370,7 +393,7 @@ def remote_status(html, search_link: str) -> str:
             additional_info = html.find_all(additional_info_containers)
             status = additional_info[-1].text
         except:
-            print("Error fetching data from record: PRACUJPL -> Location")
+            print("Error fetching data from record: PRACUJPL -> Remote status")
 
     return process_remote_status(status)
 
