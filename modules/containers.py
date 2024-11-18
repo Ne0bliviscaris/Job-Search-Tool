@@ -67,28 +67,47 @@ def detect_records(html, search_link) -> list[str]:
 
 def url(record, search_link) -> str:
     """Returns url container content for each website"""
+    url = None
     if NOFLUFFJOBS in search_link:
-        # url = record.get("a", href=True)
-        url = record.get("href")
+        try:
+            url = record.get("href")
+        except:
+            print("Error fetching data from record: NOFLUFFJOBS -> URL")
 
     elif THEPROTOCOL in search_link:
-        url = record.get("href")
+        try:
+            url = record.get("href")
+        except:
+            print("Error fetching data from record: THEPROTOCOL -> URL")
 
     elif BULLDOGJOB in search_link:
-        url = record.get("href")
+        try:
+            url = record.get("href")
+        except:
+            print("Error fetching data from record: BULLDOGJOB -> URL")
 
     elif ROCKETJOBS in search_link or JUSTJOINIT in search_link:
-        url_a = record.find("a", href=True)
-        url = url_a.get("href")
+        try:
+            url_a = record.find("a", href=True)
+            url = url_a.get("href")
+        except:
+            website = "JUSTJOINIT" if JUSTJOINIT in search_link else "ROCKETJOBS"
+            print(f"Error fetching data from record: {website} -> URL")
 
     elif SOLIDJOBS in search_link:
-        url_a = record.find("a", href=True)
-        url = url_a.get("href")
+        try:
+            url_a = record.find("a", href=True)
+            url = url_a.get("href")
+        except:
+            print("Error fetching data from record: SOLIDJOBS -> URL")
 
     elif PRACUJPL in search_link:
-        container = {"data-test": "link-offer"}
-        url_a = record.find("a", container)
-        url = url_a.get("href") if url_a else None
+        try:
+            container = {"data-test": "link-offer"}
+            url_a = record.find("a", container)
+            url = url_a.get("href") if url_a else None
+        except:
+            print("Error fetching data from record: PRACUJPL -> URL")
 
     if url:
         if url.startswith("http"):
