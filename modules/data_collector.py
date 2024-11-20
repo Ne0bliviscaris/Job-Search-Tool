@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 
 from modules.data_processor import (
     build_dataframe,
@@ -30,8 +31,14 @@ def search_site(link: str) -> list:
     """
     Get HTML block containing job search results from a file
     """
-    file = set_filename(link)
-    soup = html_to_soup(file)
+    try:
+        file = set_filename(link)
+        soup = html_to_soup(file)
 
-    job_records = process_records(soup, search_links[link]) if soup is not None else []
+        job_records = process_records(soup, search_links[link]) if soup is not None else []
+    except FileNotFoundError:
+        print(f"Run updater to process link: {link}.")
+        job_records = []
+        if "st" in globals():
+            st.toast(f"**Run updater to process link:**\n{link}", icon="⚠️")
     return job_records
