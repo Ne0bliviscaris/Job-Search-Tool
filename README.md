@@ -9,6 +9,15 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 ---
 <br><br>
 
+
+
+Containers:
+Try except each return, provide info on the point of failure
+"error on location for link nofluffjobs"
+
+
+
+
 # TODO:
 
 <details>
@@ -61,6 +70,14 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 # Changelog:
 <details>
 <summary><strong>Click to see the details</strong></summary>
+
+#### 20.11.2024
+- Popup and terminal report if update is needed
+- Prevent crashes if update file is missing while search link is active
+
+#### 18.11.2024
+- Report points of failure while scraping
+- Prevent app crashes caused by missing data
 
 #### 08.10.2024
 - Moved Selenium Chromedriver to Docker container
