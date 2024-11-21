@@ -1,6 +1,7 @@
 import streamlit as st
 
 import modules.data_collector as data_collector
+import modules.data_processor as data_processor
 from modules.dataframe_settings import set_column_config
 
 # Set page configuration
@@ -14,5 +15,5 @@ column_config = set_column_config()
 st.data_editor(collected_frame, column_config=column_config)
 
 if st.button("save records to file"):
-    data_collector.save_dataframe_to_csv(collected_frame, "modules/sites/records.csv")
+    data_processor.save_dataframe_to_csv(collected_frame, "modules/sites/records.csv")
     st.success("Saved!")

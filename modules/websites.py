@@ -22,12 +22,14 @@ search_links = {
     "solidjobs_data-junior-remote": "https://solid.jobs/offers/it;cities=Praca%20zdalna;categories=Data%20Science;experiences=Junior",
     "solidjobs_python-junior-remote": "https://solid.jobs/offers/it;cities=Praca%20zdalna;subcategories=Python;experiences=Junior",
     # Mid offers
-    #
-    # # Hybrid/local offers
-    # "nofluffjobs_data-ai-trainee-junior-poznan": "https://nofluffjobs.com/pl/hybrid/artificial-intelligence?criteria=city%3Dpoznan%20category%3Ddata%20seniority%3Dtrainee,junior",
-    # "theprotocol_python-big-data-ai-ml-junior-assistant-trainee-poznan": "https://theprotocol.it/filtry/python;t/big-data-science,ai-ml;sp/junior,assistant,trainee;p/poznan;wp/hybrydowa,zdalna;rw",
-    # "bulldogjob_data-poznan": "https://bulldogjob.pl/companies/jobs/s/locationDistance,50/role,data/city,Pozna%C5%84",
-    # "pracujpl_data-ai-junior-poznan": "https://it.pracuj.pl/praca/poznan;wp/praca%20hybrydowa;wm,hybrid?rd=30&et=17&ap=true&its=ai-ml%2Cbig-data-science",
+    "solidjobs_python-regular-remote": "https://solid.jobs/offers/it;cities=Praca%20zdalna;subcategories=Python;experiences=Regular",
+    "theprotocol-hybrid-test": "https://theprotocol.it/filtry/python;t/big-data-science,ai-ml;sp/zdalna,hybrydowa;rw",
+    # Hybrid/local offers
+    "nofluffjobs_data-ai-trainee-junior-poznan": "https://nofluffjobs.com/pl/hybrid/artificial-intelligence?criteria=city%3Dpoznan%20category%3Ddata%20seniority%3Dtrainee,junior",
+    "nofluffjobs-test": "https://nofluffjobs.com/pl/hybrid/artificial-intelligence?criteria=city%3Dpoznan%20category%3Ddata%20seniority%3Dtrainee,junior,mid,senior",
+    "theprotocol_python-big-data-ai-ml-junior-assistant-trainee-poznan": "https://theprotocol.it/filtry/python;t/big-data-science,ai-ml;sp/junior,assistant,trainee;p/poznan;wp/hybrydowa,zdalna;rw",
+    "bulldogjob_data-poznan": "https://bulldogjob.pl/companies/jobs/s/locationDistance,50/role,data/city,Pozna%C5%84",
+    "pracujpl_data-ai-junior-poznan": "https://it.pracuj.pl/praca/poznan;wp/praca%20hybrydowa;wm,hybrid?rd=30&et=17&ap=true&its=ai-ml%2Cbig-data-science",
 }
 
 websites = {

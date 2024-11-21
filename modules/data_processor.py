@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 from bs4 import BeautifulSoup
 
@@ -15,10 +17,10 @@ def process_records(soup_object: BeautifulSoup, link: str) -> list[JobRecord]:
     return [JobRecord(record, current_website) for record in records]
 
 
-def build_dataframe(records: list[list[JobRecord]]) -> pd.DataFrame:
-    """Convert a flattened list of JobRecord objects to a pandas DataFrame"""
-    records_list = [item for sublist in records for item in sublist]
-    flattened_records = [record.prepare_dataframe() for record in records_list]
+def build_dataframe(records):
+    """Convert a matrix[link][number] of JobRecords to a pandas DataFrame"""
+    records_matrix = [item for sublist in records for item in sublist]
+    flattened_records = [record.prepare_dataframe() for record in records_matrix]
     return pd.DataFrame(flattened_records)
 
 
@@ -28,3 +30,17 @@ def html_to_soup(filename: str) -> BeautifulSoup:
     """
     with open(filename, "r", encoding="utf-8") as file:
         return BeautifulSoup(file, "html.parser")
+
+
+def set_filename(link: str) -> str:
+    """
+    Generate a readable filename based on the combined link
+    """
+    return os.path.join("modules/sites", f"{link}.html")
+
+
+def save_dataframe_to_csv(dataframe: pd.DataFrame, file_path: str) -> None:
+    """
+    Save the given DataFrame to a CSV file.
+    """
+    dataframe.to_csv(file_path, index=False)
