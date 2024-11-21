@@ -7,11 +7,14 @@ st.set_page_config(layout="wide")
 
 new_records = pd.DataFrame()
 archived_records = pd.DataFrame()
+synced_status = False
 
 if st.button("Perform automatic synchronization"):
     with st.spinner("Updating..."):  # Display a spinner while updating
         archived_records, new_records = auto_sync()
         st.success("All sites synced successfully!")
+        synced_status = True
 
-show_new_records(new_records)
-show_archived_records(archived_records)
+if synced_status:
+    show_new_records(new_records)
+    show_archived_records(archived_records)
