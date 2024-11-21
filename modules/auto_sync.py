@@ -25,7 +25,7 @@ def show_new_records(new_records):
         st.title("New records:")
         st.dataframe(new_records, column_config=column_config)
     else:
-        st.write("No new records to display")
+        st.warning("No new records to display")
 
 
 def show_archived_records(archived_records):
@@ -34,4 +34,4 @@ def show_archived_records(archived_records):
         st.title("Archived records:")
         st.dataframe(archived_records, column_config=column_config)
     else:
-        st.write("No archived records to display")
+        st.warning("No archived records to display")
