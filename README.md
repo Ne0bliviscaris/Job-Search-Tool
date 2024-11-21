@@ -11,10 +11,10 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 
 
 
-Containers:
-Try except each return, provide info on the point of failure
-"error on location for link nofluffjobs"
-
+Move data storage from CSV to SQL file
+Handle all records in a single table with offer status as active/archive
+Process data without saving HTML files
+Streamline update process - merge with auto sync
 
 
 
