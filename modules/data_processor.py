@@ -86,6 +86,43 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
         db.close()
 
 
+def load_records_from_db() -> pd.DataFrame:
+    """Load job records from the database."""
+    db: Session = SessionLocal()
+    try:
+        records = db.query(JobOfferRecord).all()
+        data = [
+            {
+                "title": record.title,
+                "logo": record.logo,
+                "company_name": record.company_name,
+                "location": record.location,
+                "remote_status": record.remote_status,
+                "min_salary": record.min_salary,
+                "max_salary": record.max_salary,
+                "salary_details": record.salary_details,
+                "salary_text": record.salary_text,
+                "tags": record.tags,
+                "url": record.url,
+                "website": record.website,
+                "added_date": record.added_date,
+                "notes": record.notes,
+                "personal_rating": record.personal_rating,
+                "application_status": record.application_status,
+                "application_date": record.application_date,
+                "feedback_received": record.feedback_received,
+                "feedback_date": record.feedback_date,
+                "archived_date": record.archived_date,
+                "offer_status": record.offer_status,
+                "users_id": record.users_id,
+            }
+            for record in records
+        ]
+        return pd.DataFrame(data)
+    finally:
+        db.close()
+
+
 def update_record_status(url: str, new_status: str) -> None:
     """Update the status of a record in the database."""
     db: Session = SessionLocal()
