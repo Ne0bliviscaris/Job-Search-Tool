@@ -78,11 +78,11 @@ def remove_remote_status(location: str) -> str:
 def process_remote_status(status: str) -> str:
     """Process remote work status and return standardized format"""
     if not status:
-        return "No status"
+        return "Unknown"
 
     status = status.lower()
     for key, keywords in remote_work_dict.items():
         if any(keyword in status for keyword in keywords):
             return key
 
-    return "No status"
+    return "Unknown"
