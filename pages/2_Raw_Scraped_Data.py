@@ -17,3 +17,7 @@ st.data_editor(collected_frame, column_config=column_config)
 if st.button("save records to file"):
     data_processor.save_dataframe_to_csv(collected_frame, "modules/sites/records.csv")
     st.success("Saved!")
+
+if st.button("save records to database"):
+    data_processor.save_records_to_db(collected_frame)
+    st.success("Saved to database!")
