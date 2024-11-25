@@ -8,7 +8,7 @@ from modules.data_collector import all_sites_dataframe
 from modules.data_processor import load_records_from_db, save_records_to_db
 from modules.database.database import JobOfferRecord, SessionLocal
 
-COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text"]
+COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text", "tags", "location"]
 
 
 def prepare_comparison(frame: pd.DataFrame) -> set:
@@ -44,10 +44,6 @@ def sync_records():
     # Save the updated synced file
     if new_records:
         save_records_to_db(synced_dataframe)
-    # Return the archived and new records as DataFrames
-    missing_records = filter_records(current_db, missing_records)
-    new_records = filter_records(update, new_records)
-    return missing_records, new_records
 
 
 def process_new_records(cleaned_current_file, new_records, update_frame: pd.DataFrame) -> pd.DataFrame:
@@ -108,8 +104,7 @@ def changed_records() -> tuple:
 
 def add_timestamp(records_frame, column):
     """Add a timestamp to the records DataFrame."""
-    timestamp = datetime.now().strftime("%d-%m-%Y")
-    records_frame[column] = timestamp
+    records_frame[column] = timestamp()
     records_frame[column] = pd.to_datetime(records_frame[column])
     return records_frame
 
@@ -124,12 +119,12 @@ def show_recently_changed(record_type) -> pd.DataFrame:
     Inputs: "active" or "archived"."""
     db: Session = SessionLocal()
     try:
-        one_day_ago = datetime.now() - timedelta(days=1)
+        three_days_ago = datetime.now() - timedelta(days=3)
 
         if record_type == "active":
-            records = db.query(JobOfferRecord).filter(JobOfferRecord.added_date >= one_day_ago).all()
+            records = db.query(JobOfferRecord).filter(JobOfferRecord.added_date >= three_days_ago).all()
         elif record_type == "archived":
-            records = db.query(JobOfferRecord).filter(JobOfferRecord.archived_date >= one_day_ago).all()
+            records = db.query(JobOfferRecord).filter(JobOfferRecord.archived_date >= three_days_ago).all()
 
         data = [
             {
