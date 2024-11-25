@@ -91,9 +91,10 @@ def load_records_from_db(archive=False) -> pd.DataFrame:
     db: Session = SessionLocal()
     try:
         if not archive:
-            records = db.query(JobOfferRecord).all()
+            records = db.query(JobOfferRecord).where(JobOfferRecord.offer_status == "active").all()
             data = [
                 {
+                    "id": record.id,
                     "title": record.title,
                     "logo": record.logo,
                     "company_name": record.company_name,
@@ -123,6 +124,7 @@ def load_records_from_db(archive=False) -> pd.DataFrame:
             records = db.query(JobOfferRecord).filter(JobOfferRecord.offer_status == "archived").all()
             data = [
                 {
+                    "id": record.id,
                     "title": record.title,
                     "logo": record.logo,
                     "company_name": record.company_name,
@@ -153,15 +155,15 @@ def load_records_from_db(archive=False) -> pd.DataFrame:
         db.close()
 
 
-def update_record_status(url: str, new_status: str) -> None:
-    """Update the status of a record in the database."""
+def update_record(record_id: str, updates: dict = None) -> None:
+    """Update the status or fields of a record in the database."""
     db: Session = SessionLocal()
     try:
-        record = db.query(JobOfferRecord).filter(JobOfferRecord.url == url).first()
+        record = db.query(JobOfferRecord).filter(JobOfferRecord.id == record_id).first()
         if record:
-            record.offer_status = new_status
-            if new_status == "archived":
-                record.archived_date = datetime.now().date()
+            if updates:
+                for key, value in updates.items():
+                    setattr(record, key, value)
             db.commit()
     finally:
         db.close()
