@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 
+from modules.data_processor import db_drop_duplicates, reactivate_all_offers
 from modules.dataframe_settings import column_conversions
 from modules.sync.sync import show_recently_changed, sync_records
 from modules.updater.updater import update_all_sites
@@ -30,7 +31,7 @@ def sync_button():
 
 def show_active_offers():
     """Show active offers."""
-    st.title("Active offers:")
+    st.title("Recently added active offers:")
     ACTIVE = "active"
     active = show_recently_changed(ACTIVE)
     if active is not None and not active.empty:
@@ -41,13 +42,33 @@ def show_active_offers():
 
 def show_archived_offers():
     """Show archived offers."""
-    st.title("Archived offers:")
+    st.title("Recently archived offers:")
     ARCHIVED = "archived"
     archived = show_recently_changed(ARCHIVED)
     if archived is not None and not archived.empty:
-        column_conversions(archived)
+        column_conversions(archived, ARCHIVED)
     else:
         st.warning("No archived records.")
+
+
+def resync_button():
+    """Perform resynchronization of the database."""
+    if st.button("Resynchronize all offers"):
+        with st.spinner("Resynchronizing..."):
+            reactivate_all_offers()
+            st.warning("All offers desynchronized!")
+            db_drop_duplicates()
+            st.warning("Duplicates removed!")
+            sync_records()
+            st.success("All offers resynchronized!")
+
+
+def reactivate_all_offers_button():
+    """Perform desynchronization of the database."""
+    if st.button("Reactivate all offers"):
+        with st.spinner("Desynchronizing..."):
+            reactivate_all_offers()
+            st.warning("All offers reactivated!")
 
 
 def main():
@@ -55,6 +76,8 @@ def main():
     sync_button()
     show_active_offers()
     show_archived_offers()
+    resync_button()
+    reactivate_all_offers_button()
 
 
 main()
