@@ -1,43 +1,31 @@
-import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
+from sqlalchemy import update
+from sqlalchemy.orm import Session
 
-from modules.dataframe_settings import ALL_COLUMNS
+from modules.data_collector import all_sites_dataframe
+from modules.data_processor import load_records_from_db, save_records_to_db
+from modules.database.database import JobOfferRecord, SessionLocal
 
-RAW_FILE = "modules/sites/records.csv"
-SYNCED_FILE = "modules/sites/synced_records.csv"
-ARCHIVE_FILE = "modules/sites/archived_records.csv"
 COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text"]
 
 
-def load_csv(file: str) -> pd.DataFrame:
-    """Load CSV file, return empty DataFrame if file does not exist."""
-    if os.path.exists(file):
-        return pd.read_csv(file)
-    return pd.DataFrame(columns=ALL_COLUMNS)
-
-
-def save_csv(dataframe, file_path, mode="w", header=True):
-    """Save DataFrame to CSV file."""
-    dataframe.to_csv(file_path, mode=mode, header=header, index=False)
-
-
-def compare_content(file: pd.DataFrame) -> set:
+def prepare_comparison(frame: pd.DataFrame) -> set:
     """Set columns for the DataFrame."""
-    columns_to_compare = file[COLUMNS_TO_COMPARE]
+    columns_to_compare = frame[COLUMNS_TO_COMPARE]
     rows_as_tuples = columns_to_compare.apply(tuple, axis=1)
     rows_to_compare = set(rows_as_tuples)
     return rows_to_compare
 
 
-def filter_records(df, records) -> pd.DataFrame:
+def filter_records(db_records, tested_records) -> pd.DataFrame:
     """Returns only df records matching given records.
     Compares content of columns specified in COLUMNS_TO_COMPARE."""
-    columns = df[COLUMNS_TO_COMPARE]
+    columns = db_records[COLUMNS_TO_COMPARE]
     df_rows = columns.apply(tuple, axis=1)
-    is_in_records = df_rows.isin(records)
-    return df[is_in_records]
+    matching_records = df_rows.isin(tested_records)
+    return db_records[matching_records]
 
 
 def sync_records():
@@ -45,47 +33,52 @@ def sync_records():
     Main function to oversee the synchronisation process
     Extract records from raw, add additional information and return processed data into a new file
     """
-    missing_records, new_records, current_file, update = changed_records()
+    missing_records, new_records, current_db, update = changed_records()
 
     # Archive missing records
-    cleaned_current_file = archive_records(current_file, missing_records)
+    cleaned_dataframe = archive_records(current_db, missing_records)
 
     # If the record is new, add custom columns
-    synced_file = process_new_records(cleaned_current_file, new_records, update)
+    synced_dataframe = process_new_records(cleaned_dataframe, new_records, update)
 
     # Save the updated synced file
-    save_csv(synced_file, SYNCED_FILE)
-
+    if new_records:
+        save_records_to_db(synced_dataframe)
     # Return the archived and new records as DataFrames
-    missing_records = filter_records(current_file, missing_records)
+    missing_records = filter_records(current_db, missing_records)
     new_records = filter_records(update, new_records)
     return missing_records, new_records
 
 
-def process_new_records(cleaned_current_file: pd.DataFrame, new_records: set, update: pd.DataFrame) -> pd.DataFrame:
+def process_new_records(cleaned_current_file, new_records, update_frame: pd.DataFrame) -> pd.DataFrame:
     """Process new records adding custom columns and timestamp."""
-    new_records_df = filter_records(update, new_records)
+    new_records_df = filter_records(update_frame, new_records)
     if not new_records_df.empty:
         merged_new_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
         return merged_new_frame
     return cleaned_current_file
 
 
-def archive_records(current_file: pd.DataFrame, missing_records: set) -> pd.DataFrame:
+def archive_records(db_records, missing_records: set) -> pd.DataFrame:
     """Archive missing records from synced file."""
-    records_to_archive = filter_records(current_file, missing_records)
+    records_to_archive = filter_records(db_records, missing_records)
 
     if not records_to_archive.empty:
-        records_to_archive = add_timestamp(records_to_archive, "archived_date")
+        records_to_archive = add_timestamp(records_to_archive, column="archived_date")
 
-        # Append records to the archive file, adding header if the file is empty
-        is_empty_archive = not os.path.exists(ARCHIVE_FILE) or os.stat(ARCHIVE_FILE).st_size == 0
-        save_csv(records_to_archive, ARCHIVE_FILE, mode="a", header=is_empty_archive)
-
-        # Remove archived records from current_file
-        current_file = remove_archived_records(current_file, missing_records)
-
-    return current_file
+        db: Session = SessionLocal()
+        try:
+            # Prepare the update statement
+            for _, row in records_to_archive.iterrows():
+                update_values = {
+                    "archived_date": row["archived_date"],
+                    "offer_status": "archived",
+                }
+                update_status = update(JobOfferRecord).where(JobOfferRecord.id == row["id"]).values(update_values)
+                db.execute(update_status)
+            db.commit()
+        finally:
+            db.close()
 
 
 def remove_archived_records(df: pd.DataFrame, records_to_remove: set) -> pd.DataFrame:
@@ -101,21 +94,71 @@ def remove_archived_records(df: pd.DataFrame, records_to_remove: set) -> pd.Data
 
 def changed_records() -> tuple:
     """Load files and return missing and new records."""
-    update = load_csv(RAW_FILE)
-    current_file = load_csv(SYNCED_FILE)
+    update = all_sites_dataframe()
+    current_db = load_records_from_db()
 
-    current_records = compare_content(current_file) if not current_file.empty else set()
-    update_records = compare_content(update)
+    current_records = prepare_comparison(current_db) if not current_db.empty else set()
+    update_records = prepare_comparison(update)
 
     missing_records = current_records - update_records
     new_records = update_records - current_records
 
-    return missing_records, new_records, current_file, update
+    return missing_records, new_records, current_db, update
 
 
-def add_timestamp(records_frame, column_name):
+def add_timestamp(records_frame, column):
     """Add a timestamp to the records DataFrame."""
     timestamp = datetime.now().strftime("%d-%m-%Y")
-    records_frame[column_name] = timestamp
-    records_frame[column_name] = pd.to_datetime(records_frame[column_name])
+    records_frame[column] = timestamp
+    records_frame[column] = pd.to_datetime(records_frame[column])
     return records_frame
+
+
+def timestamp():
+    """Return a timestamp."""
+    return datetime.now().strftime("%d-%m-%Y")
+
+
+def show_recently_changed(record_type) -> pd.DataFrame:
+    """Load job records from the database where added_date is less than 1 day old.
+    Inputs: "active" or "archived"."""
+    db: Session = SessionLocal()
+    try:
+        one_day_ago = datetime.now() - timedelta(days=1)
+
+        if record_type == "active":
+            records = db.query(JobOfferRecord).filter(JobOfferRecord.added_date >= one_day_ago).all()
+        elif record_type == "archived":
+            records = db.query(JobOfferRecord).filter(JobOfferRecord.archived_date >= one_day_ago).all()
+
+        data = [
+            {
+                "id": record.id,
+                "title": record.title,
+                "logo": record.logo,
+                "company_name": record.company_name,
+                "location": record.location,
+                "remote_status": record.remote_status,
+                "min_salary": record.min_salary,
+                "max_salary": record.max_salary,
+                "salary_details": record.salary_details,
+                "salary_text": record.salary_text,
+                "tags": record.tags,
+                "url": record.url,
+                "website": record.website,
+                "added_date": record.added_date,
+                "notes": record.notes if hasattr(record, "notes") else "",
+                "personal_rating": record.personal_rating,
+                "application_status": record.application_status,
+                "application_date": record.application_date,
+                "feedback_received": record.feedback_received,
+                "feedback_date": record.feedback_date,
+                "archived_date": record.archived_date,
+                "offer_status": record.offer_status,
+                "users_id": record.users_id,
+            }
+            for record in records
+        ]
+        return pd.DataFrame(data)
+    finally:
+        db.close()
