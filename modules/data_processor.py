@@ -167,3 +167,31 @@ def update_record(record_id: str, updates: dict = None) -> None:
             db.commit()
     finally:
         db.close()
+
+
+def reactivate_all_offers():
+    """Reactivate all archived offers."""
+    db: Session = SessionLocal()
+    try:
+        records = db.query(JobOfferRecord).filter(JobOfferRecord.offer_status == "archived").all()
+        for record in records:
+            record.archived_date = None
+            record.offer_status = "active"
+        db.commit()
+
+        print(f"Reactivated {len(records)} offers.")
+    finally:
+        db.close()
+
+
+def db_drop_duplicates():
+    """Remove duplicate records from the database."""
+    db: Session = SessionLocal()
+    try:
+        records = db.query(JobOfferRecord).all()
+        records_df = pd.DataFrame(records)
+        COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text", "tags", "location"]
+        records_df.drop_duplicates()
+        db.commit()
+    finally:
+        db.close()
