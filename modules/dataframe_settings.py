@@ -28,6 +28,7 @@ ALL_COLUMNS = [
     "notes",
     "personal_rating",
     "archived_date",
+    "offer_status",
 ]
 
 MAIN_FRAME_COLUMNS = [
@@ -54,6 +55,7 @@ MAIN_FRAME_COLUMNS = [
     "feedback_received",
     "feedback_date",
     "time_until_feedback",
+    "offer_status",
 ]
 
 ARCHIVE_COLUMNS = [
@@ -75,6 +77,7 @@ ARCHIVE_COLUMNS = [
     "notes",
     "personal_rating",
     "archived_date",
+    "offer_status",
 ]
 
 
@@ -122,7 +125,7 @@ def set_column_config(archive=False):
 def column_conversions(frame, archive=False):
     """Return column conversions for the data editor."""
     columns = MAIN_FRAME_COLUMNS if not archive else ARCHIVE_COLUMNS
-
+    frame = add_missing_columns(frame)
     frame = fill_missing_values(frame)
     frame = convert_date_columns(frame)
     frame = calculate_elapsed_days(frame, archive=archive)
@@ -140,6 +143,14 @@ def convert_date_columns(frame):
         if col not in frame.columns:
             frame[col] = pd.NaT
         frame[col] = pd.to_datetime(frame[col], errors="coerce")
+    return frame
+
+
+def add_missing_columns(frame):
+    """Add missing columns to the DataFrame."""
+    missing_columns = set(ALL_COLUMNS) - set(frame.columns)
+    for col in missing_columns:
+        frame[col] = pd.NA
     return frame
 
 
