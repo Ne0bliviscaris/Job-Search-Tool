@@ -14,10 +14,6 @@ collected_frame = data_collector.all_sites_dataframe()
 column_config = set_column_config()
 st.data_editor(collected_frame, column_config=column_config)
 
-if st.button("save records to file"):
+if st.button("export to CSV"):
     data_processor.save_dataframe_to_csv(collected_frame, "modules/sites/records.csv")
     st.success("Saved!")
-
-if st.button("Append records to database"):
-    data_processor.save_records_to_db(collected_frame)
-    st.success("Appended to database!")
