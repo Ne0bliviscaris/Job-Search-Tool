@@ -3,13 +3,14 @@ import os
 
 import pandas as pd
 from bs4 import BeautifulSoup
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from modules.containers import detect_records
 from modules.JobRecord import JobRecord
 from modules.websites import identify_website
 
-from .database.database import JobOfferRecord, SessionLocal, init_db
+from .database.database import JobOfferRecord, SessionLocal
 
 
 def process_records(soup_object: BeautifulSoup, link: str) -> list[JobRecord]:
@@ -50,107 +51,48 @@ def save_dataframe_to_csv(dataframe: pd.DataFrame, file_path: str) -> None:
     dataframe.to_csv(file_path, index=False)
 
 
-def save_records_to_db(dataframe: pd.DataFrame) -> None:
-    """Save the given DataFrame to the database."""
-    init_db()
-    db: Session = SessionLocal()
-    try:
-        for _, row in dataframe.iterrows():
-            record = JobOfferRecord(
-                title=row.get("title", ""),
-                logo=row.get("logo", ""),
-                company_name=row.get("company_name", "Unknown"),
-                location=row.get("location", None),
-                remote_status=row.get("remote_status", "Unknown"),
-                min_salary=row.get("min_salary", None),
-                max_salary=row.get("max_salary", None),
-                salary_details=row.get("salary_details", None),
-                salary_text=row.get("salary_text", None),
-                tags=row.get("tags", None),
-                url=row.get("url", ""),
-                website=row.get("website", ""),
-                added_date=row.get("added_date", None),
-                notes=row.get("notes", None),
-                personal_rating=row.get("personal_rating", 0),
-                application_status=row.get("application_status", "Not applied"),
-                application_date=row.get("application_date", None),
-                feedback_received=row.get("feedback_received", False),
-                feedback_date=row.get("feedback_date", None),
-                archived_date=row.get("archived_date", None),
-                offer_status="active",
-                users_id=row.get("users_id", 0),
-            )
-            db.add(record)
-        db.commit()
-    finally:
-        db.close()
-
-
 def load_records_from_db(archive=False) -> pd.DataFrame:
     """Load job records from the database."""
     db: Session = SessionLocal()
     try:
         if not archive:
             records = db.query(JobOfferRecord).where(JobOfferRecord.offer_status == "active").all()
-            data = [
-                {
-                    "id": record.id,
-                    "title": record.title,
-                    "logo": record.logo,
-                    "company_name": record.company_name,
-                    "location": record.location,
-                    "remote_status": record.remote_status,
-                    "min_salary": record.min_salary,
-                    "max_salary": record.max_salary,
-                    "salary_details": record.salary_details,
-                    "salary_text": record.salary_text,
-                    "tags": record.tags,
-                    "url": record.url,
-                    "website": record.website,
-                    "added_date": record.added_date,
-                    "notes": record.notes,
-                    "personal_rating": record.personal_rating,
-                    "application_status": record.application_status,
-                    "application_date": record.application_date,
-                    "feedback_received": record.feedback_received,
-                    "feedback_date": record.feedback_date,
-                    "archived_date": record.archived_date,
-                    "offer_status": record.offer_status,
-                    "users_id": record.users_id,
-                }
-                for record in records
-            ]
         else:
             records = db.query(JobOfferRecord).filter(JobOfferRecord.offer_status == "archived").all()
-            data = [
-                {
-                    "id": record.id,
-                    "title": record.title,
-                    "logo": record.logo,
-                    "company_name": record.company_name,
-                    "location": record.location,
-                    "remote_status": record.remote_status,
-                    "min_salary": record.min_salary,
-                    "max_salary": record.max_salary,
-                    "salary_details": record.salary_details,
-                    "salary_text": record.salary_text,
-                    "tags": record.tags,
-                    "url": record.url,
-                    "website": record.website,
-                    "added_date": record.added_date,
-                    "notes": record.notes,
-                    "personal_rating": record.personal_rating,
-                    "application_status": record.application_status,
-                    "application_date": record.application_date,
-                    "feedback_received": record.feedback_received,
-                    "feedback_date": record.feedback_date,
-                    "archived_date": record.archived_date,
-                    "offer_status": record.offer_status,
-                    "users_id": record.users_id,
-                }
-                for record in records
-            ]
+
+        data = [
+            {
+                "id": record.id,
+                "title": record.title,
+                "logo": record.logo,
+                "company_name": record.company_name,
+                "location": record.location,
+                "remote_status": record.remote_status,
+                "min_salary": record.min_salary,
+                "max_salary": record.max_salary,
+                "salary_details": record.salary_details,
+                "salary_text": record.salary_text,
+                "tags": record.tags,
+                "url": record.url,
+                "website": record.website,
+                "added_date": record.added_date,
+                "notes": record.notes,
+                "personal_rating": record.personal_rating,
+                "application_status": record.application_status,
+                "application_date": record.application_date,
+                "feedback_received": record.feedback_received,
+                "feedback_date": record.feedback_date,
+                "archived_date": record.archived_date,
+                "offer_status": record.offer_status,
+                "users_id": record.users_id,
+            }
+            for record in records
+        ]
+
         return pd.DataFrame(data)
+    except OperationalError:
+        empty_frame = pd.DataFrame()
+        return empty_frame
     finally:
         db.close()
 
