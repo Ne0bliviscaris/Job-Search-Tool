@@ -2,8 +2,9 @@ import os
 
 import streamlit as st
 
-import modules.data_processor as data_processor
-from modules.data_processor import load_records_from_db, save_records_to_db
+import modules.database.database as data_processor
+from modules.data_processor import load_records_from_db
+from modules.database.database import save_records_to_db
 from modules.dataframe_settings import column_conversions
 
 st.set_page_config(layout="wide")
