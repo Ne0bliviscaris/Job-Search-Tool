@@ -5,9 +5,15 @@ from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from modules.data_collector import all_sites_dataframe
-from modules.data_processor import load_records_from_db, save_records_to_db
-from modules.database.database import JobOfferRecord, SessionLocal
+from modules.data_processor import load_records_from_db
+from modules.database.database import (
+    JobOfferRecord,
+    SessionLocal,
+    ensure_database_exists,
+    save_records_to_db,
+)
 
+ensure_database_exists()
 COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text", "tags", "location"]
 
 
@@ -22,10 +28,13 @@ def prepare_comparison(frame: pd.DataFrame) -> set:
 def filter_records(db_records, tested_records) -> pd.DataFrame:
     """Returns only df records matching given records.
     Compares content of columns specified in COLUMNS_TO_COMPARE."""
-    columns = db_records[COLUMNS_TO_COMPARE]
-    df_rows = columns.apply(tuple, axis=1)
-    matching_records = df_rows.isin(tested_records)
-    return db_records[matching_records]
+    if not db_records.empty:
+        columns = db_records[COLUMNS_TO_COMPARE]
+        df_rows = columns.apply(tuple, axis=1)
+        matching_records = df_rows.isin(tested_records)
+        return db_records[matching_records]
+    else:
+        return pd.DataFrame()
 
 
 def sync_records():
@@ -33,6 +42,7 @@ def sync_records():
     Main function to oversee the synchronisation process
     Extract records from raw, add additional information and return processed data into a new file
     """
+
     missing_records, new_records, current_db, update = changed_records()
 
     # Archive missing records
@@ -94,7 +104,7 @@ def changed_records() -> tuple:
     current_db = load_records_from_db()
 
     current_records = prepare_comparison(current_db) if not current_db.empty else set()
-    update_records = prepare_comparison(update)
+    update_records = prepare_comparison(update) if not update.empty else set()
 
     missing_records = current_records - update_records
     new_records = update_records - current_records
