@@ -8,9 +8,6 @@ from modules.updater.updater import update_all_sites
 
 st.set_page_config(layout="wide")
 
-new_records = pd.DataFrame()
-archived_records = pd.DataFrame()
-
 
 def update_button():
     """Update all sites button."""
