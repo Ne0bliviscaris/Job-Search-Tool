@@ -142,6 +142,7 @@ def column_conversions(frame, archive=False, key=None):
     frame = fill_missing_values(frame)
     # frame = convert_date_columns(frame)
     frame = calculate_elapsed_days(frame, archive=archive)
+    frame = calculate_time_until_feedback(frame)
     frame = check_application_status(frame)
     frame = check_feedback_status(frame)
 
@@ -179,30 +180,36 @@ def fill_missing_values(frame):
 
 def calculate_elapsed_days(frame, archive=False):
     """Calculate elapsed days since the job offer was added."""
-    now = datetime.now().strftime(DATE_FORMAT)
-    now = pd.to_datetime(now, format=DATE_FORMAT).date()
-
-    # Calculate elapsed days
-
-    # Fix needed
-    added_date = frame["added_date"] if frame["added_date"].notna().all() else None
-    archived_date = frame["archived_date"] if frame["archived_date"].notna().all() else None
-    application_date = frame["application_date"] if frame["application_date"].notna().all() else None
-    feedback_date = frame["feedback_date"] if frame["feedback_date"].notna().all() else None
+    today = datetime.now().strftime(DATE_FORMAT)
+    today = pd.to_datetime(today, format=DATE_FORMAT).date()
 
     if not archive:
-        if added_date is not None:
-            frame["elapsed_days"] = (now - added_date).apply(lambda x: x.days if pd.notnull(x) else None)
+        frame["elapsed_days"] = frame.apply(
+            lambda row: (today - row["added_date"]).days if pd.notnull(row["added_date"]) else None, axis=1
+        )
     else:
-        if added_date is not None and archived_date is not None:
-            frame["elapsed_days"] = (archived_date - added_date).apply(lambda x: x.days if pd.notnull(x) else None)
+        frame["elapsed_days"] = frame.apply(
+            lambda row: (
+                (row["archived_date"] - row["added_date"]).days
+                if pd.notnull(row["added_date"]) and pd.notnull(row["archived_date"])
+                else None
+            ),
+            axis=1,
+        )
 
-    # Calculate time until feedback
-    if application_date is not None and feedback_date is not None:
-        frame["time_until_feedback"] = (feedback_date - application_date).apply(lambda x: x.days)
-    else:
-        print("Application date or feedback date is missing.")
-        frame["time_until_feedback"] = None
+    return frame
+
+
+def calculate_time_until_feedback(frame):
+    """Calculate time until feedback."""
+    frame["time_until_feedback"] = frame.apply(
+        lambda row: (
+            (row["feedback_date"] - row["application_date"]).days
+            if pd.notnull(row["application_date"]) and pd.notnull(row["feedback_date"])
+            else None
+        ),
+        axis=1,
+    )
     return frame
 
 
