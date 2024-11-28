@@ -40,7 +40,7 @@ class JobOfferRecord(Base):
     url = Column(String, default=None)
     website = Column(String, index=True, default=None)
     added_date = Column(Date, default=None, nullable=True)
-    notes = Column(String, default=None)
+    notes = Column(String, default=None, nullable=True)
     personal_rating = Column(Integer, default=0)
     application_status = Column(String, default="Not applied")
     application_date = Column(Date, default=None, nullable=True)
@@ -277,3 +277,13 @@ def update_edited_dataframe(changed_dataframe, st_session_state):
     for row_id, updates in edited_rows.items():
         record_id = changed_dataframe.loc[int(row_id), "id"]
         update_record(int(record_id), updates)
+
+
+def wipe_database():
+    """Delete all records from the database."""
+    db: Session = SessionLocal()
+    try:
+        db.query(JobOfferRecord).delete()
+        db.commit()
+    finally:
+        db.close()

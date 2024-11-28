@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from modules.data_processor import db_drop_duplicates, reactivate_all_offers
+from modules.database.database import wipe_database
 from modules.dataframe_settings import column_conversions
 from modules.sync.sync import show_recently_changed, sync_records
 from modules.updater.updater import update_all_sites
@@ -68,6 +69,14 @@ def reactivate_all_offers_button():
             st.warning("All offers reactivated!")
 
 
+def wipe_button():
+    """Wipe database button."""
+    if st.button("Wipe database"):
+        with st.spinner("Wiping..."):
+            wipe_database()
+            st.warning("Database wiped!")
+
+
 def main():
     update_button()
     sync_button()
@@ -75,6 +84,7 @@ def main():
     show_archived_offers()
     resync_button()
     reactivate_all_offers_button()
+    wipe_button()
 
 
 main()
