@@ -114,14 +114,9 @@ def changed_records() -> tuple:
 
 def add_timestamp(records_frame, column):
     """Add a timestamp to the records DataFrame."""
-    records_frame[column] = timestamp()
+    records_frame[column] = datetime.now().strftime("%d-%m-%Y")
     records_frame[column] = pd.to_datetime(records_frame[column])
     return records_frame
-
-
-def timestamp():
-    """Return a timestamp."""
-    return datetime.now().strftime("%d-%m-%Y")
 
 
 def show_recently_changed(record_type) -> pd.DataFrame:
@@ -132,9 +127,19 @@ def show_recently_changed(record_type) -> pd.DataFrame:
         three_days_ago = datetime.now() - timedelta(days=3)
 
         if record_type == "active":
-            records = db.query(JobOfferRecord).filter(JobOfferRecord.added_date >= three_days_ago).all()
+            records = (
+                db.query(JobOfferRecord)
+                .filter(JobOfferRecord.added_date >= three_days_ago)
+                .where(JobOfferRecord.offer_status == "active")
+                .all()
+            )
         elif record_type == "archived":
-            records = db.query(JobOfferRecord).filter(JobOfferRecord.archived_date >= three_days_ago).all()
+            records = (
+                db.query(JobOfferRecord)
+                .filter(JobOfferRecord.archived_date >= three_days_ago)
+                .where(JobOfferRecord.offer_status == "archived")
+                .all()
+            )
 
         data = [
             {
