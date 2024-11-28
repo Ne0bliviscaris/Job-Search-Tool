@@ -1,5 +1,9 @@
+from datetime import datetime
+
 import pandas as pd
 import streamlit as st
+
+from modules.settings import DATE_FORMAT
 
 pd.set_option("future.no_silent_downcasting", True)
 
@@ -88,8 +92,7 @@ ARCHIVE_COLUMNS = [
 
 def set_column_config(archive=False):
     """Return column configuration for the data editor."""
-    date_format = "DD-MM-YYYY"
-    date_column = lambda name: st.column_config.DateColumn(name, format=date_format)
+    date_column = lambda name: st.column_config.DateColumn(name, format="YYYY-MM-DD")
     application_statuses = ["Not applied", "Applied", "Interview", "Hired"]
 
     static_columns = {
@@ -137,7 +140,7 @@ def column_conversions(frame, archive=False, key=None):
     columns = MAIN_FRAME_COLUMNS if not archive else ARCHIVE_COLUMNS
     frame = add_missing_columns(frame)
     frame = fill_missing_values(frame)
-    frame = convert_date_columns(frame)
+    # frame = convert_date_columns(frame)
     frame = calculate_elapsed_days(frame, archive=archive)
     frame = check_application_status(frame)
     frame = check_feedback_status(frame)
@@ -151,9 +154,10 @@ def convert_date_columns(frame):
     date_columns = ["added_date", "application_date", "feedback_date", "archived_date"]
     for col in date_columns:
         if col not in frame.columns:
-            # frame[col] = pd.NaT
             frame[col] = None
-        frame[col] = pd.to_datetime(frame[col], errors="coerce", format="%d-%m-%Y").dt.date
+        else:
+            if frame[col] is not None:
+                frame[col] = pd.to_datetime(frame[col], format=DATE_FORMAT, errors="coerce").dt.date
     return frame
 
 
@@ -173,12 +177,11 @@ def fill_missing_values(frame):
     return frame
 
 
-from datetime import datetime
-
-
 def calculate_elapsed_days(frame, archive=False):
     """Calculate elapsed days since the job offer was added."""
-    now = datetime.now().date()
+    now = datetime.now().strftime(DATE_FORMAT)
+    now = pd.to_datetime(now, format=DATE_FORMAT).date()
+
     # Calculate elapsed days
 
     # Fix needed
@@ -188,9 +191,11 @@ def calculate_elapsed_days(frame, archive=False):
     feedback_date = frame["feedback_date"] if frame["feedback_date"].notna().all() else None
 
     if not archive:
-        frame["elapsed_days"] = (now - added_date).apply(lambda x: x.days if pd.notnull(x) else None)
+        if added_date is not None:
+            frame["elapsed_days"] = (now - added_date).apply(lambda x: x.days if pd.notnull(x) else None)
     else:
-        frame["elapsed_days"] = (archived_date - added_date).apply(lambda x: x.days if pd.notnull(x) else None)
+        if added_date is not None and archived_date is not None:
+            frame["elapsed_days"] = (archived_date - added_date).apply(lambda x: x.days if pd.notnull(x) else None)
 
     # Calculate time until feedback
     if application_date is not None and feedback_date is not None:
