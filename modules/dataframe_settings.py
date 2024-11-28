@@ -140,7 +140,6 @@ def column_conversions(frame, archive=False, key=None):
     columns = MAIN_FRAME_COLUMNS if not archive else ARCHIVE_COLUMNS
     frame = add_missing_columns(frame)
     frame = fill_missing_values(frame)
-    # frame = convert_date_columns(frame)
     frame = calculate_elapsed_days(frame, archive=archive)
     frame = calculate_time_until_feedback(frame)
     frame = check_application_status(frame)
@@ -148,18 +147,6 @@ def column_conversions(frame, archive=False, key=None):
 
     edited_df = st.data_editor(frame[columns], disabled=archive, column_config=set_column_config(archive), key=key)
     return edited_df
-
-
-def convert_date_columns(frame):
-    """Convert date columns to datetime."""
-    date_columns = ["added_date", "application_date", "feedback_date", "archived_date"]
-    for col in date_columns:
-        if col not in frame.columns:
-            frame[col] = None
-        else:
-            if frame[col] is not None:
-                frame[col] = pd.to_datetime(frame[col], format=DATE_FORMAT, errors="coerce").dt.date
-    return frame
 
 
 def add_missing_columns(frame):
