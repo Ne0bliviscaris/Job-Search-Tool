@@ -47,10 +47,10 @@ MAIN_FRAME_COLUMNS = [
     "min_salary",
     "max_salary",
     "salary_details",
-    "salary_text",
+    # "salary_text",
     "tags",
     "url",
-    "website",
+    # "website",
     # Custom added columns
     "notes",
     "personal_rating",
@@ -61,9 +61,9 @@ MAIN_FRAME_COLUMNS = [
     "feedback_received",
     "feedback_date",
     "time_until_feedback",
-    "offer_status",
-    "archived_date",
-    "users_id",
+    # "offer_status",
+    # "archived_date",
+    # "users_id",
 ]
 
 ARCHIVE_COLUMNS = [
@@ -78,15 +78,15 @@ ARCHIVE_COLUMNS = [
     "salary_details",
     "tags",
     "url",
-    "website",
-    "added_date",
-    "elapsed_days",
-    "application_date",
-    "feedback_received",
+    # "website",
     "notes",
     "personal_rating",
+    # "added_date",
+    # "elapsed_days",
     "archived_date",
-    "offer_status",
+    "application_date",
+    "feedback_received",
+    # "offer_status",
 ]
 
 
@@ -105,8 +105,8 @@ def set_column_config(archive=False):
         "salary_text": st.column_config.TextColumn("Salary Text", disabled=True),
         "tags": st.column_config.TextColumn("Tags", disabled=True),
         "logo": st.column_config.ImageColumn("Logo", width=100),
-        "min_salary": st.column_config.NumberColumn("Min Salary", disabled=True, format="%d"),
-        "max_salary": st.column_config.NumberColumn("Max Salary", disabled=True, format="%d"),
+        "min_salary": st.column_config.NumberColumn("Min Salary", disabled=True),
+        "max_salary": st.column_config.NumberColumn("Max Salary", disabled=True),
         "elapsed_days": st.column_config.NumberColumn("Elapsed Days", disabled=True, format="%d"),
         "website": st.column_config.LinkColumn("Website", disabled=True),
         "added_date": date_column("Added date"),
