@@ -4,6 +4,7 @@ import streamlit as st
 from modules.data_processor import db_drop_duplicates, reactivate_all_offers
 from modules.database.database import wipe_database
 from modules.dataframe_settings import column_conversions
+from modules.settings import DEBUG_MODE
 from modules.sync.sync import show_recently_changed, sync_records
 from modules.updater.updater import update_all_sites
 
@@ -82,9 +83,10 @@ def main():
     sync_button()
     show_active_offers()
     show_archived_offers()
-    resync_button()
-    reactivate_all_offers_button()
-    wipe_button()
+    if DEBUG_MODE:
+        resync_button()
+        reactivate_all_offers_button()
+        wipe_button()
 
 
 main()

@@ -5,6 +5,7 @@ import streamlit as st
 from modules.data_processor import load_records_from_db
 from modules.database.database import update_edited_dataframe
 from modules.dataframe_settings import column_conversions
+from modules.settings import DEBUG_MODE
 
 st.set_page_config(layout="wide")
 
@@ -13,7 +14,6 @@ def save_changes_button(changed_dataframe):
     """Display the save changes button."""
     if st.button("Save Changes"):
         update_edited_dataframe(changed_dataframe, st.session_state)
-
         st.success("Changes saved successfully!")
 
 
@@ -29,4 +29,5 @@ def db_frame():
 
 
 db_frame()
-st.session_state
+if DEBUG_MODE:
+    st.session_state["editable_dataframe"]["edited_rows"]
