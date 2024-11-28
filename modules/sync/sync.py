@@ -61,17 +61,10 @@ def process_new_records(cleaned_current_file, new_records, update_frame: pd.Data
     """Process new records adding custom columns and timestamp."""
     new_records_df = filter_records(update_frame, new_records)
     if not new_records_df.empty:
-        new_records_df = add_added_date(new_records_df)
+        new_records_df = add_date_to_column(new_records_df, column="added_date")
         merged_new_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
         return merged_new_frame
     return cleaned_current_file
-
-
-def add_added_date(dataframe):
-    """Add timestamp to the DataFrame."""
-    dataframe["added_date"] = datetime.now().strftime(DATE_FORMAT)
-    dataframe["added_date"] = pd.to_datetime(dataframe["added_date"], format=DATE_FORMAT)
-    return dataframe
 
 
 def archive_records(db_records, missing_records: set) -> pd.DataFrame:
@@ -79,7 +72,7 @@ def archive_records(db_records, missing_records: set) -> pd.DataFrame:
     records_to_archive = filter_records(db_records, missing_records)
 
     if not records_to_archive.empty:
-        records_to_archive = add_timestamp(records_to_archive, column="archived_date")
+        records_to_archive = add_date_to_column(records_to_archive, column="archived_date")
 
         db: Session = SessionLocal()
         try:
@@ -121,11 +114,11 @@ def changed_records() -> tuple:
     return missing_records, new_records, current_db, update
 
 
-def add_timestamp(records_frame, column):
+def add_date_to_column(frame, column):
     """Add a timestamp to the records DataFrame."""
-    records_frame[column] = datetime.now().strftime("%d-%m-%Y")
-    records_frame[column] = pd.to_datetime(records_frame[column])
-    return records_frame
+    frame[column] = datetime.now().strftime(DATE_FORMAT)
+    frame[column] = pd.to_datetime(frame[column], format=DATE_FORMAT)
+    return frame
 
 
 def show_recently_changed(record_type) -> pd.DataFrame:
