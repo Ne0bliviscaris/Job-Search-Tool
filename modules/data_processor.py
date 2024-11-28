@@ -7,10 +7,9 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from modules.containers import detect_records
+from modules.database.database import JobOfferRecord, SessionLocal
 from modules.JobRecord import JobRecord
 from modules.websites import identify_website
-
-from .database.database import JobOfferRecord, SessionLocal
 
 
 def process_records(soup_object: BeautifulSoup, link: str) -> list[JobRecord]:
