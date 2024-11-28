@@ -5,7 +5,6 @@ import pandas as pd
 from sqlalchemy import Boolean, Column, Date, Integer, String, create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
-from modules.dataframe_settings import convert_date_columns
 from modules.settings import DATE_FORMAT
 
 DATABASE_URL = "sqlite:///modules/database/database.db"
@@ -57,7 +56,6 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
             if col in dataframe.columns:
                 dataframe[col] = dataframe[col].apply(lambda x: None if pd.isna(x) else x)
                 dataframe[col] = pd.to_datetime(dataframe[col], format=DATE_FORMAT, errors="coerce")
-                # dataframe[col] = dataframe[col].where(dataframe[col].notna(), None)
 
         # Prepare default values for non-date columns
         defaults = {
@@ -153,7 +151,6 @@ def update_record(record_id: int, updates: dict) -> None:
 
 def update_edited_dataframe(changed_dataframe, st_session_state):
     """Update the edited records in the database."""
-    changed_dataframe = convert_date_columns(changed_dataframe)
 
     edited_rows = st_session_state.get("editable_dataframe", {}).get("edited_rows", {})
 
