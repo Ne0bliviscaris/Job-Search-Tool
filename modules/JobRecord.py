@@ -25,7 +25,7 @@ class JobRecord:
         self.remote_status = self.fetch_remote_status()
         self.salary_min, self.salary_max, self.salary_details, self.salary_text = self.fetch_salary_range()
         self.host_site = self.host_site()
-        self.added_date = self.current_date()
+        # self.added_date = self.current_date()
 
     def __repr__(self):
         return (
@@ -42,7 +42,6 @@ class JobRecord:
             f"Salary details: {self.salary_details}\n"
             f"Salary text: {self.salary_text}\n"
             f"Website: {self.host_site}\n"
-            f"Added date: {self.added_date}"
         )
 
     def fetch_job_title(self) -> str:
@@ -119,7 +118,6 @@ class JobRecord:
             "salary_text": self.salary_text,
             "tags": self.tags,
             "url": self.url,
-            "added_date": self.added_date,
             "website": self.host_site,
         }
 
@@ -137,8 +135,3 @@ class JobRecord:
         """
         status = containers.remote_status(self.html, self.website)
         return status if status else None
-
-    def current_date(self) -> datetime.date:
-        """Returns current date as datetime object"""
-        current_date = datetime.now().date()
-        return current_date

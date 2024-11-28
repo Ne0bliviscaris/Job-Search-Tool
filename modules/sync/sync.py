@@ -12,6 +12,7 @@ from modules.database.database import (
     ensure_database_exists,
     save_records_to_db,
 )
+from modules.settings import DATE_FORMAT
 
 ensure_database_exists()
 COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text", "tags", "location"]
@@ -60,9 +61,17 @@ def process_new_records(cleaned_current_file, new_records, update_frame: pd.Data
     """Process new records adding custom columns and timestamp."""
     new_records_df = filter_records(update_frame, new_records)
     if not new_records_df.empty:
+        new_records_df = add_added_date(new_records_df)
         merged_new_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
         return merged_new_frame
     return cleaned_current_file
+
+
+def add_added_date(dataframe):
+    """Add timestamp to the DataFrame."""
+    dataframe["added_date"] = datetime.now().strftime(DATE_FORMAT)
+    dataframe["added_date"] = pd.to_datetime(dataframe["added_date"], format=DATE_FORMAT)
+    return dataframe
 
 
 def archive_records(db_records, missing_records: set) -> pd.DataFrame:
