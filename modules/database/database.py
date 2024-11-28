@@ -2,19 +2,11 @@ import os
 from datetime import datetime
 
 import pandas as pd
-from sqlalchemy import (
-    Boolean,
-    CheckConstraint,
-    Column,
-    Date,
-    Integer,
-    String,
-    create_engine,
-    text,
-)
+from sqlalchemy import Boolean, Column, Date, Integer, String, create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from modules.dataframe_settings import convert_date_columns
+from modules.settings import DATE_FORMAT
 
 DATABASE_URL = "sqlite:///modules/database/database.db"
 
@@ -64,7 +56,7 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
         for col in date_columns:
             if col in dataframe.columns:
                 dataframe[col] = dataframe[col].apply(lambda x: None if pd.isna(x) else x)
-                # dataframe[col] = pd.to_datetime(dataframe[col], errors="coerce")
+                dataframe[col] = pd.to_datetime(dataframe[col], format=DATE_FORMAT, errors="coerce")
                 # dataframe[col] = dataframe[col].where(dataframe[col].notna(), None)
 
         # Prepare default values for non-date columns
@@ -91,7 +83,8 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
         numeric_cols = ["min_salary", "max_salary", "personal_rating", "users_id"]
         for col in numeric_cols:
             if col in dataframe.columns:
-                dataframe[col] = pd.to_numeric(dataframe[col], errors="coerce").fillna(0).astype(int)
+                if col is not None:
+                    dataframe[col] = pd.to_numeric(dataframe[col], errors="coerce").fillna(0).astype(int)
 
         for _, row in dataframe.iterrows():
             record = JobOfferRecord(
@@ -124,118 +117,6 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
         db.close()
 
 
-# obsolete
-# def update_records_in_db(dataframe: pd.DataFrame) -> None:
-#     """Update existing records in database."""
-#     db: Session = SessionLocal()
-#     try:
-#         # # Convert dates
-#         # date_columns = ["added_date", "application_date", "feedback_date", "archived_date"]
-#         # for col in date_columns:
-#         #     if col in dataframe.columns:
-#         #         dataframe[col] = pd.to_datetime(dataframe[col], errors="coerce")
-#         #         dataframe[col] = dataframe[col].where(~dataframe[col].isna(), None)
-
-#         # # Process numeric columns
-#         # numeric_cols = ["min_salary", "max_salary", "personal_rating", "users_id"]
-#         # for col in numeric_cols:
-#         #     if col in dataframe.columns:
-#         #         dataframe[col] = dataframe[col].fillna(None)
-#         #         dataframe[col] = dataframe[col].astype(float).round().astype(int)
-
-#         # Update records
-#         for row in dataframe.itertuples():
-
-#             record_id = row.id
-#             if record_id:
-#                 # query = (
-#                 #     db.query(JobOfferRecord)
-#                 #     .filter(JobOfferRecord.id == record_id)
-#                 #     .update(
-#                 #         {
-#                 #             "title": str(row.title),
-#                 #             "logo": str(row.logo),
-#                 #             "company_name": str(row.company_name),
-#                 #             "location": str(row.location),
-#                 #             "remote_status": str(row.remote_status),
-#                 #             "min_salary": int(row.min_salary),
-#                 #             "max_salary": int(row.max_salary),
-#                 #             "salary_details": str(row.salary_details),
-#                 #             "salary_text": str(row.salary_text),
-#                 #             "tags": str(row.tags),
-#                 #             "url": str(row.url),
-#                 #             "website": str(row.website),
-#                 #             "added_date": row.added_date,
-#                 #             "notes": str(row.notes),
-#                 #             "personal_rating": int(row.personal_rating),
-#                 #             "application_status": str(row.application_status),
-#                 #             "application_date": row.application_date,
-#                 #             "feedback_received": bool(row.feedback_received),
-#                 #             "feedback_date": row.feedback_date,
-#                 #             "archived_date": row.archived_date,
-#                 #             "offer_status": str(row.offer_status),
-#                 #             "users_id": int(row.users_id),
-#                 #         }
-#                 #     )
-#                 # )
-#                 # print(query)
-#                 query = text(
-#                     """UPDATE job_records SET
-#                                 title=:title,
-#                                 logo=:logo,
-#                                 company_name=:company_name,
-#                                 location=:location,
-#                                 remote_status=:remote_status,
-#                                 min_salary=:min_salary,
-#                                 max_salary=:max_salary,
-#                                 salary_details=:salary_details,
-#                                 salary_text=:salary_text,
-#                                 tags=:tags,
-#                                 url=:url,
-#                                 website=:website,
-#                                 added_date=:added_date,
-#                                 notes=:notes,
-#                                 personal_rating=:personal_rating,
-#                                 application_status=:application_status,
-#                                 application_date=:application_date,
-#                                 feedback_received=:feedback_received,
-#                                 feedback_date=:feedback_date,
-#                                 archived_date=:archived_date,
-#                                 offer_status=:offer_status,
-#                                 users_id=:users_id
-#                                 WHERE id=:id"""
-#                 )
-#                 params = {
-#                     "title": str(row.title),
-#                     "logo": str(row.logo),
-#                     "company_name": str(row.company_name),
-#                     "location": str(row.location),
-#                     "remote_status": str(row.remote_status),
-#                     "min_salary": int(row.min_salary) if not pd.isnull(row.min_salary) else None,
-#                     "max_salary": int(row.max_salary) if not pd.isnull(row.max_salary) else None,
-#                     "salary_details": str(row.salary_details),
-#                     "salary_text": str(row.salary_text),
-#                     "tags": str(row.tags),
-#                     "url": str(row.url),
-#                     "website": str(row.website),
-#                     "notes": str(row.notes),
-#                     "personal_rating": int(row.personal_rating),
-#                     "added_date": row.added_date if not pd.isnull(row.added_date) else None,
-#                     "application_status": str(row.application_status),
-#                     "application_date": (row.application_date if not pd.isnull(row.application_date) else None),
-#                     "feedback_received": bool(row.feedback_received),
-#                     "feedback_date": row.feedback_date if not pd.isnull(row.feedback_date) else None,
-#                     "archived_date": row.archived_date if not pd.isnull(row.archived_date) else None,
-#                     "offer_status": str(row.offer_status),
-#                     "users_id": int(row.users_id),
-#                     "id": row.id,
-#                 }
-#             db.execute(query, params)
-#         db.commit()
-#     finally:
-#         db.close()
-
-
 def ensure_database_exists():
     if not os.path.exists(DATABASE_URL):
         init_db()
@@ -258,9 +139,12 @@ def update_record(record_id: int, updates: dict) -> None:
     """Update a single record in the database."""
     db: Session = SessionLocal()
     try:
+        date_columns = ["added_date", "application_date", "feedback_date", "archived_date"]
         record = db.query(JobOfferRecord).filter(JobOfferRecord.id == record_id).first()
         if record:
             for key, value in updates.items():
+                if key in date_columns:
+                    value = datetime.strptime(value, DATE_FORMAT).date() if value else None
                 setattr(record, key, value)
             db.commit()
     finally:
