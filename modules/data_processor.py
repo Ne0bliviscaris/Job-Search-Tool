@@ -96,20 +96,6 @@ def load_records_from_db(archive=False) -> pd.DataFrame:
         db.close()
 
 
-def update_record(record_id: str, updates: dict = None) -> None:
-    """Update the status or fields of a record in the database."""
-    db: Session = SessionLocal()
-    try:
-        record = db.query(JobOfferRecord).filter(JobOfferRecord.id == record_id).first()
-        if record:
-            if updates:
-                for key, value in updates.items():
-                    setattr(record, key, value)
-            db.commit()
-    finally:
-        db.close()
-
-
 def reactivate_all_offers():
     """Reactivate all archived offers."""
     db: Session = SessionLocal()
