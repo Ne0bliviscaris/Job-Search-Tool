@@ -10,12 +10,11 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 <br><br>
 
 
+# THIS BRANCH: 
 
-Containers:
-Try except each return, provide info on the point of failure
-"error on location for link nofluffjobs"
-
-
+Fix Save Changes button in 6_Database_Browser
+Elapsed days calculation not being updated
+Fix calculate_elapsed_days in dataframe_settings
 
 
 # TODO:
