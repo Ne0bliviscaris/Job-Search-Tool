@@ -86,6 +86,8 @@ ARCHIVE_COLUMNS = [
     "archived_date",
     "application_date",
     "feedback_received",
+    "feedback_date",
+    "time_until_feedback",
     # "offer_status",
 ]
 
