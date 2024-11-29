@@ -17,29 +17,33 @@ Base = declarative_base()
 class JobOfferRecord(Base):
     __tablename__ = "job_records"
 
+    # Integer columns
     id = Column(Integer, primary_key=True, index=True)
+    min_salary = Column(Integer, default=0)
+    max_salary = Column(Integer, default=0)
+    personal_rating = Column(Integer, default=0)
+    users_id = Column(Integer, index=True, default=0)
+    # String columns
     title = Column(String, index=True, default="")
     logo = Column(String, default="")
     company_name = Column(String, default="Unknown")
     location = Column(String, index=True, default=None)
     remote_status = Column(String, index=True, default="Unknown")
-    min_salary = Column(Integer, default=0)
-    max_salary = Column(Integer, default=0)
     salary_details = Column(String, default=None)
     salary_text = Column(String, default=None)
     tags = Column(String, index=True, default=None)
     url = Column(String, default=None)
     website = Column(String, index=True, default=None)
-    added_date = Column(Date, default=None, nullable=True)
     notes = Column(String, default=None, nullable=True)
-    personal_rating = Column(Integer, default=0)
     application_status = Column(String, default="Not applied")
+    offer_status = Column(String, default="active", index=True)
+    # Date columns
+    added_date = Column(Date, default=None, nullable=True)
     application_date = Column(Date, default=None, nullable=True)
-    feedback_received = Column(Boolean, default=False, index=True)
     feedback_date = Column(Date, default=None, nullable=True)
     archived_date = Column(Date, default=None, nullable=True)
-    offer_status = Column(String, default="active", index=True)
-    users_id = Column(Integer, index=True, default=0)
+    # Other columns
+    feedback_received = Column(Boolean, default=False, index=True)
 
 
 def init_db():
@@ -86,28 +90,32 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
 
         for _, row in dataframe.iterrows():
             record = JobOfferRecord(
+                # Integer columns
+                min_salary=int(row.get("min_salary", 0)),
+                max_salary=int(row.get("max_salary", 0)),
+                personal_rating=int(row.get("personal_rating", 0)),
+                users_id=int(row.get("users_id", 0)),
+                # String columns
                 title=str(row.get("title", "")),
                 logo=str(row.get("logo", "")),
                 company_name=str(row.get("company_name", "Unknown")),
                 location=str(row.get("location", "")),
                 remote_status=str(row.get("remote_status", "Unknown")),
-                min_salary=float(row.get("min_salary", 0)),
-                max_salary=int(row.get("max_salary", 0)),
                 salary_details=str(row.get("salary_details", "")),
                 salary_text=str(row.get("salary_text", "")),
                 tags=str(row.get("tags", "")),
                 url=str(row.get("url", "")),
                 website=str(row.get("website", "")),
-                added_date=row.get("added_date"),
                 notes=str(row.get("notes", "")),
-                personal_rating=int(row.get("personal_rating", 0)),
                 application_status=str(row.get("application_status", "Not applied")),
+                offer_status=str(row.get("offer_status", "active")),
+                # Date columns
+                added_date=row.get("added_date"),
                 application_date=row.get("application_date"),
-                feedback_received=bool(row.get("feedback_received", False)),
                 feedback_date=row.get("feedback_date"),
                 archived_date=row.get("archived_date"),
-                offer_status=str(row.get("offer_status", "active")),
-                users_id=int(row.get("users_id", 0)),
+                # Other columns
+                feedback_received=bool(row.get("feedback_received", False)),
             )
             db.add(record)
         db.commit()
