@@ -30,8 +30,8 @@ def extract_salary_details(cleaned_salary, salary_text):
     last_two_chars = cleaned_salary[-2:]
     index = salary_text.lower().rfind(last_two_chars)
     salary_details = salary_text[index + 2 :].strip() if index != -1 else None
-    # Handle Bulldogjobs case
-    if salary_text == "Znamy widełki":
+    # Handle Bulldogjobs and NoFluffJobs case
+    if salary_text == "Znamy widełki" or "Sprawdź" in salary_text:
         salary_details = salary_text
     return salary_details
 
