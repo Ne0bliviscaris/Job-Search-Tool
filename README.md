@@ -12,11 +12,6 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 
 # THIS BRANCH: 
 
-Fix Save Changes button in 6_Database_Browser
-Elapsed days calculation not being updated
-Fix calculate_elapsed_days in dataframe_settings
-
-
 # TODO:
 
 <details>
@@ -69,6 +64,11 @@ Fix calculate_elapsed_days in dataframe_settings
 # Changelog:
 <details>
 <summary><strong>Click to see the details</strong></summary>
+
+#### 29.11.2024
+- Fully migrated to SQL database
+- Dropped using CSV files
+- Introduced settings file
 
 #### 20.11.2024
 - Popup and terminal report if update is needed
