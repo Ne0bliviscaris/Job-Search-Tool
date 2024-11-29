@@ -11,6 +11,9 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 
 
 # THIS BRANCH: 
+- Fix synchronization issues
+    - Doubling records
+    - Active offers getting archived
 
 # TODO:
 
