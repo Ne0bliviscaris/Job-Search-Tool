@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import pandas as pd
-from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from modules.data_collector import html_dataframe
@@ -25,11 +24,11 @@ def sync_records():
     Extract records from raw, add additional information and return processed data into a new file
     """
     update = html_dataframe()
-    current_db = load_records_from_db()
-    missing_records, new_records = find_changed_records(update, current_db)
+    db = load_records_from_db()
+    missing_records, new_records = find_changed_records(update, db)
 
-    archive_records(current_db, missing_records)
-    process_new_records(current_db, new_records)
+    archive_records(db, missing_records)
+    process_new_records(db, new_records)
 
 
 def prepare_comparison(frame: pd.DataFrame) -> set:
@@ -70,14 +69,14 @@ def process_new_records(current_db: pd.DataFrame, new_records: pd.DataFrame) -> 
                 save_records_to_db(unique_new_df)
 
 
-def archive_records(db_records, missing_records: set) -> pd.DataFrame:
+def archive_records(db, missing_records: set) -> pd.DataFrame:
     """Archive missing records from synced file."""
-    missing_frame = filter_matching_df(db_records, missing_records)
+    missing_df = filter_matching_df(db, missing_records)
 
-    if not missing_frame.empty:
-        missing_frame = add_date_to_column(missing_frame, column="archived_date")
+    if not missing_df.empty:
+        missing_df = add_date_to_column(missing_df, column="archived_date")
 
-        for _, row in missing_frame.iterrows():
+        for _, row in missing_df.iterrows():
             update_values = {
                 "archived_date": row["archived_date"],
                 "offer_status": "archived",
