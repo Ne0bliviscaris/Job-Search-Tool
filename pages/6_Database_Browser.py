@@ -30,4 +30,5 @@ def db_frame():
 
 db_frame()
 if DEBUG_MODE:
-    st.session_state["editable_dataframe"]["edited_rows"]
+    if "editable_dataframe" in st.session_state:
+        st.session_state["editable_dataframe"]["edited_rows"]
