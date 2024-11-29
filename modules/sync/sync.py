@@ -4,18 +4,32 @@ import pandas as pd
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 
-from modules.data_collector import all_sites_dataframe
+from modules.data_collector import html_dataframe
 from modules.data_processor import load_records_from_db
 from modules.database.database import (
     JobOfferRecord,
     SessionLocal,
     ensure_database_exists,
     save_records_to_db,
+    update_record,
 )
 from modules.settings import DATE_FORMAT
 
 ensure_database_exists()
 COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text", "tags", "location"]
+
+
+def sync_records():
+    """
+    Main function to oversee the synchronisation process
+    Extract records from raw, add additional information and return processed data into a new file
+    """
+    update = html_dataframe()
+    current_db = load_records_from_db()
+    missing_records, new_records = find_changed_records(update, current_db)
+
+    archive_records(current_db, missing_records)
+    process_new_records(current_db, new_records)
 
 
 def prepare_comparison(frame: pd.DataFrame) -> set:
@@ -26,7 +40,7 @@ def prepare_comparison(frame: pd.DataFrame) -> set:
     return rows_to_compare
 
 
-def filter_records(db_records, tested_records) -> pd.DataFrame:
+def filter_matching_df(db_records, tested_records) -> pd.DataFrame:
     """Returns only df records matching given records.
     Compares content of columns specified in COLUMNS_TO_COMPARE."""
     if not db_records.empty:
@@ -38,72 +52,41 @@ def filter_records(db_records, tested_records) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def sync_records():
-    """
-    Main function to oversee the synchronisation process
-    Extract records from raw, add additional information and return processed data into a new file
-    """
-
-    missing_records, new_records, current_db, update = changed_records()
-
-    # Archive missing records
-    cleaned_dataframe = archive_records(current_db, missing_records)
-
-    # If the record is new, add custom columns
-    synced_dataframe = process_new_records(cleaned_dataframe, new_records, update)
-
-    # Save the updated synced file
-    if new_records:
-        save_records_to_db(synced_dataframe)
-
-
-def process_new_records(cleaned_current_file, new_records, update_frame: pd.DataFrame) -> pd.DataFrame:
+def process_new_records(current_db: pd.DataFrame, new_records: pd.DataFrame) -> None:
     """Process new records adding custom columns and timestamp."""
-    new_records_df = filter_records(update_frame, new_records)
-    if not new_records_df.empty:
-        new_records_df = add_date_to_column(new_records_df, column="added_date")
-        merged_new_frame = pd.concat([cleaned_current_file, new_records_df], ignore_index=True)
-        return merged_new_frame
-    return cleaned_current_file
+    if not new_records.empty:
+        if current_db.empty:
+            new_records = add_date_to_column(new_records, column="added_date")
+            save_records_to_db(new_records)
+        else:
+            # Ensure new records are not already in the current database
+            new_set = prepare_comparison(new_records)
+            current_set = prepare_comparison(current_db)
+            unique_new_set = new_set - current_set
+            unique_new_df = new_records[new_records.apply(tuple, axis=1).isin(unique_new_set)]
+
+            if not unique_new_df.empty:
+                unique_new_df = add_date_to_column(unique_new_df, column="added_date")
+                save_records_to_db(unique_new_df)
 
 
 def archive_records(db_records, missing_records: set) -> pd.DataFrame:
     """Archive missing records from synced file."""
-    records_to_archive = filter_records(db_records, missing_records)
+    missing_frame = filter_matching_df(db_records, missing_records)
 
-    if not records_to_archive.empty:
-        records_to_archive = add_date_to_column(records_to_archive, column="archived_date")
+    if not missing_frame.empty:
+        missing_frame = add_date_to_column(missing_frame, column="archived_date")
 
-        db: Session = SessionLocal()
-        try:
-            # Prepare the update statement
-            for _, row in records_to_archive.iterrows():
-                update_values = {
-                    "archived_date": row["archived_date"],
-                    "offer_status": "archived",
-                }
-                update_status = update(JobOfferRecord).where(JobOfferRecord.id == row["id"]).values(update_values)
-                db.execute(update_status)
-            db.commit()
-        finally:
-            db.close()
+        for _, row in missing_frame.iterrows():
+            update_values = {
+                "archived_date": row["archived_date"],
+                "offer_status": "archived",
+            }
+            update_record(record_id=row["id"], updates=update_values)
 
 
-def remove_archived_records(df: pd.DataFrame, records_to_remove: set) -> pd.DataFrame:
-    """Remove records from DataFrame based on compared columns content."""
-    columns = df[COLUMNS_TO_COMPARE]
-    rows_as_tuples = columns.apply(tuple, axis=1)
-
-    # Filter out rows that are in records_to_remove
-    not_in_records_to_remove = ~rows_as_tuples.isin(records_to_remove)
-    cleaned_df = df[not_in_records_to_remove]
-    return cleaned_df
-
-
-def changed_records() -> tuple:
+def find_changed_records(update, current_db):
     """Load files and return missing and new records."""
-    update = all_sites_dataframe()
-    current_db = load_records_from_db()
 
     current_records = prepare_comparison(current_db) if not current_db.empty else set()
     update_records = prepare_comparison(update) if not update.empty else set()
@@ -111,7 +94,10 @@ def changed_records() -> tuple:
     missing_records = current_records - update_records
     new_records = update_records - current_records
 
-    return missing_records, new_records, current_db, update
+    missing_frame = filter_matching_df(current_db, missing_records)
+    new_frame = filter_matching_df(update, new_records)
+
+    return missing_frame, new_frame
 
 
 def add_date_to_column(frame, column):
