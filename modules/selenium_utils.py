@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 
 import modules.containers as containers
 import modules.site_specific_actions as site_specific_actions
+from modules.settings import CHROMEDRIVER_CONTAINER
 from modules.websites import NOFLUFFJOBS, PRACUJPL
 
 
@@ -54,12 +55,11 @@ def setup_webdriver():
     Setup and return a Selenium WebDriver instance
     """
     # Path to container with Chrome
-    docker_chrome_url = "http://localhost:4444/wd/hub"
 
     options = set_chromedriver_options()
 
     # Return WebDriver instance
-    return webdriver.Remote(command_executor=docker_chrome_url, options=options)
+    return webdriver.Remote(command_executor=CHROMEDRIVER_CONTAINER, options=options)
 
 
 def set_chromedriver_options():
