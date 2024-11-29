@@ -10,7 +10,7 @@ from modules.data_processor import (
 from modules.websites import search_links
 
 
-def all_sites_dataframe() -> pd.DataFrame:
+def html_dataframe() -> pd.DataFrame:
     """
     Return a DataFrame containing all job records from all sites.
     """
