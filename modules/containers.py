@@ -364,9 +364,11 @@ def location(html, search_link: str) -> str:
     location = None
     if NOFLUFFJOBS in search_link:
         location_container = {"data-cy": "location on the job offer listing"}
-        location_block = html.find(attrs=location_container).span
+        location_block = html.find(attrs=location_container)
+        if location_block:
+            location_span = location_block.span
         try:
-            location = location_block.text.strip()
+            location = location_span.text.strip()
         except:
             print("Error fetching data from record: NOFLUFFJOBS -> Location")
 

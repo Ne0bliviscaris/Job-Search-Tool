@@ -65,6 +65,9 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 <details>
 <summary><strong>Click to see the details</strong></summary>
 
+#### 01.12.2024
+- Fixed synchronization module misdetecting changed records
+
 #### 29.11.2024
 - Fully migrated to SQL database
 - Dropped using CSV files

@@ -1,7 +1,6 @@
-import pandas as pd
 import streamlit as st
 
-from modules.data_processor import db_drop_duplicates, reactivate_all_offers
+from modules.data_processor import reactivate_all_offers
 from modules.database.database import wipe_database
 from modules.dataframe_settings import column_conversions
 from modules.settings import DEBUG_MODE
@@ -23,7 +22,6 @@ def sync_button():
     """Synchronize database button."""
     if st.button("Perform database synchronization"):
         with st.spinner("Updating..."):  # Display a spinner while updating
-            # Separate archived and new records as new functions - fetch records with added or archived date shorter than 1 day
             sync_records()
             st.success("All sites synced successfully!")
 
@@ -31,8 +29,7 @@ def sync_button():
 def show_active_offers():
     """Show active offers."""
     st.title("Recently added active offers:")
-    ACTIVE = "active"
-    active = show_recently_changed(ACTIVE)
+    active = show_recently_changed("active")
     if active is not None and not active.empty:
         column_conversions(active)
     else:
@@ -42,24 +39,11 @@ def show_active_offers():
 def show_archived_offers():
     """Show archived offers."""
     st.title("Recently archived offers:")
-    ARCHIVED = "archived"
-    archived = show_recently_changed(ARCHIVED)
+    archived = show_recently_changed("archived")
     if archived is not None and not archived.empty:
-        column_conversions(archived, ARCHIVED)
+        column_conversions(archived, "archived")
     else:
         st.warning("No archived records.")
-
-
-def resync_button():
-    """Perform resynchronization of the database."""
-    if st.button("Resynchronize all offers"):
-        with st.spinner("Resynchronizing..."):
-            reactivate_all_offers()
-            st.warning("All offers desynchronized!")
-            db_drop_duplicates()
-            st.warning("Duplicates removed!")
-            sync_records()
-            st.success("All offers resynchronized!")
 
 
 def reactivate_all_offers_button():
@@ -79,14 +63,21 @@ def wipe_button():
 
 
 def main():
-    update_button()
-    sync_button()
+    # Buttons in horizontal layout using columns
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        sync_button()
+    if DEBUG_MODE:
+        with col2:
+            reactivate_all_offers_button()
+        with col3:
+            wipe_button()
+    with col4:
+        update_button()
+
     show_active_offers()
     show_archived_offers()
-    if DEBUG_MODE:
-        resync_button()
-        reactivate_all_offers_button()
-        wipe_button()
 
 
 main()
