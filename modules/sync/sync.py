@@ -76,15 +76,15 @@ def process_new_records(current_db: pd.DataFrame, new_records: pd.DataFrame) -> 
                 save_records_to_db(unique_new_df)
 
 
-def archive_records(db, missing_records: set) -> pd.DataFrame:
+def archive_records(db, missing_df: set) -> pd.DataFrame:
     """Archive missing records from synced file."""
-    missing_df = filter_matching_df(db, missing_records)
+    # missing_df = filter_matching_df(db, missing_records)
     if not missing_df.empty:
         missing_df = add_date_to_column(missing_df, column="archived_date")
 
         for _, row in missing_df.iterrows():
             update_values = {
-                "archived_date": row["archived_date"],
+                "archived_date": str(row["archived_date"]),
                 "offer_status": "archived",
             }
             update_record(record_id=row["id"], updates=update_values)
@@ -108,7 +108,10 @@ def find_changed_records(update, current_db):
 
 def add_date_to_column(frame, column):
     """Add a timestamp to the records DataFrame."""
-    frame[column] = datetime.now().strftime(DATE_FORMAT)
+    date_time = datetime.now().strftime(DATE_FORMAT)
+    date = date_time.split(" ")[0]
+
+    frame[column] = date
     frame[column] = pd.to_datetime(frame[column], format=DATE_FORMAT)
     return frame
 

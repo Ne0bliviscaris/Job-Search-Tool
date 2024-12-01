@@ -150,7 +150,7 @@ def update_record(record_id: int, updates: dict) -> None:
         if record:
             for key, value in updates.items():
                 if key in date_columns:
-                    value = datetime.strptime(value, DATE_FORMAT).date() if value else None
+                    value = datetime.strptime(value.split(" ")[0], DATE_FORMAT).date() if value else None
                 setattr(record, key, value)
             db.commit()
     finally:
