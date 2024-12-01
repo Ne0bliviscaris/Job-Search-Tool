@@ -34,11 +34,11 @@ def sync_records():
     update = html_dataframe()
     db = load_records_from_db()
     missing_records, new_records = find_changed_records(update, db)
-    archive_records(db, missing_records)
+    archive_records(missing_records)
     process_new_records(db, new_records)
 
 
-def prepare_comparison(frame: pd.DataFrame) -> set:
+def prepare_comparison(frame: pd.DataFrame):
     """Set columns for the DataFrame."""
     columns_to_compare = frame[COLUMNS_TO_COMPARE]
     rows_as_tuples = columns_to_compare.apply(tuple, axis=1)
@@ -76,9 +76,8 @@ def process_new_records(current_db: pd.DataFrame, new_records: pd.DataFrame) -> 
                 save_records_to_db(unique_new_df)
 
 
-def archive_records(db, missing_df: set) -> pd.DataFrame:
+def archive_records(missing_df: set) -> pd.DataFrame:
     """Archive missing records from synced file."""
-    # missing_df = filter_matching_df(db, missing_records)
     if not missing_df.empty:
         missing_df = add_date_to_column(missing_df, column="archived_date")
 
@@ -101,8 +100,7 @@ def find_changed_records(update, current_db):
 
     missing_frame = filter_matching_df(current_db, missing_records)
     new_frame = filter_matching_df(update, new_records)
-    print(f"Missing records: {missing_frame.shape[0]}")
-    print(f"New records: {new_frame.shape[0]}")
+
     return missing_frame, new_frame
 
 
