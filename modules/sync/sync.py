@@ -15,7 +15,15 @@ from modules.database.database import (
 from modules.settings import DATE_FORMAT
 
 ensure_database_exists()
-COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text", "tags", "location"]
+COLUMNS_TO_COMPARE = [
+    "title",
+    "company_name",
+    "website",
+    "remote_status",
+    "salary_details",
+    "tags",
+    "location",
+]
 
 
 def sync_records():
@@ -26,7 +34,6 @@ def sync_records():
     update = html_dataframe()
     db = load_records_from_db()
     missing_records, new_records = find_changed_records(update, db)
-
     archive_records(db, missing_records)
     process_new_records(db, new_records)
 
@@ -72,7 +79,6 @@ def process_new_records(current_db: pd.DataFrame, new_records: pd.DataFrame) -> 
 def archive_records(db, missing_records: set) -> pd.DataFrame:
     """Archive missing records from synced file."""
     missing_df = filter_matching_df(db, missing_records)
-
     if not missing_df.empty:
         missing_df = add_date_to_column(missing_df, column="archived_date")
 
@@ -95,7 +101,8 @@ def find_changed_records(update, current_db):
 
     missing_frame = filter_matching_df(current_db, missing_records)
     new_frame = filter_matching_df(update, new_records)
-
+    print(f"Missing records: {missing_frame.shape[0]}")
+    print(f"New records: {new_frame.shape[0]}")
     return missing_frame, new_frame
 
 
