@@ -2,17 +2,15 @@
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 <br><br>
 
-# Demonstration:
-
-https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
+# How to launch:
+1. Install `requirements.txt` using pip
+2. To launch main Streamlit app, use `Introduction.py`
+3. To run `Updater`, project uses `Selenium Standalone-Chrome` Docker container. To configure your own, follow instructions in `modules/settings.py` file.
 
 ---
 <br><br>
 
-
-# THIS BRANCH: 
-
-# TODO:
+# To do:
 
 <details>
   <summary>Data processing</summary>
@@ -27,7 +25,7 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
   #### Synchronization ETL module:
   - Use tag and location dictionaries to unify variable elements
   #### Records visualization:
-  - Prepare record template - fetch one record from CSV, fill specific fields
+  - Migrate to Flask for more detailed control over data visualization
   - Initially scrolled up, showing minimal info. Click, to show full record details
 
 </details>
