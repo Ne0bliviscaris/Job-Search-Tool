@@ -78,7 +78,7 @@ ARCHIVE_COLUMNS = [
     "salary_details",
     "tags",
     "url",
-    # "website",
+    "website",
     "notes",
     "personal_rating",
     # "added_date",

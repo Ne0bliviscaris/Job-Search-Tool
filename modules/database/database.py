@@ -61,26 +61,6 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
                 dataframe[col] = dataframe[col].apply(lambda x: None if pd.isna(x) else x)
                 dataframe[col] = pd.to_datetime(dataframe[col], format=DATE_FORMAT, errors="coerce")
 
-        # Prepare default values for non-date columns
-        defaults = {
-            "min_salary": 0,
-            "max_salary": 0,
-            "personal_rating": 0,
-            "users_id": 0,
-            "location": "",
-            "salary_details": "",
-            "salary_text": "",
-            "tags": "",
-            "url": "",
-            "website": "",
-            "notes": "",
-            "application_status": "Not applied",
-            "offer_status": "active",
-        }
-
-        # Fill missing values
-        dataframe = dataframe.fillna(value=defaults)
-
         # Convert numeric columns to integers
         numeric_cols = ["min_salary", "max_salary", "personal_rating", "users_id"]
         for col in numeric_cols:
@@ -88,34 +68,34 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
                 if col is not None:
                     dataframe[col] = pd.to_numeric(dataframe[col], errors="coerce").fillna(0).astype(int)
 
-        for _, row in dataframe.iterrows():
+        for row in dataframe.itertuples():
             record = JobOfferRecord(
                 # Integer columns
-                min_salary=int(row.get("min_salary", 0)),
-                max_salary=int(row.get("max_salary", 0)),
-                personal_rating=int(row.get("personal_rating", 0)),
-                users_id=int(row.get("users_id", 0)),
+                min_salary=row.min_salary,
+                max_salary=row.max_salary,
+                personal_rating=row.personal_rating if hasattr(row, "personal_rating") else 0,
+                users_id=row.users_id if hasattr(row, "users_id") else 0,
                 # String columns
-                title=str(row.get("title", "")),
-                logo=str(row.get("logo", "")),
-                company_name=str(row.get("company_name", "Unknown")),
-                location=str(row.get("location", "")),
-                remote_status=str(row.get("remote_status", "Unknown")),
-                salary_details=str(row.get("salary_details", "")),
-                salary_text=str(row.get("salary_text", "")),
-                tags=str(row.get("tags", "")),
-                url=str(row.get("url", "")),
-                website=str(row.get("website", "")),
-                notes=str(row.get("notes", "")),
-                application_status=str(row.get("application_status", "Not applied")),
-                offer_status=str(row.get("offer_status", "active")),
+                title=row.title,
+                logo=row.logo,
+                company_name=row.company_name,
+                location=row.location,
+                remote_status=row.remote_status,
+                salary_details=row.salary_details,
+                salary_text=row.salary_text,
+                tags=row.tags,
+                url=row.url,
+                website=row.website,
+                notes=row.notes if hasattr(row, "notes") else None,
+                application_status=row.application_status if hasattr(row, "application_status") else "Not applied",
+                offer_status=row.offer_status if hasattr(row, "offer_status") else "active",
                 # Date columns
-                added_date=row.get("added_date"),
-                application_date=row.get("application_date"),
-                feedback_date=row.get("feedback_date"),
-                archived_date=row.get("archived_date"),
+                added_date=row.added_date if hasattr(row, "added_date") else None,
+                application_date=row.application_date if hasattr(row, "application_date") else None,
+                feedback_date=row.feedback_date if hasattr(row, "feedback_date") else None,
+                archived_date=row.archived_date if hasattr(row, "archived_date") else None,
                 # Other columns
-                feedback_received=bool(row.get("feedback_received", False)),
+                feedback_received=row.feedback_received if hasattr(row, "feedback_received") else False,
             )
             db.add(record)
         db.commit()
@@ -150,7 +130,7 @@ def update_record(record_id: int, updates: dict) -> None:
         if record:
             for key, value in updates.items():
                 if key in date_columns:
-                    value = datetime.strptime(value, DATE_FORMAT).date() if value else None
+                    value = datetime.strptime(value.split(" ")[0], DATE_FORMAT).date() if value else None
                 setattr(record, key, value)
             db.commit()
     finally:

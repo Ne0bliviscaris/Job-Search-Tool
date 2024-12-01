@@ -1,4 +1,3 @@
-import datetime
 import os
 
 import pandas as pd
@@ -107,18 +106,5 @@ def reactivate_all_offers():
         db.commit()
 
         print(f"Reactivated {len(records)} offers.")
-    finally:
-        db.close()
-
-
-def db_drop_duplicates():
-    """Remove duplicate records from the database."""
-    db: Session = SessionLocal()
-    try:
-        records = db.query(JobOfferRecord).all()
-        records_df = pd.DataFrame(records)
-        COLUMNS_TO_COMPARE = ["title", "company_name", "website", "remote_status", "salary_text", "tags", "location"]
-        records_df.drop_duplicates()
-        db.commit()
     finally:
         db.close()
