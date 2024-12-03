@@ -118,8 +118,9 @@ def show_recently_changed(record_type) -> pd.DataFrame:
     """Load job records from the database where added_date is less than 1 day old.
     Inputs: "active" or "archived"."""
     db: Session = SessionLocal()
+    RECENT_DAYS_THRESHOLD = 1
     try:
-        three_days_ago = datetime.now() - timedelta(days=3)
+        three_days_ago = datetime.now() - timedelta(days=RECENT_DAYS_THRESHOLD)
 
         if record_type == "active":
             records = (
