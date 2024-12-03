@@ -12,6 +12,7 @@ from modules.database.database import (
     save_records_to_db,
     update_record,
 )
+from modules.debug.sync import DEBUG_SYNC, find_differences
 from modules.settings import DATE_FORMAT
 
 ensure_database_exists()
@@ -32,10 +33,11 @@ def sync_records():
     Extract records from raw, add additional information and return processed data into a new file
     """
     update = html_dataframe()
-    db = load_records_from_db()
+    db = load_records_from_db(all_records=DEBUG_SYNC)
     missing_records, new_records = find_changed_records(update, db)
-    archive_records(missing_records)
-    process_new_records(db, new_records)
+    if not DEBUG_SYNC:
+        archive_records(missing_records)
+        process_new_records(db, new_records)
 
 
 def prepare_comparison(frame: pd.DataFrame):
@@ -101,6 +103,8 @@ def find_changed_records(update, current_db):
     missing_frame = filter_matching_df(current_db, missing_records)
     new_frame = filter_matching_df(update, new_records)
 
+    if DEBUG_SYNC:
+        find_differences(current_db, update)
     return missing_frame, new_frame
 
 
