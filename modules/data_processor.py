@@ -49,15 +49,17 @@ def save_dataframe_to_csv(dataframe: pd.DataFrame, file_path: str) -> None:
     dataframe.to_csv(file_path, index=False)
 
 
-def load_records_from_db(archive=False) -> pd.DataFrame:
+def load_records_from_db(archive=False, all_records=False) -> pd.DataFrame:
     """Load job records from the database."""
     db: Session = SessionLocal()
     try:
-        if not archive:
-            records = db.query(JobOfferRecord).where(JobOfferRecord.offer_status == "active").all()
+        if not all_records:
+            if not archive:
+                records = db.query(JobOfferRecord).where(JobOfferRecord.offer_status == "active").all()
+            else:
+                records = db.query(JobOfferRecord).filter(JobOfferRecord.offer_status == "archived").all()
         else:
-            records = db.query(JobOfferRecord).filter(JobOfferRecord.offer_status == "archived").all()
-
+            records = db.query(JobOfferRecord).all()
         data = [
             {
                 "id": record.id,
