@@ -1,5 +1,5 @@
 # Private datbase
-modules/database/database.db
+datbase.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
