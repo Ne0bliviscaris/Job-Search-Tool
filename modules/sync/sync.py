@@ -4,11 +4,11 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from modules.data_collector import html_dataframe
-from modules.data_processor import load_records_from_db
 from modules.database.database import (
     JobOfferRecord,
     SessionLocal,
     ensure_database_exists,
+    load_records_from_db,
     save_records_to_db,
     update_record,
 )

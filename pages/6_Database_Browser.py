@@ -2,8 +2,7 @@ import os
 
 import streamlit as st
 
-from modules.data_processor import load_records_from_db
-from modules.database.database import update_edited_dataframe
+from modules.database.database import load_records_from_db, update_edited_dataframe
 from modules.dataframe_settings import column_conversions
 from modules.settings import DEBUG_MODE
 
