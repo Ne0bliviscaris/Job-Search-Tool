@@ -12,6 +12,11 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 
 # THIS BRANCH: 
 
+- Major refactor
+- Bugfixes
+- Add handling updated records in sync module
+
+
 # TODO:
 
 <details>
