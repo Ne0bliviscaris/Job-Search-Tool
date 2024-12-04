@@ -94,18 +94,18 @@ def archive_records(missing_df: set) -> pd.DataFrame:
 def find_changed_records(update, current_db):
     """Load files and return missing and new records."""
 
-    current_records = prepare_comparison(current_db) if not current_db.empty else set()
-    update_records = prepare_comparison(update) if not update.empty else set()
+    current_set = prepare_comparison(current_db) if not current_db.empty else set()
+    update_set = prepare_comparison(update) if not update.empty else set()
 
-    missing_records = current_records - update_records
-    new_records = update_records - current_records
+    missing_set = current_set - update_set
+    new_set = update_set - current_set
 
-    missing_frame = filter_matching_df(current_db, missing_records)
-    new_frame = filter_matching_df(update, new_records)
+    missing_df = filter_matching_df(current_db, missing_set)
+    new_df = filter_matching_df(update, new_set)
 
     if DEBUG_SYNC:
         find_differences(current_db, update)
-    return missing_frame, new_frame
+    return missing_df, new_df
 
 
 def add_date_to_column(frame, column):
