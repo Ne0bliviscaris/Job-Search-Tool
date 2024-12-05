@@ -62,43 +62,42 @@ def filter_matching_df(db_records, tested_records) -> pd.DataFrame:
 
 def process_new_records(current_db: pd.DataFrame, update_records: pd.DataFrame) -> None:
     """Process new records adding custom columns and timestamp."""
-    if not update_records.empty:
-        if current_db.empty:
-            update_records = add_date_to_column(update_records, column="added_date")
-            save_records_to_db(update_records)
-        else:
-            # Ensure new records are not already in the current database
-            update_set = prepare_set_for_comparison(update_records)
-            current_set = prepare_set_for_comparison(current_db)
-            new_set = update_set - current_set
-            new_records_df = update_records[update_records.apply(tuple, axis=1).isin(new_set)]
+    if update_records.empty:
+        return
 
-            if not new_records_df.empty:
-                new_records_df = add_date_to_column(new_records_df, column="added_date")
-                save_records_to_db(new_records_df)
+    records_to_save = update_records
+
+    if not current_db.empty:
+        # Filter out records that already exist in database
+        _, new_set = find_set_differences(current_db, update_records)
+        records_to_save = update_records[update_records.apply(tuple, axis=1).isin(new_set)]
+
+    if not records_to_save.empty:
+        records_to_save = add_date_to_column(records_to_save, column="added_date")
+        save_records_to_db(records_to_save)
 
 
-def archive_records(missing_df: set) -> pd.DataFrame:
+def archive_records(records_to_archive: set) -> pd.DataFrame:
     """Archive missing records from synced file."""
-    if not missing_df.empty:
-        missing_df = add_date_to_column(missing_df, column="archived_date")
+    if records_to_archive.empty:
+        return
 
-        for _, row in missing_df.iterrows():
-            update_values = {
-                "archived_date": str(row["archived_date"]),
-                "offer_status": "archived",
-            }
-            update_record(record_id=row["id"], updates=update_values)
+    # Add archive date to records
+    records_with_date = add_date_to_column(records_to_archive, column="archived_date")
+
+    # Update records in database
+    records_with_date.apply(
+        lambda row: update_record(
+            record_id=row["id"], updates={"archived_date": str(row["archived_date"]), "offer_status": "archived"}
+        ),
+        axis=1,
+    )
 
 
 def find_changed_records(update, current_db):
     """Load files and return missing and new records."""
 
-    current_set = prepare_set_for_comparison(current_db) if not current_db.empty else set()
-    update_set = prepare_set_for_comparison(update) if not update.empty else set()
-
-    missing_set = current_set - update_set
-    new_set = update_set - current_set
+    missing_set, new_set = find_set_differences(current_db, update)
 
     missing_df = filter_matching_df(current_db, missing_set)
     new_df = filter_matching_df(update, new_set)
@@ -106,6 +105,25 @@ def find_changed_records(update, current_db):
     if DEBUG_SYNC:
         find_differences(current_db, update)
     return missing_df, new_df
+
+
+def find_set_differences(current_db: pd.DataFrame, update_df: pd.DataFrame) -> tuple[set, set]:
+    """Find differences between two DataFrames and return tuple of missing and new record sets.
+
+    Args:
+        current_db: DataFrame with current database records
+        update_df: DataFrame with new records to compare
+
+    Returns:
+        Tuple containing (missing_set, new_set)
+    """
+    current_set = prepare_set_for_comparison(current_db) if not current_db.empty else set()
+    update_set = prepare_set_for_comparison(update_df) if not update_df.empty else set()
+
+    missing_set = current_set - update_set
+    new_set = update_set - current_set
+
+    return missing_set, new_set
 
 
 def add_date_to_column(frame, column):
