@@ -12,7 +12,6 @@ from modules.database.database import (
     save_records_to_db,
     update_record,
 )
-from modules.debug.sync import DEBUG_SYNC, find_differences
 from modules.settings import DATE_FORMAT
 
 ensure_database_exists()
@@ -33,11 +32,10 @@ def sync_records():
     Extract records from raw, add additional information and return processed data into a new file
     """
     update = html_dataframe()
-    db = load_records_from_db(all_records=DEBUG_SYNC)
-    missing_records, new_records = find_changed_records(update, db)
-    if not DEBUG_SYNC:
-        archive_records(missing_records)
-        process_new_records(db, new_records)
+    db = load_records_from_db()
+    missing_records, new_records = find_record_changes(update, db)
+    archive_records(missing_records)
+    process_new_records(new_records)
 
 
 def prepare_set_for_comparison(frame: pd.DataFrame):
@@ -48,33 +46,11 @@ def prepare_set_for_comparison(frame: pd.DataFrame):
     return rows_to_compare
 
 
-def filter_matching_df(db_records, tested_records) -> pd.DataFrame:
-    """Returns only df records matching given records.
-    Compares content of columns specified in COLUMNS_TO_COMPARE."""
-    if not db_records.empty:
-        columns = db_records[COLUMNS_TO_COMPARE]
-        df_rows = columns.apply(tuple, axis=1)
-        matching_records = df_rows.isin(tested_records)
-        return db_records[matching_records]
-    else:
-        return pd.DataFrame()
-
-
-def process_new_records(current_db: pd.DataFrame, update_records: pd.DataFrame) -> None:
+def process_new_records(update_records: pd.DataFrame):
     """Process new records adding custom columns and timestamp."""
-    if update_records.empty:
-        return
-
-    records_to_save = update_records
-
-    if not current_db.empty:
-        # Filter out records that already exist in database
-        _, new_set = find_set_differences(current_db, update_records)
-        records_to_save = update_records[update_records.apply(tuple, axis=1).isin(new_set)]
-
-    if not records_to_save.empty:
-        records_to_save = add_date_to_column(records_to_save, column="added_date")
-        save_records_to_db(records_to_save)
+    if not update_records.empty:
+        update_records = add_date_to_column(update_records, column="added_date")
+        save_records_to_db(update_records)
 
 
 def archive_records(records_to_archive: set) -> pd.DataFrame:
@@ -94,7 +70,7 @@ def archive_records(records_to_archive: set) -> pd.DataFrame:
     )
 
 
-def find_changed_records(update, current_db):
+def find_record_changes(update, current_db):
     """Load files and return missing and new records."""
 
     missing_set, new_set = find_set_differences(current_db, update)
@@ -102,9 +78,19 @@ def find_changed_records(update, current_db):
     missing_df = filter_matching_df(current_db, missing_set)
     new_df = filter_matching_df(update, new_set)
 
-    if DEBUG_SYNC:
-        find_differences(current_db, update)
     return missing_df, new_df
+
+
+def filter_matching_df(db_records, tested_records) -> pd.DataFrame:
+    """Returns only df records matching given records.
+    Compares content of columns specified in COLUMNS_TO_COMPARE."""
+    if not db_records.empty:
+        columns = db_records[COLUMNS_TO_COMPARE]
+        df_rows = columns.apply(tuple, axis=1)
+        matching_records = df_rows.isin(tested_records)
+        return db_records[matching_records]
+    else:
+        return pd.DataFrame()
 
 
 def find_set_differences(current_db: pd.DataFrame, update_df: pd.DataFrame) -> tuple[set, set]:
