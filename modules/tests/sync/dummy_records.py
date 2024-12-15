@@ -35,10 +35,10 @@ def get_dummy_db_records():
                 ][i],
                 "offer_status": ["archived", "archived", "active", "archived", "active", "active", "archived"][i],
                 # Date columns
-                "added_date": pd.to_datetime(f"2023-01-0{i+1}"),
-                "application_date": pd.to_datetime(f"2023-01-0{i+3}"),
-                "feedback_date": pd.to_datetime(f"2023-01-0{i+5}"),
-                "archived_date": pd.to_datetime(f"2023-01-0{i+7}"),
+                "added_date": pd.to_datetime(f"2023-01-{str(i+1).zfill(2)}"),
+                "application_date": pd.to_datetime(f"2023-01-{str(min(i+3, 31)).zfill(2)}"),
+                "feedback_date": pd.to_datetime(f"2023-01-{str(min(i+5, 31)).zfill(2)}"),
+                "archived_date": pd.to_datetime(f"2023-01-{str(min(i+7, 31)).zfill(2)}"),
                 # Boolean columns
                 "feedback_received": [True, False, True, False, True, False, True][i],
             }
@@ -131,33 +131,50 @@ def get_dummy_empty_records():
 
 
 def get_dummy_fully_overlapping_records():
-    """Return records that exactly match records from dummy database."""
-    return pd.DataFrame(
-        {
-            "title": ["Job1", "Job2", "Job3"],
-            "company_name": ["Company1", "Company2", "Company3"],
-            "website": ["www.company1.com", "www.company2.com", "www.company3.com"],
-            "remote_status": ["Remote", "On-site", "Hybrid"],
-            "salary_details": ["50k-60k", "70k-80k", "90k-100k"],
-            "tags": ["tag1, tag2", "tag3, tag4", "tag5, tag6"],
-            "location": ["Location1", "Location2", "Location3"],
-        }
-    )
+    """Return records that exactly match first 3 records from dummy database."""
+    db_records = get_dummy_db_records()
+    overlapping_cols = [
+        "title",
+        "logo",
+        "company_name",
+        "location",
+        "remote_status",
+        "min_salary",
+        "max_salary",
+        "salary_details",
+        "salary_text",
+        "tags",
+        "url",
+        "website",
+    ]
+    return db_records.head(3)[overlapping_cols]
 
 
 def get_dummy_partially_overlapping_records():
-    """Return mix of existing and new records without modifications."""
-    return pd.DataFrame(
-        {
-            "title": ["Job1", "Job2", "Job8", "Job9"],
-            "company_name": ["Company1", "Company2", "Company8", "Company9"],
-            "website": ["www.company1.com", "www.company2.com", "www.company8.com", "www.company9.com"],
-            "remote_status": ["Remote", "On-site", "Hybrid", "Remote"],
-            "salary_details": ["50k-60k", "70k-80k", "190k-200k", "210k-220k"],
-            "tags": ["tag1, tag2", "tag3, tag4", "tag15, tag16", "tag17, tag18"],
-            "location": ["Location1", "Location2", "Location8", "Location9"],
-        }
-    )
+    """Return mix of existing and new records."""
+    db_records = get_dummy_db_records()
+    scraped_records = get_dummy_scraped_records()
+
+    overlapping_cols = [
+        "title",
+        "logo",
+        "company_name",
+        "location",
+        "remote_status",
+        "min_salary",
+        "max_salary",
+        "salary_details",
+        "salary_text",
+        "tags",
+        "url",
+        "website",
+    ]
+
+    # Get first 2 records from DB and records 8-9 from scraped
+    existing_records = db_records.head(2)[overlapping_cols]
+    new_records = scraped_records[scraped_records["title"].isin(["Job8", "Job9"])][overlapping_cols]
+
+    return pd.concat([existing_records, new_records], ignore_index=True)
 
 
 def get_dummy_already_archived_records():
