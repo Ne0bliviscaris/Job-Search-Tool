@@ -1,5 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 import modules.containers as containers
 import modules.site_specific_actions as site_specific_actions
@@ -21,19 +23,28 @@ def scrape(web_driver, search_link: str) -> str:
 
 
 def get_search_container(driver: webdriver.Chrome, search_link: str) -> str:
-    """
-    Get the HTML content of the search container using Selenium
-    """
+    """Get the HTML content of the search container using Selenium."""
     search_container = containers.search(search_link)
     if not search_container:
         print(f"Website not supported yet: {search_link}")
         return ""
     try:
-        search_block = driver.find_element(By.CSS_SELECTOR, search_container)
+        search_block = wait_for_content(driver, search_container)
         return search_block.get_attribute("outerHTML")
+
     except Exception as e:
         print(f"No offers found: {search_link}")
         return ""
+
+
+def wait_for_content(driver, search_container, timeout=100):
+    """Wait for element to be present and contain content."""
+    wait = WebDriverWait(driver, timeout)
+    page_content = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, search_container)))
+
+    page_content_loaded = len(page_content.text.strip()) > 0
+    wait.until(lambda d: page_content_loaded)
+    return page_content
 
 
 def perform_additional_action(driver: webdriver.Chrome, search_link: str):
