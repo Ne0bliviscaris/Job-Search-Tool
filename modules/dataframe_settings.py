@@ -1,9 +1,5 @@
-from datetime import datetime
-
 import pandas as pd
 import streamlit as st
-
-from modules.settings import DATE_FORMAT
 
 pd.set_option("future.no_silent_downcasting", True)
 
@@ -92,9 +88,23 @@ ARCHIVE_COLUMNS = [
 ]
 
 
+def column_conversions(frame, archive=False, key=None):
+    """Return column conversions for the data editor."""
+    columns = MAIN_FRAME_COLUMNS if not archive else ARCHIVE_COLUMNS
+    frame = add_missing_columns(frame)
+    frame = fill_missing_values(frame)
+    frame = calculate_elapsed_days(frame, archive=archive)
+    frame = calculate_time_until_feedback(frame)
+    frame = check_application_status(frame)
+    frame = check_feedback_status(frame)
+
+    edited_df = st.data_editor(frame[columns], disabled=archive, column_config=set_column_config(archive), key=key)
+    return edited_df
+
+
 def set_column_config(archive=False):
     """Return column configuration for the data editor."""
-    date_column = lambda name: st.column_config.DateColumn(name, format="YYYY-MM-DD")
+    date_column = lambda name: st.column_config.DateColumn(name, format="DD-MM-YYYY")
     application_statuses = ["Not applied", "Applied", "Interview", "Hired"]
 
     static_columns = {
@@ -137,20 +147,6 @@ def set_column_config(archive=False):
     return column_config
 
 
-def column_conversions(frame, archive=False, key=None):
-    """Return column conversions for the data editor."""
-    columns = MAIN_FRAME_COLUMNS if not archive else ARCHIVE_COLUMNS
-    frame = add_missing_columns(frame)
-    frame = fill_missing_values(frame)
-    frame = calculate_elapsed_days(frame, archive=archive)
-    frame = calculate_time_until_feedback(frame)
-    frame = check_application_status(frame)
-    frame = check_feedback_status(frame)
-
-    edited_df = st.data_editor(frame[columns], disabled=archive, column_config=set_column_config(archive), key=key)
-    return edited_df
-
-
 def add_missing_columns(frame):
     """Add missing columns to the DataFrame."""
     missing_columns = set(ALL_COLUMNS) - set(frame.columns)
@@ -169,17 +165,16 @@ def fill_missing_values(frame):
 
 def calculate_elapsed_days(frame, archive=False):
     """Calculate elapsed days since the job offer was added."""
-    today = datetime.now().strftime(DATE_FORMAT)
-    today = pd.to_datetime(today, format=DATE_FORMAT).date()
-
+    today = pd.Timestamp.now()
     if not archive:
         frame["elapsed_days"] = frame.apply(
-            lambda row: (today - row["added_date"]).days if pd.notnull(row["added_date"]) else None, axis=1
+            lambda row: ((today - row["added_date"]).days if pd.notnull(row["added_date"]) else None),
+            axis=1,
         )
     else:
         frame["elapsed_days"] = frame.apply(
             lambda row: (
-                (row["archived_date"] - row["added_date"]).days
+                (pd.to_datetime(row["archived_date"]) - row["added_date"]).days
                 if pd.notnull(row["added_date"]) and pd.notnull(row["archived_date"])
                 else None
             ),
