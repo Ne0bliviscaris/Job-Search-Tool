@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pandas as pd
 from sqlalchemy.orm import Session
@@ -12,7 +12,6 @@ from modules.database.database import (
     save_records_to_db,
     update_record,
 )
-from modules.settings import DATE_FORMAT
 
 ensure_database_exists()
 COLUMNS_TO_COMPARE = [
@@ -64,7 +63,8 @@ def archive_records(records_to_archive: set) -> pd.DataFrame:
     # Update records in database
     records_with_date.apply(
         lambda row: update_record(
-            record_id=row["id"], updates={"archived_date": str(row["archived_date"]), "offer_status": "archived"}
+            record_id=row["id"],
+            updated_fields={"archived_date": str(row["archived_date"]), "offer_status": "archived"},
         ),
         axis=1,
     )
@@ -113,12 +113,8 @@ def find_set_differences(current_db: pd.DataFrame, update_df: pd.DataFrame) -> t
 
 
 def add_date_to_column(frame, column):
-    """Add a timestamp to the records DataFrame."""
-    date_time = datetime.now().strftime(DATE_FORMAT)
-    date = date_time.split(" ")[0]
-
-    frame[column] = date
-    frame[column] = pd.to_datetime(frame[column], format=DATE_FORMAT)
+    """Add current timestamp to DataFrame column."""
+    frame[column] = pd.Timestamp.now()
     return frame
 
 
@@ -128,19 +124,19 @@ def show_recently_changed(record_type) -> pd.DataFrame:
     db: Session = SessionLocal()
     RECENT_DAYS_THRESHOLD = 1
     try:
-        three_days_ago = datetime.now() - timedelta(days=RECENT_DAYS_THRESHOLD)
+        one_day_ago = pd.Timestamp.now() - timedelta(days=RECENT_DAYS_THRESHOLD)
 
         if record_type == "active":
             records = (
                 db.query(JobOfferRecord)
-                .filter(JobOfferRecord.added_date >= three_days_ago)
+                .filter(JobOfferRecord.added_date >= one_day_ago)
                 .where(JobOfferRecord.offer_status == "active")
                 .all()
             )
         elif record_type == "archived":
             records = (
                 db.query(JobOfferRecord)
-                .filter(JobOfferRecord.archived_date >= three_days_ago)
+                .filter(JobOfferRecord.archived_date >= one_day_ago)
                 .where(JobOfferRecord.offer_status == "archived")
                 .all()
             )

@@ -1,12 +1,11 @@
 import os
-from datetime import datetime
 
 import pandas as pd
-from sqlalchemy import Boolean, Column, Date, Integer, String, create_engine
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
-from modules.settings import DATE_FORMAT
+from modules.dicts import DATE_COLUMNS
 
 DATABASE_URL = "sqlite:///modules/database/database.db"
 
@@ -39,10 +38,10 @@ class JobOfferRecord(Base):
     application_status = Column(String, default="Not applied")
     offer_status = Column(String, default="active", index=True)
     # Date columns
-    added_date = Column(Date, default=None, nullable=True)
-    application_date = Column(Date, default=None, nullable=True)
-    feedback_date = Column(Date, default=None, nullable=True)
-    archived_date = Column(Date, default=None, nullable=True)
+    added_date = Column(DateTime, default=None, nullable=True)
+    application_date = Column(DateTime, default=None, nullable=True)
+    feedback_date = Column(DateTime, default=None, nullable=True)
+    archived_date = Column(DateTime, default=None, nullable=True)
     # Other columns
     feedback_received = Column(Boolean, default=False, index=True)
 
@@ -55,13 +54,10 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
     """Save the given DataFrame to the database."""
     db: Session = SessionLocal()
     try:
-        # Convert NaT to None for date columns
-        date_columns = ["added_date", "application_date", "feedback_date", "archived_date"]
-        for col in date_columns:
+        # Convert NaT to None and strings to Timestamp for date columns
+        for col in DATE_COLUMNS:
             if col in dataframe.columns:
-                dataframe[col] = dataframe[col].apply(lambda x: None if pd.isna(x) else x)
-                dataframe[col] = pd.to_datetime(dataframe[col], format=DATE_FORMAT, errors="coerce")
-
+                dataframe[col] = dataframe[col].apply(lambda x: None if pd.isna(x) else pd.Timestamp(x))
         # Convert numeric columns to integers
         numeric_cols = ["min_salary", "max_salary", "personal_rating", "users_id"]
         for col in numeric_cols:
@@ -109,35 +105,6 @@ def ensure_database_exists():
         init_db()
 
 
-def insert_empty_record():
-    """Insert an empty record to the database."""
-    db: Session = SessionLocal()
-    try:
-
-        archived_date = datetime.strptime("26-11-2024", "%d-%m-%Y").date()
-        record = JobOfferRecord(added_date=archived_date)
-        db.add(record)
-        db.commit()
-    finally:
-        db.close()
-
-
-def update_record(record_id: int, updates: dict) -> None:
-    """Update a single record in the database."""
-    db: Session = SessionLocal()
-    try:
-        date_columns = ["added_date", "application_date", "feedback_date", "archived_date"]
-        record = db.query(JobOfferRecord).filter(JobOfferRecord.id == record_id).first()
-        if record:
-            for key, value in updates.items():
-                if key in date_columns:
-                    value = datetime.strptime(value.split(" ")[0], DATE_FORMAT).date() if value else None
-                setattr(record, key, value)
-            db.commit()
-    finally:
-        db.close()
-
-
 def update_edited_dataframe(changed_dataframe, st_session_state):
     """Update the edited records in the database."""
 
@@ -147,6 +114,21 @@ def update_edited_dataframe(changed_dataframe, st_session_state):
     for row_id, updates in edited_rows.items():
         record_id = changed_dataframe.loc[int(row_id), "id"]
         update_record(int(record_id), updates)
+
+
+def update_record(record_id: int, updated_fields: dict) -> None:
+    """Update a single record in the database."""
+    db: Session = SessionLocal()
+    try:
+        record = db.query(JobOfferRecord).filter(JobOfferRecord.id == record_id).first()
+        if record:
+            for key, value in updated_fields.items():
+                if key in DATE_COLUMNS and value:
+                    value = pd.Timestamp(value)
+                setattr(record, key, value)
+            db.commit()
+    finally:
+        db.close()
 
 
 def wipe_database():
@@ -199,12 +181,23 @@ def load_records_from_db(archive=False, all_records=False) -> pd.DataFrame:
             for record in records
         ]
 
-        return pd.DataFrame(data)
+        db_frame = pd.DataFrame(data)
+        db_frame = convert_dates_to_timestamps(db_frame)
+        return db_frame
+
     except OperationalError:
         empty_frame = pd.DataFrame()
         return empty_frame
     finally:
         db.close()
+
+
+def convert_dates_to_timestamps(frame: pd.DataFrame) -> pd.DataFrame:
+    """Convert date columns to Timestamp objects."""
+    for col in DATE_COLUMNS:
+        if col in frame.columns:
+            frame[col] = pd.to_datetime(frame[col])
+    return frame
 
 
 def reactivate_all_offers():
