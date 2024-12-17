@@ -15,11 +15,9 @@ def scrape(web_driver, search_link: str) -> str:
     perform_additional_action(web_driver, search_link)
     stop_scraping = evaluate_stop_conditions(web_driver, search_link)
 
-    if stop_scraping is not True:
-        html_content = get_search_container(web_driver, search_link)
-    else:
-        html_content = ""
-    return html_content
+    if stop_scraping is True:
+        return ""
+    return get_search_container(web_driver, search_link)
 
 
 def get_search_container(driver: webdriver.Chrome, search_link: str) -> str:
@@ -37,7 +35,7 @@ def get_search_container(driver: webdriver.Chrome, search_link: str) -> str:
         return ""
 
 
-def wait_for_content(driver, search_container, timeout=100):
+def wait_for_content(driver, search_container, timeout=10):
     """Wait for element to be present and contain content."""
     wait = WebDriverWait(driver, timeout)
     page_content = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, search_container)))
@@ -66,10 +64,7 @@ def setup_webdriver():
     Setup and return a Selenium WebDriver instance
     """
     # Path to container with Chrome
-
     options = set_chromedriver_options()
-
-    # Return WebDriver instance
     return webdriver.Remote(command_executor=CHROMEDRIVER_CONTAINER, options=options)
 
 
