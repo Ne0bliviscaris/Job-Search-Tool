@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from modules.JobRecord import JobRecord
+from modules.updater.data_processing.JobRecord import JobRecord
 from modules.updater.scraper.containers import detect_records
 from modules.websites import identify_website
 

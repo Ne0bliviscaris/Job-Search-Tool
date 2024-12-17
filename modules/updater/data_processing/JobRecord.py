@@ -1,5 +1,5 @@
 import modules.updater.scraper.containers as containers
-from modules.helper_functions import (
+from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
     ensure_string,
     extract_salary_details,

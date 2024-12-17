@@ -3,7 +3,6 @@ from datetime import timedelta
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from modules.data_collector import html_dataframe
 from modules.database.database import (
     JobOfferRecord,
     SessionLocal,
@@ -12,6 +11,7 @@ from modules.database.database import (
     save_records_to_db,
     update_record,
 )
+from modules.updater.data_processing.data_collector import html_dataframe
 
 ensure_database_exists()
 COLUMNS_TO_COMPARE = [

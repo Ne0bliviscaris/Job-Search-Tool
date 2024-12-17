@@ -6,12 +6,12 @@ import pandas as pd
 import pytest
 
 from modules.settings import DATE_FORMAT
-from modules.sync.sync import archive_records
 from modules.tests.sync.dummy_records import (
     get_dummy_already_archived_records,
     get_dummy_db_records,
     get_dummy_empty_records,
 )
+from modules.updater.data_processing.sync import archive_records
 
 
 @pytest.fixture

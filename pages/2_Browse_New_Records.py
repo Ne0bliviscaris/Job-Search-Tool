@@ -1,7 +1,6 @@
 import streamlit as st
 
-import modules.data_collector as data_collector
-import modules.data_processor as data_processor
+import modules.updater.data_processing.data_collector as data_collector
 from modules.dataframe_settings import set_column_config
 
 

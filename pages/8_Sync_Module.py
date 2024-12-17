@@ -3,7 +3,7 @@ import streamlit as st
 from modules.database.database import reactivate_all_offers, wipe_database
 from modules.dataframe_settings import column_conversions
 from modules.settings import DEBUG_MODE
-from modules.sync.sync import show_recently_changed, sync_records
+from modules.updater.data_processing.sync import show_recently_changed, sync_records
 from modules.updater.updater import update_all_sites
 
 st.set_page_config(layout="wide")

@@ -1,4 +1,7 @@
-from modules.helper_functions import process_remote_status, remove_remote_status
+from modules.updater.data_processing.helper_functions import (
+    process_remote_status,
+    remove_remote_status,
+)
 from modules.websites import JUSTJOINIT  # Same structure as RocketJobs
 from modules.websites import (
     BULLDOGJOB,

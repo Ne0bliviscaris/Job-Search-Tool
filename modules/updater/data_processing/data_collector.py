@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from modules.data_processor import (
+from modules.updater.data_processing.data_processor import (
     build_dataframe,
     html_to_soup,
     process_records,

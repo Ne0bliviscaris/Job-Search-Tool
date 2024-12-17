@@ -3,11 +3,15 @@ from unittest.mock import patch
 
 import pytest
 
-from modules.sync.sync import find_record_changes, find_set_differences, sync_records
 from modules.tests.sync.dummy_records import (
     get_dummy_db_records,
     get_dummy_empty_records,
     get_dummy_scraped_records,
+)
+from modules.updater.data_processing.sync import (
+    find_record_changes,
+    find_set_differences,
+    sync_records,
 )
 
 

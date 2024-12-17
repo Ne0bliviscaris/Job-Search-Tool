@@ -5,12 +5,12 @@ import pandas as pd
 import pytest
 
 from modules.settings import DATE_FORMAT
-from modules.sync.sync import process_new_records
 from modules.tests.sync.dummy_records import (
     get_dummy_db_records,
     get_dummy_empty_records,
     get_dummy_scraped_records,
 )
+from modules.updater.data_processing.sync import process_new_records
 
 
 @pytest.fixture
