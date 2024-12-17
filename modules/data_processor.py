@@ -36,7 +36,7 @@ def set_filename(link: str) -> str:
     """
     Generate a readable filename based on the combined link
     """
-    return os.path.join("modules/sites", f"{link}.html")
+    return os.path.join("modules/updater/sites", f"{link}.html")
 
 
 def save_dataframe_to_csv(dataframe: pd.DataFrame, file_path: str) -> None:
