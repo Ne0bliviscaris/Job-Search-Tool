@@ -27,19 +27,7 @@ def save_html_to_file(html_content: str, filename: str) -> None:
         file.write(str(html_content))
 
 
-def update_all_sites() -> None:
-    """
-    Download HTML content for all search links and save them to files.
-    """
-
-    with setup_webdriver() as web_driver:
-        for link_name, search_link in search_links.items():
-            update_site(web_driver, link_name, search_link)
-            print(f"Downloaded {link_name}")
-        print("All links downloaded")
-
-
-def streamlit_update_all(st) -> None:
+def update_all_sites(st) -> None:
     """
     Download HTML content for all search links and save them to files.
     """

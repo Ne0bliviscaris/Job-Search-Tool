@@ -9,22 +9,21 @@ from modules.updater.updater import update_all_sites
 st.set_page_config(layout="wide")
 
 # Debugging flags
-# DEBUG_SYNC = False
-DEBUG_SYNC = True
+DEBUG_SYNC = False
+# DEBUG_SYNC = True
 
 
 def update_button():
     """Update all sites button."""
     if st.button("Update all sites"):
         with st.spinner("Updating..."):  # Display a spinner while updating
-            update_all_sites()
-            st.success("All sites updated successfully!")
+            update_all_sites(st)
 
 
 def sync_button():
     """Synchronize database button."""
     if st.button("Perform database synchronization"):
-        with st.spinner("Updating..."):  # Display a spinner while updating
+        with st.spinner("Syncing..."):  # Display a spinner while updating
             sync_records()
             st.success("All sites synced successfully!")
 
