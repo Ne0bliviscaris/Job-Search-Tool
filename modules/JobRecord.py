@@ -1,4 +1,4 @@
-import modules.containers as containers
+import modules.updater.scraper.containers as containers
 from modules.helper_functions import (
     convert_k_notation,
     ensure_string,

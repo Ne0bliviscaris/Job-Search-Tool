@@ -3,8 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-import modules.containers as containers
-import modules.site_specific_actions as site_specific_actions
+import modules.updater.scraper.containers as containers
+import modules.updater.scraper.site_specific_actions as site_specific_actions
 from modules.settings import CHROMEDRIVER_CONTAINER
 from modules.websites import NOFLUFFJOBS, PRACUJPL
 

@@ -3,8 +3,8 @@ import os
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from modules.containers import detect_records
 from modules.JobRecord import JobRecord
+from modules.updater.scraper.containers import detect_records
 from modules.websites import identify_website
 
 
