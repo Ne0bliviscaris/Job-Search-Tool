@@ -14,7 +14,9 @@ https://github.com/user-attachments/assets/3d28d709-f5ef-43c3-8e25-9544e263582b
 
 - Major refactor
 - Bugfixes
-- Add handling updated records in sync module
+- Add function to check if new record is not already in archive
+- Add function to update changed records (link based?)
+- Separate update and database from interface
 
 
 # TODO:

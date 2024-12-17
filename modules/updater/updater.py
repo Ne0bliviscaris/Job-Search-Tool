@@ -43,20 +43,19 @@ def streamlit_update_all(st) -> None:
     """
     Download HTML content for all search links and save them to files.
     """
+    try:
+        with setup_webdriver() as web_driver:
+            progress_bar = st.empty()
+            status_box = st.empty()
+            current_status = 0
 
-    with setup_webdriver() as web_driver:
-        progress_bar = st.empty()
-        status_box = st.empty()
-        current_status = 0
-
-        for link_name, search_link in search_links.items():
-            update_site(web_driver, link_name, search_link)
-            status_box.success(f"Downloaded: {link_name}")
-            current_status += 1
-            progress_bar.progress(current_status / len(search_links))
-            time.sleep(3)  # Wait for 2 seconds before clearing the message
-            status_box.empty()
-
-
-if __name__ == "__main__":
-    streamlit_update_all()
+            for link_name, search_link in search_links.items():
+                update_site(web_driver, link_name, search_link)
+                status_box.success(f"Downloaded: {link_name}")
+                current_status += 1
+                progress_bar.progress(current_status / len(search_links))
+                time.sleep(3)
+                status_box.empty()
+            st.success("All sites updated!")
+    except Exception as e:
+        st.error("Make sure you have properly configured Webdriver (see modules/settings.py)")

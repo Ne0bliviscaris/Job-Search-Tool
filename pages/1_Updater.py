@@ -10,4 +10,3 @@ if st.button("Update All Sites"):
     """Update all sites data when button is clicked"""
     with st.spinner("Updating..."):  # Display a spinner while updating
         streamlit_update_all(st)
-    st.success("All sites updated successfully!")
