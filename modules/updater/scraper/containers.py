@@ -24,7 +24,7 @@ def search(search_link: str) -> str:
     elif BULLDOGJOB in current_website:
         return '[id="__next"]'
     elif ROCKETJOBS in current_website or JUSTJOINIT in current_website:
-        return '[data-test-id="virtuoso-item-list"]'
+        return '[id="up-offers-list"]'
     elif SOLIDJOBS in current_website:
         return '[class="scrollable-content"]'
     elif PRACUJPL in current_website:
