@@ -114,10 +114,7 @@ def find_set_differences(current_db: pd.DataFrame, update_df: pd.DataFrame) -> t
 
 def add_date_to_column(frame, column):
     """Add current timestamp to DataFrame column."""
-    if column not in frame.columns:
-        frame.loc[:, column] = pd.NaT
-    frame.loc[:, column] = pd.Timestamp.now()
-    return frame
+    return frame.assign(**{column: pd.Timestamp.now()})
 
 
 def show_recently_changed(record_type) -> pd.DataFrame:
