@@ -57,13 +57,13 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
         # Convert NaT to None and strings to Timestamp for date columns
         for col in DATE_COLUMNS:
             if col in dataframe.columns:
-                dataframe[col] = dataframe[col].apply(lambda x: None if pd.isna(x) else pd.Timestamp(x))
+                dataframe.loc[:, col] = dataframe[col].apply(lambda x: None if pd.isna(x) else pd.Timestamp(x))
         # Convert numeric columns to integers
         numeric_cols = ["min_salary", "max_salary", "personal_rating", "users_id"]
         for col in numeric_cols:
             if col in dataframe.columns:
                 if col is not None:
-                    dataframe[col] = pd.to_numeric(dataframe[col], errors="coerce").fillna(0).astype(int)
+                    dataframe.loc[:, col] = pd.to_numeric(dataframe[col], errors="coerce").fillna(0).astype(int)
 
         for row in dataframe.itertuples():
             record = JobOfferRecord(
