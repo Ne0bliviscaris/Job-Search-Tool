@@ -27,7 +27,8 @@ def get_search_container(driver: webdriver.Chrome, search_link: str) -> str:
         print(f"Website not supported yet: {search_link}")
         return ""
     try:
-        search_block = wait_for_content(driver, search_container)
+        # search_block = wait_for_content(driver, search_container)
+        search_block = driver.find_element(By.CSS_SELECTOR, search_container)  #  wait_for_content fails for RocketJobs
         return search_block.get_attribute("outerHTML")
 
     except Exception as e:
