@@ -1,10 +1,14 @@
 import streamlit as st
 
 from modules.database.backup import backup_db
-from modules.database.database import reactivate_all_offers, wipe_database
+from modules.database.database import (
+    reactivate_all_offers,
+    show_recently_changed,
+    wipe_database,
+)
 from modules.dataframe_settings import column_conversions
 from modules.settings import DEBUG_MODE
-from modules.updater.data_processing.sync import show_recently_changed, sync_records
+from modules.updater.data_processing.sync import sync_records
 from modules.updater.updater import update_all_sites
 
 st.set_page_config(layout="wide")

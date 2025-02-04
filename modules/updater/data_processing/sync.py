@@ -1,11 +1,6 @@
-from datetime import timedelta
-
 import pandas as pd
-from sqlalchemy.orm import Session
 
 from modules.database.database import (
-    JobOfferRecord,
-    SessionLocal,
     ensure_database_exists,
     load_records_from_db,
     save_records_to_db,
@@ -115,59 +110,3 @@ def find_set_differences(current_db: pd.DataFrame, update_df: pd.DataFrame) -> t
 def add_date_to_column(frame, column):
     """Add current timestamp to DataFrame column."""
     return frame.assign(**{column: pd.Timestamp.now()})
-
-
-def show_recently_changed(record_type) -> pd.DataFrame:
-    """Load job records from the database where added_date is less than 1 day old.
-    Inputs: "active" or "archived"."""
-    db: Session = SessionLocal()
-    RECENT_DAYS_THRESHOLD = 1
-    try:
-        one_day_ago = pd.Timestamp.now() - timedelta(days=RECENT_DAYS_THRESHOLD)
-
-        if record_type == "active":
-            records = (
-                db.query(JobOfferRecord)
-                .filter(JobOfferRecord.added_date >= one_day_ago)
-                .where(JobOfferRecord.offer_status == "active")
-                .all()
-            )
-        elif record_type == "archived":
-            records = (
-                db.query(JobOfferRecord)
-                .filter(JobOfferRecord.archived_date >= one_day_ago)
-                .where(JobOfferRecord.offer_status == "archived")
-                .all()
-            )
-
-        data = [
-            {
-                "id": record.id,
-                "title": record.title,
-                "logo": record.logo,
-                "company_name": record.company_name,
-                "location": record.location,
-                "remote_status": record.remote_status,
-                "min_salary": record.min_salary,
-                "max_salary": record.max_salary,
-                "salary_details": record.salary_details,
-                "salary_text": record.salary_text,
-                "tags": record.tags,
-                "url": record.url,
-                "website": record.website,
-                "added_date": record.added_date,
-                "notes": record.notes if hasattr(record, "notes") else "",
-                "personal_rating": record.personal_rating,
-                "application_status": record.application_status,
-                "application_date": record.application_date,
-                "feedback_received": record.feedback_received,
-                "feedback_date": record.feedback_date,
-                "archived_date": record.archived_date,
-                "offer_status": record.offer_status,
-                "users_id": record.users_id,
-            }
-            for record in records
-        ]
-        return pd.DataFrame(data)
-    finally:
-        db.close()
