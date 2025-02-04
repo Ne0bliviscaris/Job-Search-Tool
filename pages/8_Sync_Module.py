@@ -1,5 +1,6 @@
 import streamlit as st
 
+from modules.database.backup import backup_db
 from modules.database.database import reactivate_all_offers, wipe_database
 from modules.dataframe_settings import column_conversions
 from modules.settings import DEBUG_MODE
@@ -24,6 +25,7 @@ def sync_button():
     """Synchronize database button."""
     if st.button("Perform database synchronization"):
         with st.spinner("Syncing..."):  # Display a spinner while updating
+            backup_db()
             sync_records()
             st.success("All sites synced successfully!")
 
