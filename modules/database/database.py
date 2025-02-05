@@ -234,7 +234,6 @@ def show_recently_changed(record_type) -> pd.DataFrame:
     with SessionLocal() as db:
         try:
             one_day_ago = pd.Timestamp.now() - timedelta(days=RECENT_DAYS_THRESHOLD)
-
             if record_type == "active":
                 records = (
                     db.query(JobOfferRecord)
@@ -279,5 +278,10 @@ def show_recently_changed(record_type) -> pd.DataFrame:
                 for record in records
             ]
             return pd.DataFrame(data)
+
+        # Database unavailable
+        except Exception:
+            return pd.DataFrame()
+
         finally:
             db.close()
