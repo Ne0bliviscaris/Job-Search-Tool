@@ -6,6 +6,9 @@ modules/database/db backup/*.db
 test.ipynb
 test.py
 
+# Shortcut file
+*.lnk
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
