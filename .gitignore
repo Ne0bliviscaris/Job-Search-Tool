@@ -2,6 +2,10 @@
 modules/database/database.db
 modules/database/db backup/*.db
 
+# Test file
+test.ipynb
+test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
