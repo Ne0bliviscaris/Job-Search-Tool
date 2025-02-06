@@ -66,7 +66,9 @@ def setup_webdriver():
     """
     # Path to container with Chrome
     options = set_chromedriver_options()
-    return webdriver.Remote(command_executor=CHROMEDRIVER_CONTAINER, options=options)
+    driver = webdriver.Remote(command_executor=CHROMEDRIVER_CONTAINER, options=options)
+    driver.set_page_load_timeout(15)
+    return driver
 
 
 def set_chromedriver_options():
@@ -81,4 +83,6 @@ def set_chromedriver_options():
     options.add_argument("--log-level=2")  # Hide unnecessary logs
     options.add_argument("--disable-webgl")  # Disable WebGL
     options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})  # Disable images
+    # options.add_argument("--disable-blink-features=AutomationControlled")  # Try to avoid detection
+    # options.add_argument("--disable-extensions")
     return options
