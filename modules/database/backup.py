@@ -4,6 +4,8 @@ from datetime import datetime
 
 from pandas import Timestamp
 
+from modules.updater.log import updater_log
+
 
 def fetch_all_backups():
     """Fetch all database backups."""
@@ -26,6 +28,7 @@ def backup_db():
     if not os.path.exists(backup_path):
         shutil.copy(db_file, backup_path)
         print(f"Database backup created: {backup_path}")
+        updater_log("DB").info(f"Database backup created: {backup_path}")
     else:
         print("Database has already been backed up within the last minute.")
 
@@ -38,7 +41,7 @@ def get_date_from_filename(filename):
     try:
         date = datetime.strptime(timestamp_str, "%d-%m-%Y-%H-%M")
     except ValueError:
-        date = "Invalid format"
+        date = filename
     return date
 
 
@@ -52,6 +55,7 @@ def restore_backup(selected_backup):
     try:
         shutil.copy(backup_path, db_file)
         print(f"Database backup restored: {backup_path}")
+        updater_log("DB").info(f"Database backup restored: {backup_path}")
     except PermissionError as error:
         print("Error: Ensure all connections to the database are closed before restoring backup.")
         raise error
