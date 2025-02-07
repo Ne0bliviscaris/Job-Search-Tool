@@ -7,6 +7,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from modules.dicts import DATE_COLUMNS
+from modules.updater.log import updater_log
 
 DATABASE_URL = "sqlite:///modules/database/database.db"
 
@@ -111,6 +112,7 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
 def ensure_database_exists():
     if not os.path.exists(DATABASE_URL):
         init_db()
+        updater_log("DB").info("Database recreated.")
 
 
 def update_edited_dataframe(changed_dataframe, st_session_state):
@@ -122,6 +124,7 @@ def update_edited_dataframe(changed_dataframe, st_session_state):
     for row_id, updates in edited_rows.items():
         record_id = changed_dataframe.loc[int(row_id), "id"]
         update_record(int(record_id), updates)
+    updater_log("DB").info(f"Updated {len(edited_rows)} records.")
 
 
 def update_record(record_id: int, updated_fields: dict) -> None:
@@ -149,6 +152,7 @@ def wipe_database():
             db.commit()
         finally:
             db.close()
+    updater_log("DB").info("Database wiped.")
 
 
 def load_records_from_db(archive=False, all_records=False) -> pd.DataFrame:
@@ -223,6 +227,7 @@ def reactivate_all_offers():
             print(f"Reactivated {len(records)} offers.")
         finally:
             db.close()
+    updater_log("DB").info(f"Reactivated {len(records)} offers.")
 
 
 def show_recently_changed(record_type) -> pd.DataFrame:
@@ -234,7 +239,6 @@ def show_recently_changed(record_type) -> pd.DataFrame:
     with SessionLocal() as db:
         try:
             one_day_ago = pd.Timestamp.now() - timedelta(days=RECENT_DAYS_THRESHOLD)
-
             if record_type == "active":
                 records = (
                     db.query(JobOfferRecord)
@@ -279,5 +283,10 @@ def show_recently_changed(record_type) -> pd.DataFrame:
                 for record in records
             ]
             return pd.DataFrame(data)
+
+        # Database unavailable
+        except Exception:
+            return pd.DataFrame()
+
         finally:
             db.close()

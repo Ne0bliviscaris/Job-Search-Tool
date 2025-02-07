@@ -41,7 +41,7 @@ def show_active_offers():
     if active is not None and not active.empty:
         column_conversions(active)
     else:
-        st.warning("No active records.")
+        st.warning("No recently added records.")
 
 
 def show_archived_offers():
@@ -51,7 +51,7 @@ def show_archived_offers():
     if archived is not None and not archived.empty:
         column_conversions(archived, "archived")
     else:
-        st.warning("No archived records.")
+        st.warning("No recently archived records.")
 
 
 def reactivate_all_offers_button():

@@ -7,6 +7,7 @@ from modules.database.database import (
     update_record,
 )
 from modules.updater.data_processing.data_collector import html_dataframe
+from modules.updater.log import updater_log
 
 ensure_database_exists()
 COLUMNS_TO_COMPARE = [
@@ -30,6 +31,9 @@ def sync_records():
     missing_records, new_records = find_record_changes(update, db)
     archive_records(missing_records)
     process_new_records(new_records)
+    updater_log("Sync").info(
+        f"Synchronization completed. Added {new_records.shape[0]} new records, archived {missing_records.shape[0]}."
+    )
 
 
 def prepare_set_for_comparison(frame: pd.DataFrame):

@@ -6,19 +6,25 @@ from modules.updater.scraper.selenium_utils import scrape, setup_webdriver
 from modules.websites import search_links
 
 
-def update_all_sites(st) -> None:
-    """Download HTML content for all search links."""
+def update_all_sites():
+    """Process all sites using webdriver and yield link names upon successful update."""
+    with setup_webdriver() as web_driver:
+        for link_name, search_link in search_links.items():
+            if process_single_site(web_driver, link_name, search_link):
+                yield link_name
+
+
+def update_sites_with_progress_bar(st):
+    """Display progress bar while updating sites."""
     try:
-        with setup_webdriver() as web_driver:
-            progress_bar, status_box = handle_update_progress(st)
-            progress = 0
-
-            for link_name, search_link in search_links.items():
-                if process_single_site(web_driver, link_name, search_link):
-                    progress += 1
-                    update_status(progress_bar, status_box, progress, link_name)
-
-            st.success("All sites updated!")
+        progress_bar, status_box = handle_update_progress(st)
+        total_sites = len(search_links)
+        progress = 0
+        # Process each site using the core function that yields link_name
+        for link_name in update_all_sites():
+            progress += 1
+            update_status(progress_bar, status_box, progress, link_name)
+        st.success("All sites updated!")
     except Exception as e:
         st.error("Make sure you have properly configured Webdriver (see modules/settings.py)")
 
@@ -40,14 +46,14 @@ def process_single_site(web_driver, link_name: str, search_link: str) -> None:
         return False
 
 
-def update_site(webdriver, link: str, search_link: str) -> str:
+def update_site(webdriver, link_name: str, search_link: str) -> str:
     """
     Download HTML content from the search link and save it to a file.
     """
     search_block = scrape(webdriver, search_link)
 
     # Save HTML to file
-    filename = os.path.join(set_filename(link))
+    filename = os.path.join(set_filename(link_name))
     save_html_to_file(search_block, filename)
 
     return filename
