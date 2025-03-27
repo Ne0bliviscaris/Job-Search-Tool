@@ -1,27 +1,35 @@
 import streamlit as st
 
-from modules.data_processor import reactivate_all_offers
-from modules.database.database import wipe_database
+from modules.database.backup import backup_db
+from modules.database.database import (
+    reactivate_all_offers,
+    show_recently_changed,
+    wipe_database,
+)
 from modules.dataframe_settings import column_conversions
 from modules.settings import DEBUG_MODE
-from modules.sync.sync import show_recently_changed, sync_records
+from modules.updater.data_processing.sync import sync_records
 from modules.updater.updater import update_all_sites
 
 st.set_page_config(layout="wide")
+
+# Debugging flags
+DEBUG_SYNC = False
+# DEBUG_SYNC = True
 
 
 def update_button():
     """Update all sites button."""
     if st.button("Update all sites"):
         with st.spinner("Updating..."):  # Display a spinner while updating
-            update_all_sites()
-            st.success("All sites updated successfully!")
+            update_all_sites(st)
 
 
 def sync_button():
     """Synchronize database button."""
     if st.button("Perform database synchronization"):
-        with st.spinner("Updating..."):  # Display a spinner while updating
+        with st.spinner("Syncing..."):  # Display a spinner while updating
+            backup_db()
             sync_records()
             st.success("All sites synced successfully!")
 
@@ -33,7 +41,7 @@ def show_active_offers():
     if active is not None and not active.empty:
         column_conversions(active)
     else:
-        st.warning("No active records.")
+        st.warning("No recently added records.")
 
 
 def show_archived_offers():
@@ -43,7 +51,7 @@ def show_archived_offers():
     if archived is not None and not archived.empty:
         column_conversions(archived, "archived")
     else:
-        st.warning("No archived records.")
+        st.warning("No recently archived records.")
 
 
 def reactivate_all_offers_button():
@@ -68,7 +76,7 @@ def main():
 
     with col1:
         sync_button()
-    if DEBUG_MODE:
+    if DEBUG_MODE or DEBUG_SYNC:
         with col2:
             reactivate_all_offers_button()
         with col3:

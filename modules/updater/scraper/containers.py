@@ -1,4 +1,7 @@
-from modules.helper_functions import process_remote_status, remove_remote_status
+from modules.updater.data_processing.helper_functions import (
+    process_remote_status,
+    remove_remote_status,
+)
 from modules.websites import JUSTJOINIT  # Same structure as RocketJobs
 from modules.websites import (
     BULLDOGJOB,
@@ -533,14 +536,17 @@ def salary(html, search_link: str) -> dict:
         try:
             # All containers on site are MuiBox-root. Need to find the right one
             MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-            # Salary is contained in the same parent div as the h3 tag with job title
+            # Salary is in sibling div to the one containing title (h3)
             h3_container = html.h3
             if h3_container:
                 parent_div = h3_container.find_parent("div", class_=MuiBox_block)
+                salary_block = parent_div.find_next_sibling("div", class_=MuiBox_block)
                 # Salary is in <span> inside the parent div of <h3>
-                if parent_div:
-                    salary_elements = parent_div.find_all("span")
+                if salary_block:
+                    salary_elements = salary_block.find_all("span")
                     if salary_elements:
+
+                        # JustJoinIT - Addepto not fetching salary
                         elements = [pay.text.strip() for pay in salary_elements]
                         if elements:
                             salary = " - ".join(elements)

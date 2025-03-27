@@ -1,8 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-import modules.containers as containers
-import modules.site_specific_actions as site_specific_actions
+import modules.updater.scraper.containers as containers
+import modules.updater.scraper.site_specific_actions as site_specific_actions
 from modules.settings import CHROMEDRIVER_CONTAINER
 from modules.websites import NOFLUFFJOBS, PRACUJPL
 
@@ -13,27 +15,35 @@ def scrape(web_driver, search_link: str) -> str:
     perform_additional_action(web_driver, search_link)
     stop_scraping = evaluate_stop_conditions(web_driver, search_link)
 
-    if stop_scraping is not True:
-        html_content = get_search_container(web_driver, search_link)
-    else:
-        html_content = ""
-    return html_content
+    if stop_scraping is True:
+        return ""
+    return get_search_container(web_driver, search_link)
 
 
 def get_search_container(driver: webdriver.Chrome, search_link: str) -> str:
-    """
-    Get the HTML content of the search container using Selenium
-    """
+    """Get the HTML content of the search container using Selenium."""
     search_container = containers.search(search_link)
     if not search_container:
         print(f"Website not supported yet: {search_link}")
         return ""
     try:
-        search_block = driver.find_element(By.CSS_SELECTOR, search_container)
+        # search_block = wait_for_content(driver, search_container)
+        search_block = driver.find_element(By.CSS_SELECTOR, search_container)  #  wait_for_content fails for RocketJobs
         return search_block.get_attribute("outerHTML")
+
     except Exception as e:
         print(f"No offers found: {search_link}")
         return ""
+
+
+def wait_for_content(driver, search_container, timeout=10):
+    """Wait for element to be present and contain content."""
+    wait = WebDriverWait(driver, timeout)
+    page_content = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, search_container)))
+
+    page_content_loaded = len(page_content.text.strip()) > 0
+    wait.until(lambda d: page_content_loaded)
+    return page_content
 
 
 def perform_additional_action(driver: webdriver.Chrome, search_link: str):
@@ -55,11 +65,10 @@ def setup_webdriver():
     Setup and return a Selenium WebDriver instance
     """
     # Path to container with Chrome
-
     options = set_chromedriver_options()
-
-    # Return WebDriver instance
-    return webdriver.Remote(command_executor=CHROMEDRIVER_CONTAINER, options=options)
+    driver = webdriver.Remote(command_executor=CHROMEDRIVER_CONTAINER, options=options)
+    driver.set_page_load_timeout(15)
+    return driver
 
 
 def set_chromedriver_options():
@@ -74,4 +83,6 @@ def set_chromedriver_options():
     options.add_argument("--log-level=2")  # Hide unnecessary logs
     options.add_argument("--disable-webgl")  # Disable WebGL
     options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})  # Disable images
+    # options.add_argument("--disable-blink-features=AutomationControlled")  # Try to avoid detection
+    # options.add_argument("--disable-extensions")
     return options

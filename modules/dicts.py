@@ -12,3 +12,4 @@ remote_work_dict = {
     "Hybrid": ["hybrid", "hybrydowa", "remote hybrid", "hybryd"],
     "Stationary": ["stationary", "stacjonarna", "full office"],
 }
+DATE_COLUMNS = ["added_date", "application_date", "feedback_date", "archived_date"]

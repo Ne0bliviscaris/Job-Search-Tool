@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from modules.data_processor import load_records_from_db
+from modules.database.database import load_records_from_db
 from modules.dataframe_settings import column_conversions
 
 st.set_page_config(layout="wide")
