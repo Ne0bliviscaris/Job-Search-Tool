@@ -11,9 +11,7 @@ from modules.websites import search_links
 
 
 def html_dataframe() -> pd.DataFrame:
-    """
-    Return a DataFrame containing all job records from all sites.
-    """
+    """Return a DataFrame containing all job records from all sites."""
     search_results = search_all_sites()
     all_records_frame = build_dataframe(search_results)
     cleaned_frame = all_records_frame.drop_duplicates()
@@ -21,16 +19,12 @@ def html_dataframe() -> pd.DataFrame:
 
 
 def search_all_sites() -> list:
-    """
-    Search all websites in search_links
-    """
+    """Search all websites in search_links"""
     return [search_site(link) for link in search_links.keys()]
 
 
 def search_site(link: str) -> list:
-    """
-    Get HTML block containing job search results from a file
-    """
+    """Get HTML block containing job search results from a file"""
     try:
         file = set_filename(link)
         soup = html_to_soup(file)
@@ -39,6 +33,7 @@ def search_site(link: str) -> list:
     except FileNotFoundError:
         print(f"Run updater to process link: {link}.")
         job_records = []
+
         if "st" in globals():
             st.toast(f"**Run updater to process link:**\n{link}", icon="⚠️")
     return job_records
