@@ -8,3 +8,7 @@ CHROMEDRIVER_CONTAINER = "http://localhost:4444/wd/hub"
 # Debug mode switch
 DEBUG_MODE = False
 # DEBUG_MODE = True
+
+# Save update HTML files
+# SAVE_HTML = False
+SAVE_HTML = True
