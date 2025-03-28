@@ -112,7 +112,11 @@ class PracujPL(JobSite):
         """
         Fetch salary range and additional salary details from the job listing HTML.
         """
-        salary_text = ensure_string(self.salary_container())
+        salary = self.salary_container()
+        if not salary:
+            return None, None, None, None
+
+        salary_text = ensure_string(salary)
         if salary_text:
             cleaned_salary = salary_cleanup(salary_text)
             salary_details = extract_salary_details(cleaned_salary, salary_text)
