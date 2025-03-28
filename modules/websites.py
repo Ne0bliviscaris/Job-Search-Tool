@@ -13,7 +13,7 @@ search_links = {
     # Junior offers
     "nofluffjobs_data-python-trainee-junior-remote": "https://nofluffjobs.com/pl/praca-zdalna/data?criteria=requirement%3DPython%20%20seniority%3Dtrainee,junior",
     "nofluffjobs_ai-python-trainee-junior-remote": "https://nofluffjobs.com/pl/praca-zdalna/artificial-intelligence?criteria=requirement%3DPython%20%20seniority%3Dtrainee,junior",
-    # "pracujpl_data-ai-python-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science&itth=37",
+    "pracujpl_data-ai-python-junior-remote": "https://it.pracuj.pl/praca/praca%20zdalna;wm,home-office?et=17&ap=true&its=ai-ml%2Cbig-data-science&itth=37",
     #     "bulldogjob_data-junior-python-remote": "https://bulldogjob.pl/companies/jobs/s/city,Remote/experienceLevel,junior,intern/skills,Python/role,data",
     #     "theprotocol_python-data-ai-python-junior-remote": "https://theprotocol.it/filtry/python;t/big-data-science,ai-ml;sp/junior,assistant,trainee;p/zdalna;rw",
     #     "rocketjobs_data-junior-remote": "https://rocketjobs.pl/oferty-pracy/wszystkie-lokalizacje/bi-data?doswiadczenie=staz-junior&praca-zdalna=tak&orderBy=DESC&sortBy=published&from=0",
