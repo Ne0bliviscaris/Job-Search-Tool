@@ -3,37 +3,23 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-import modules.updater.scraper.containers as containers
 import modules.updater.scraper.site_specific_actions as site_specific_actions
 from modules.settings import CHROMEDRIVER_CONTAINER
+from modules.updater.sites.JobSite import JobSite
 from modules.websites import NOFLUFFJOBS, PRACUJPL
 
 
-def scrape(web_driver, search_link: str) -> str:
+def scrape(web_driver, job_site: JobSite) -> str:
     """Scrape given link using Selenium."""
-    web_driver.get(search_link)
-    perform_additional_action(web_driver, search_link)
-    stop_scraping = evaluate_stop_conditions(web_driver, search_link)
+    web_driver.get(job_site.search_link)
+    job_site.perform_additional_action(web_driver)
+    stop_scraping = job_site.stop_scraping(web_driver)
 
     if stop_scraping is True:
         return ""
-    return get_search_container(web_driver, search_link)
 
-
-def get_search_container(driver: webdriver.Chrome, search_link: str) -> str:
-    """Get the HTML content of the search container using Selenium."""
-    search_container = containers.search(search_link)
-    if not search_container:
-        print(f"Website not supported yet: {search_link}")
-        return ""
-    try:
-        # search_block = wait_for_content(driver, search_container)
-        search_block = driver.find_element(By.CSS_SELECTOR, search_container)  #  wait_for_content fails for RocketJobs
-        return search_block.get_attribute("outerHTML")
-
-    except Exception as e:
-        print(f"No offers found: {search_link}")
-        return ""
+    search_block = web_driver.find_element(By.CSS_SELECTOR, job_site.search_block)
+    return search_block.get_attribute("outerHTML") or ""
 
 
 def wait_for_content(driver, search_container, timeout=10):

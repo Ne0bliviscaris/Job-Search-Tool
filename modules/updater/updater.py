@@ -1,8 +1,10 @@
 import os
 import time
 
-from modules.updater.data_processing.data_processor import set_filename
+from modules.settings import SAVE_HTML
+from modules.updater.data_processing.data_processor import set_filename_from_link
 from modules.updater.scraper.selenium_utils import scrape, setup_webdriver
+from modules.updater.sites.SiteFactory import SiteFactory
 from modules.websites import search_links
 
 
@@ -39,30 +41,27 @@ def handle_update_progress(st) -> tuple:
 def process_single_site(web_driver, link_name: str, search_link: str) -> None:
     """Process single website update."""
     try:
-        update_site(web_driver, link_name, search_link)
+        update_site(web_driver, search_link)
         return True
     except Exception as e:
         print(f"Error updating {link_name}: {e}")
         return False
 
 
-def update_site(webdriver, link_name: str, search_link: str) -> str:
-    """
-    Download HTML content from the search link and save it to a file.
-    """
-    search_block = scrape(webdriver, search_link)
+def update_site(webdriver, search_link) -> str:
+    """Download HTML content from the search link and save it to a file."""
+    job_site = SiteFactory.identify_website(search_link)
+    search_block = scrape(webdriver, job_site)
 
-    # Save HTML to file
-    filename = os.path.join(set_filename(link_name))
-    save_html_to_file(search_block, filename)
+    if SAVE_HTML:
+        filename = os.path.join(set_filename_from_link(search_link))
+        save_html_to_file(search_block, filename)
 
-    return filename
+    return filename if SAVE_HTML else ""
 
 
 def save_html_to_file(html_content: str, filename: str) -> None:
-    """
-    Save HTML content to a file.
-    """
+    """Save HTML content to a file."""
     with open(filename, "w", encoding="utf-8") as file:
         file.write(str(html_content))
 
