@@ -29,7 +29,7 @@ class SiteFactory:
         """Creates site instance based on search link."""
         for url, site_class in SiteFactory.site_classes.items():
             if url in search_link:
-                return site_class()
+                return site_class(search_link=search_link)
         return "Error: Website not recognized"
 
     @staticmethod
