@@ -5,7 +5,7 @@ from modules.updater.data_processing.data_processor import (
     build_dataframe,
     html_to_soup,
     process_records,
-    set_filename,
+    set_filename_from_link,
 )
 from modules.websites import search_links
 
@@ -20,16 +20,16 @@ def html_dataframe() -> pd.DataFrame:
 
 def search_all_sites() -> list:
     """Search all websites in search_links"""
-    return [search_site(link) for link in search_links.keys()]
+    return [search_site(link) for link in search_links.values()]
 
 
 def search_site(link: str) -> list:
     """Get HTML block containing job search results from a file"""
     try:
-        file = set_filename(link)
+        file = set_filename_from_link(link)
         soup = html_to_soup(file)
 
-        job_records = process_records(soup, search_links[link]) if soup is not None else []
+        job_records = process_records(soup, link) if soup is not None else []
     except FileNotFoundError:
         print(f"Run updater to process link: {link}.")
         job_records = []
