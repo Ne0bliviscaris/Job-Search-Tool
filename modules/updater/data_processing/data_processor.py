@@ -11,8 +11,12 @@ from modules.websites import search_links
 def process_records(search_block: BeautifulSoup, link: str):
     """Process HTML soup into JobRecord objects"""
     website: JobSite = SiteFactory.identify_website(link)
-    records = website.records_list(html=search_block)
-    return [SiteFactory.single_record(website=website, record=record) for record in records]
+    try:
+        records = website.records_list(html=search_block)
+        return [SiteFactory.single_record(website=website, record=record) for record in records]
+    except AttributeError:
+        print(f"Website not implemented yet:\n {link}.")
+        return []
 
 
 def build_dataframe(records):
