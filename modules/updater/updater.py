@@ -44,7 +44,7 @@ def process_single_site(web_driver, link_name: str, search_link: str) -> None:
         update_site(web_driver, search_link)
         return True
     except Exception as e:
-        print(f"Error updating {link_name}: {e}")
+        print(f"updater.process_single_site:   Error updating {link_name}:\n{e}")
         return False
 
 
