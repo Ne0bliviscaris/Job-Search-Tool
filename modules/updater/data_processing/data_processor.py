@@ -8,15 +8,13 @@ from modules.updater.sites.SiteFactory import SiteFactory
 from modules.websites import search_links
 
 
+# THIS FILE CAUSES ISSUE WITH PRACUJ.PL
+# RECORDS IS 1 RECORD, NOT LIST
 def process_records(search_block: BeautifulSoup, link: str):
     """Process HTML soup into JobRecord objects"""
     website: JobSite = SiteFactory.identify_website(link)
-    try:
-        records = website.records_list(html=search_block)
-        return [SiteFactory.single_record(website=website, record=record) for record in records]
-    except AttributeError:
-        print(f"Website not implemented yet:\n {link}.")
-        return []
+    records = website.records_list(html=search_block)
+    return [SiteFactory.single_record(website=website, record=record) for record in records]
 
 
 def build_dataframe(records):
