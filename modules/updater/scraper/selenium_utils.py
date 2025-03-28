@@ -18,7 +18,7 @@ def scrape(web_driver, job_site: JobSite) -> str:
     if stop_scraping is True:
         return ""
 
-    search_block = web_driver.find_element(By.CSS_SELECTOR, job_site.search_block)
+    search_block = web_driver.find_element(By.CSS_SELECTOR, job_site.search_container())
     return search_block.get_attribute("outerHTML") or ""
 
 

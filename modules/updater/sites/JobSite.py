@@ -6,8 +6,9 @@ TAG_SEPARATOR = " | "
 class JobSite(ABC):
     """Base abstract class for job board sites."""
 
-    def __init__(self, html=None):
+    def __init__(self, search_link=None, html=None):
         self.html = html
+        self.search_link = search_link
         self.website = self.website()
         if html:
             self.url = self.url()
