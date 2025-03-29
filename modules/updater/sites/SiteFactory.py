@@ -6,7 +6,7 @@ from modules.updater.sites.websites.PracujPL import PracujPL
 # from modules.updater.sites.justjoinit import JustJoinIT
 # from modules.updater.sites.rocketjobs import RocketJobs
 # from modules.updater.sites.solidjobs import SolidJobs
-# from modules.updater.sites.theprotocol import TheProtocol
+from modules.updater.sites.websites.Theprotocol import Theprotocol
 
 
 class SiteFactory:
@@ -18,7 +18,7 @@ class SiteFactory:
         "https://it.pracuj.pl": PracujPL,
         "https://bulldogjob.pl": Bulldogjob,
         #     # Selenium required
-        #     "https://theprotocol.it": TheProtocol,
+        "https://theprotocol.it": Theprotocol,
         #     "https://rocketjobs.pl": RocketJobs,
         #     "https://justjoin.it": JustJoinIT,
         #     "https://solid.jobs": SolidJobs,
