@@ -26,3 +26,21 @@ def fancy_error_handler(func):
             return False
 
     return wrapper
+
+
+def scraping_error_handler(func):
+    """Decorator for scraping methods that handles errors gracefully."""
+
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        try:
+            result = func(self, *args, **kwargs)
+            # Return None for empty result
+            return result if result is not None else None
+        except Exception as e:
+            class_name = self.__class__.__name__
+            func_name = func.__name__
+            print(f"""Fetching error:   {class_name:<14} ->   {func_name:<14}    {e}""")
+            return None
+
+    return wrapper
