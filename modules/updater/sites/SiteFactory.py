@@ -1,8 +1,8 @@
 from modules.updater.sites.JobSite import JobSite
+from modules.updater.sites.websites.Bulldogjob import Bulldogjob
 from modules.updater.sites.websites.NoFluffJobs import NoFluffJobs
 from modules.updater.sites.websites.PracujPL import PracujPL
 
-# from modules.updater.sites.bulldogjob import BulldogJob
 # from modules.updater.sites.justjoinit import JustJoinIT
 # from modules.updater.sites.rocketjobs import RocketJobs
 # from modules.updater.sites.solidjobs import SolidJobs
@@ -16,7 +16,7 @@ class SiteFactory:
         # Requests.get viable
         "https://nofluffjobs.com": NoFluffJobs,
         "https://it.pracuj.pl": PracujPL,
-        #     "https://bulldogjob.pl": BulldogJob,
+        "https://bulldogjob.pl": Bulldogjob,
         #     # Selenium required
         #     "https://theprotocol.it": TheProtocol,
         #     "https://rocketjobs.pl": RocketJobs,
