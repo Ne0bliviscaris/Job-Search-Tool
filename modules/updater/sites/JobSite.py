@@ -83,11 +83,13 @@ class JobSite(ABC):
         pass
 
     @staticmethod
+    @abstractmethod
     def stop_scraping(webdriver) -> str:
         """Returns stop condition for scraping."""
         pass
 
     @staticmethod
+    @abstractmethod
     def perform_additional_action(webdriver) -> str:
         """Returns additional actions for scraping."""
         pass
