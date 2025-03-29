@@ -4,9 +4,11 @@ from modules.updater.data_processing.helper_functions import (
     extract_salary_details,
     get_salary_range,
     process_remote_status,
+    remove_remote_status,
     salary_cleanup,
     split_salary,
 )
+from modules.updater.error_handler import scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -34,86 +36,72 @@ class NoFluffJobs(JobSite):
         """Returns site name as link."""
         return "NoFluffJobs.com"
 
+    @scraping_error_handler
     def url(self) -> str:
         """Extracts URL from job record."""
-        try:
-            url = self.html.get("href")
-            if url:
-                return url if url.startswith("http") else f"https://nofluffjobs.com{url}"
-        except:
-            print(f"Error fetching data from record: {self.website} -> URL")
+        url = self.html.get("href")
+        if url:
+            return url if url.startswith("http") else f"https://nofluffjobs.com{url}"
 
+    @scraping_error_handler
     def job_title(self) -> str:
         """Extracts job title."""
-        try:
-            container = {"data-cy": "title position on the job offer listing"}
-            title = self.html.find(attrs=container)
-            return title.text.strip() if title else None
-        except:
-            print(f"Error fetching data from record: {self.website} -> Job Title")
+        container = {"data-cy": "title position on the job offer listing"}
+        title = self.html.find(attrs=container)
+        if title:
+            return title.text.strip()
 
+    @scraping_error_handler
     def tags(self):
         """Extracts job tags from record."""
-        try:
-            tags_container = {"data-cy": "category name on the job offer listing"}
-            tags = self.html.find_all(attrs=tags_container)
-            tags_list = [tag.text for tag in tags]
-            if tags_list:
-                return TAG_SEPARATOR.join(tags_list)
-        except:
-            print(f"Error fetching data from record: {self.website} -> Tags")
+        tags_container = {"data-cy": "category name on the job offer listing"}
+        tags = self.html.find_all(attrs=tags_container)
+        tags_list = [tag.text for tag in tags]
+        if tags_list:
+            return TAG_SEPARATOR.join(tags_list)
 
+    @scraping_error_handler
     def company(self):
         """Extract company name from record."""
-        try:
-            name = lambda x: x and x.startswith("company-name")
-            company_container = {"class": name}
-            return self.html.find(attrs=company_container).text
-        except:
-            print(f"Error fetching data from record: {self.website} -> Company")
+        name = lambda x: x and x.startswith("company-name")
+        company_container = {"class": name}
+        return self.html.find(attrs=company_container).text.strip()
 
+    @scraping_error_handler
     def logo(self):
         """Extract company logo from record."""
-        try:
-            img = self.html.find("img")
-            if img:
-                logo_container = {"alt": "Company logo"}
-                if logo_container:
-                    logo = self.html.find(attrs=logo_container)
-                    return logo["src"]
-        except:
-            print(f"Error fetching data from record: {self.website} -> Logo")
+        img = self.html.find("img")
+        if img:
+            logo_container = {"alt": "Company logo"}
+            logo = self.html.find(attrs=logo_container)
+            if logo:
+                return logo["src"]
 
+    @scraping_error_handler
     def location(self):
+        """Extract location from job record."""
         location_container = {"data-cy": "location on the job offer listing"}
         location_block = self.html.find(attrs=location_container)
-        if location_block:
-            location_span = location_block.span
-        try:
-            return location_span.text.strip()
-        except:
-            print(f"Error fetching data from record: {self.website} -> Location")
+        if location_block and location_block.span:
+            location = location_block.span.text.strip()
+            return remove_remote_status(location)
 
+    @scraping_error_handler
     def remote_status(self):
-        try:
-            location_container = {"data-cy": "location on the job offer listing"}
-            location = self.html.find(attrs=location_container)
-            if location:
-                return process_remote_status(location.text)
-        except:
-            print(f"Error fetching data from record: {self.website} -> Remote status")
+        """Extract remote status from job record."""
+        location_container = {"data-cy": "location on the job offer listing"}
+        location = self.html.find(attrs=location_container)
+        if location:
+            return process_remote_status(location.text)
 
+    @scraping_error_handler
     def salary_container(self):
-        try:
-            salary_container = {"data-cy": "salary ranges on the job offer listing"}
-            return self.html.find(attrs=salary_container)
-        except:
-            print(f"Error fetching data from record: {self.website} -> Salary")
+        """Extract salary container from record."""
+        salary_container = {"data-cy": "salary ranges on the job offer listing"}
+        return self.html.find(attrs=salary_container)
 
     def fetch_salary_range(self) -> tuple[int, int, str, str]:
-        """
-        Fetch salary range and additional salary details from the job listing HTML.
-        """
+        """Fetch salary range and details from job listing HTML."""
         salary_text = ensure_string(self.salary_container())
         cleaned_salary = salary_cleanup(salary_text)
         salary_details = extract_salary_details(cleaned_salary, salary_text)
@@ -123,7 +111,6 @@ class NoFluffJobs(JobSite):
         try:
             min_salary, max_salary = split_salary(processed_salary)
             return min_salary, max_salary, salary_details, salary_text
-
         except ValueError:
             print(f"Error processing data from record: {self.website} -> Salary range")
             return None, None, salary_details, salary_text
