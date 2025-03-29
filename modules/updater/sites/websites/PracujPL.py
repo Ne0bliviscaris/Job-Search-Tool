@@ -1,3 +1,5 @@
+import re
+
 from selenium.webdriver.common.by import By
 
 from modules.updater.data_processing.helper_functions import (
@@ -10,6 +12,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
+from modules.updater.error_handler import scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -35,78 +38,69 @@ class PracujPL(JobSite):
         """Returns site name as link."""
         return "Pracuj.pl"
 
+    @scraping_error_handler
     def url(self) -> str:
         """Extracts URL from job record."""
-        try:
-            container = {"data-test": "link-offer"}
-            url_a = self.html.find("a", container)
-            if url_a:
-                return url_a.get("href")
-        except:
-            print(f"Error fetching data from record: {self.website} -> URL")
+        container = {"data-test": "link-offer"}
+        url_a = self.html.find("a", container)
+        if url_a:
+            return url_a.get("href")
 
+    @scraping_error_handler
     def job_title(self) -> str:
         """Extracts job title."""
-        try:
-            container = {"data-test": "offer-title"}
-            return self.html.find("h2", container).text.strip()
-        except:
-            print(f"Error fetching data from record: {self.website} -> Job Title")
+        container = {"data-test": "offer-title"}
+        return self.html.find("h2", container).text.strip()
 
+    @scraping_error_handler
     def tags(self):
         """Extracts job tags from record."""
-        try:
-            container = {"data-test": "technologies-item"}
-            tags_block = self.html.find_all("span", container)
-            tags_list = [tag.text.strip() for tag in tags_block]
-            if tags_list:
-                return TAG_SEPARATOR.join(tags_list)
+        container = {"data-test": "technologies-item"}
+        tags_block = self.html.find_all("span", container)
+        tags_list = [tag.text.strip() for tag in tags_block]
+        if tags_list:
+            return TAG_SEPARATOR.join(tags_list)
 
-        except:
-            print(f"Error fetching data from record: {self.website} -> Tags")
-
+    @scraping_error_handler
     def company(self):
         """Extract company name from record."""
-        try:
-            return self.html.find("h3", {"data-test": "text-company-name"}).text.strip()
-        except:
-            print(f"Error fetching data from record: {self.website} -> Company")
+        return self.html.find("h3", {"data-test": "text-company-name"}).text.strip()
 
+    @scraping_error_handler
     def logo(self):
         """Extract company logo from record."""
-        try:
-            return self.html.find("img", {"data-test": "image-responsive"})["src"]
-        except:
-            print(f"Error fetching data from record: {self.website} -> Logo")
+        logo = self.html.find("img", {"data-test": "image-responsive"})
+        return logo["src"] if logo else None
 
+    @scraping_error_handler
     def location(self):
-        try:
-            loc = self.html.find("h4", {"data-test": "text-region"})
-            if loc and loc.strong:
-                location = loc.strong.text
-                return remove_remote_status(location)
-        except:
-            print(f"Error fetching data from record: {self.website} -> Location")
+        """Extract location from record."""
+        loc = self.html.find("h4", {"data-test": "text-region"})
 
+        if not loc:
+            return None
+
+        if not multiloc_offer(loc):
+            location = loc.text
+            return remove_remote_status(location)
+        else:
+            return handle_multiloc(self.html)
+
+    @scraping_error_handler
     def remote_status(self):
-        try:
-            tag_name = "offer-additional-info"
-            additional_info_containers = lambda tag: tag.has_attr("data-test") and tag["data-test"].startswith(
-                tag_name
-            )
-            additional_info = self.html.find_all(additional_info_containers)
-            status = additional_info[-1].text
-            return process_remote_status(status)
-        except:
-            print(f"Error fetching data from record: {self.website} -> Remote status")
+        """Extract remote status from record."""
+        tag_name = "offer-additional-info"
+        additional_info_containers = lambda tag: tag.has_attr("data-test") and tag["data-test"].startswith(tag_name)
+        additional_info = self.html.find_all(additional_info_containers)
+        status = additional_info[-1].text
+        return process_remote_status(status)
 
+    @scraping_error_handler
     def salary_container(self):
-        try:
-            salary_container = self.html.find("span", {"data-test": "offer-salary"})
-            if salary_container:
-                return salary_container.text.strip()
-        except:
-            print(f"Error fetching data from record: {self.website} -> Salary")
+        """Extract salary information."""
+        salary_container = self.html.find("span", {"data-test": "offer-salary"})
+        if salary_container:
+            return salary_container.text.strip()
 
     def fetch_salary_range(self) -> tuple[int, int, str, str]:
         """
@@ -136,12 +130,12 @@ class PracujPL(JobSite):
     @staticmethod
     def perform_additional_action(webdriver):
         """Performs additional actions needed for scraping the website."""
-        return None
+        pracujpl_confirm_cookies(webdriver)
+        pracujpl_click_multi_location_offer(webdriver)
 
     @staticmethod
     def stop_scraping(webdriver):
-        pracujpl_confirm_cookies(webdriver)
-        pracujpl_click_multi_location_offer(webdriver)
+        return False
 
 
 def pracujpl_click_multi_location_offer(webdriver):
@@ -163,3 +157,21 @@ def pracujpl_confirm_cookies(webdriver):
         element.click()
     except Exception as e:
         pass
+
+
+def multiloc_offer(loc):
+    """Check if the job listing is a multilocation offer."""
+    multiloc_pattern = r"[0-9]+ lokalizacj"
+    multiloc_match = re.findall(multiloc_pattern, loc.text)
+    if multiloc_match:
+        return True
+    return False
+
+
+def handle_multiloc(html):
+    """Handle multilocation records."""
+    wybierz_lokalizacje = html.find("p", text="Wybierz lokalizację")
+    loc_selector = wybierz_lokalizacje.parent
+    multi_loc = loc_selector.find_all("a", {"data-test": "link-offer"})
+    locations = [location.text for location in multi_loc]
+    return TAG_SEPARATOR.join(locations)
