@@ -130,6 +130,11 @@ class Bulldogjob(JobSite):
         return None, None, None, None
 
     @staticmethod
+    def perform_additional_action(webdriver):
+        """Performs additional actions needed for scraping the website."""
+        return None
+
+    @staticmethod
     def stop_scraping(webdriver):
         """Returns stop condition for scraping."""
         return False

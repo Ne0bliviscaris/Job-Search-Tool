@@ -134,6 +134,11 @@ class PracujPL(JobSite):
         return None, None, None, None
 
     @staticmethod
+    def perform_additional_action(webdriver):
+        """Performs additional actions needed for scraping the website."""
+        return None
+
+    @staticmethod
     def stop_scraping(webdriver):
         pracujpl_confirm_cookies(webdriver)
         pracujpl_click_multi_location_offer(webdriver)

@@ -129,6 +129,11 @@ class NoFluffJobs(JobSite):
             return None, None, salary_details, salary_text
 
     @staticmethod
+    def perform_additional_action(webdriver):
+        """Performs additional actions needed for scraping the website."""
+        return None
+
+    @staticmethod
     def stop_scraping(webdriver):
         return nofluffjobs_no_search_results(webdriver)
 
