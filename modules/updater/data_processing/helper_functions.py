@@ -7,6 +7,8 @@ from modules.dicts import remote_work_dict
 
 def ensure_string(salary):
     """Get the salary text from the salary tag"""
+    if not salary:
+        return None
     return salary if isinstance(salary, str) else salary.get_text(strip=True)
 
 
