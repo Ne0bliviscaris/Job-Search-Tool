@@ -3,6 +3,7 @@ import time
 
 from modules.settings import SAVE_HTML
 from modules.updater.data_processing.data_processor import set_filename_from_link
+from modules.updater.error_handler import fancy_error_handler
 from modules.updater.scraper.selenium_utils import scrape, setup_webdriver
 from modules.updater.sites.SiteFactory import SiteFactory
 from modules.websites import search_links
@@ -12,23 +13,20 @@ def update_all_sites():
     """Process all sites using webdriver and yield link names upon successful update."""
     with setup_webdriver() as web_driver:
         for link_name, search_link in search_links.items():
-            if process_single_site(web_driver, link_name, search_link):
+            if process_single_site(web_driver, search_link):
                 yield link_name
 
 
+@fancy_error_handler
 def update_sites_with_progress_bar(st):
     """Display progress bar while updating sites."""
-    try:
-        progress_bar, status_box = handle_update_progress(st)
-        total_sites = len(search_links)
-        progress = 0
-        # Process each site using the core function that yields link_name
-        for link_name in update_all_sites():
-            progress += 1
-            update_status(progress_bar, status_box, progress, link_name)
-        st.success("All sites updated!")
-    except Exception as e:
-        st.error("Make sure you have properly configured Webdriver (see modules/settings.py)")
+    progress_bar, status_box = handle_update_progress(st)
+    progress = 0
+    # Process each site using the core function that yields link_name
+    for link_name in update_all_sites():
+        progress += 1
+        update_status(progress_bar, status_box, progress, link_name)
+    st.success("All sites updated!")
 
 
 def handle_update_progress(st) -> tuple:
@@ -38,14 +36,10 @@ def handle_update_progress(st) -> tuple:
     return progress_bar, status_box
 
 
-def process_single_site(web_driver, link_name: str, search_link: str) -> None:
+def process_single_site(web_driver, search_link: str) -> None:
     """Process single website update."""
-    try:
-        update_site(web_driver, search_link)
-        return True
-    except Exception as e:
-        print(f"updater.process_single_site:   Error updating {link_name}:\n{e}")
-        return False
+    update_site(web_driver, search_link)
+    return True
 
 
 def update_site(webdriver, search_link) -> str:
