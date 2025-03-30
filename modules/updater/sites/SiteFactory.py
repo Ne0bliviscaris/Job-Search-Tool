@@ -1,11 +1,11 @@
 from modules.updater.sites.JobSite import JobSite
 from modules.updater.sites.websites.Bulldogjob import Bulldogjob
+from modules.updater.sites.websites.JustJoinIT import JustJoinIT
 from modules.updater.sites.websites.NoFluffJobs import NoFluffJobs
 from modules.updater.sites.websites.PracujPL import PracujPL
+from modules.updater.sites.websites.RocketJobs import RocketJobs
 
-# from modules.updater.sites.justjoinit import JustJoinIT
-# from modules.updater.sites.rocketjobs import RocketJobs
-# from modules.updater.sites.solidjobs import SolidJobs
+# from modules.updater.sites.websites.solidjobs import SolidJobs
 from modules.updater.sites.websites.Theprotocol import Theprotocol
 
 
@@ -19,8 +19,8 @@ class SiteFactory:
         "https://bulldogjob.pl": Bulldogjob,
         #     # Selenium required
         "https://theprotocol.it": Theprotocol,
-        #     "https://rocketjobs.pl": RocketJobs,
-        #     "https://justjoin.it": JustJoinIT,
+        "https://rocketjobs.pl": RocketJobs,
+        "https://justjoin.it": JustJoinIT,
         #     "https://solid.jobs": SolidJobs,
     }
 
