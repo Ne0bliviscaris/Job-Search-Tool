@@ -4,8 +4,7 @@ from modules.updater.sites.websites.JustJoinIT import JustJoinIT
 from modules.updater.sites.websites.NoFluffJobs import NoFluffJobs
 from modules.updater.sites.websites.PracujPL import PracujPL
 from modules.updater.sites.websites.RocketJobs import RocketJobs
-
-# from modules.updater.sites.websites.solidjobs import SolidJobs
+from modules.updater.sites.websites.SOLIDJobs import Solidjobs
 from modules.updater.sites.websites.Theprotocol import Theprotocol
 
 
@@ -21,7 +20,7 @@ class SiteFactory:
         "https://theprotocol.it": Theprotocol,
         "https://rocketjobs.pl": RocketJobs,
         "https://justjoin.it": JustJoinIT,
-        #     "https://solid.jobs": SolidJobs,
+        "https://solid.jobs": Solidjobs,
     }
 
     @staticmethod
