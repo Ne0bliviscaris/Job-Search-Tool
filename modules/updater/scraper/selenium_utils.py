@@ -3,10 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-import modules.updater.scraper.site_specific_actions as site_specific_actions
 from modules.settings import CHROMEDRIVER_CONTAINER
 from modules.updater.sites.JobSite import JobSite
-from modules.websites import NOFLUFFJOBS, PRACUJPL
 
 
 def scrape(web_driver, job_site: JobSite) -> str:
@@ -22,35 +20,8 @@ def scrape(web_driver, job_site: JobSite) -> str:
     return search_block.get_attribute("outerHTML") or ""
 
 
-def wait_for_content(driver, search_container, timeout=10):
-    """Wait for element to be present and contain content."""
-    wait = WebDriverWait(driver, timeout)
-    page_content = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, search_container)))
-
-    page_content_loaded = len(page_content.text.strip()) > 0
-    wait.until(lambda d: page_content_loaded)
-    return page_content
-
-
-def perform_additional_action(driver: webdriver.Chrome, search_link: str):
-    """Perform additional actions depending on the page."""
-    if PRACUJPL in search_link:
-        site_specific_actions.pracujpl_confirm_cookies(driver)
-        site_specific_actions.pracujpl_click_multi_location_offer(driver)
-
-
-def evaluate_stop_conditions(web_driver, search_link: str) -> bool:
-    """Check if the stop conditions are met."""
-    if NOFLUFFJOBS in search_link:
-        return site_specific_actions.nofluffjobs_check_if_results_exist(web_driver)
-    return False
-
-
 def setup_webdriver():
-    """
-    Setup and return a Selenium WebDriver instance
-    """
-    # Path to container with Chrome
+    """Setup and return a Selenium WebDriver instance"""
     options = set_chromedriver_options()
     driver = webdriver.Remote(command_executor=CHROMEDRIVER_CONTAINER, options=options)
     driver.set_page_load_timeout(15)
