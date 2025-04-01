@@ -1,8 +1,8 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from modules.updater.scraper.selenium_utils import setup_webdriver
 from modules.updater.sites.websites.PracujPL import PracujPL
+from modules.updater.webdriver import setup_webdriver
 
 empty_listing = "https://it.pracuj.pl/praca?et=1&sal=50000"
 job_listing = "https://it.pracuj.pl/praca"

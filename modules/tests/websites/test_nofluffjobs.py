@@ -1,8 +1,7 @@
-import pytest
 from bs4 import BeautifulSoup
 
-from modules.updater.scraper.selenium_utils import setup_webdriver
 from modules.updater.sites.websites.NoFluffJobs import NoFluffJobs
+from modules.updater.webdriver import setup_webdriver
 
 empty_listing = "https://nofluffjobs.com/pl/?criteria=salary%3Epln50000m%20seniority%3Dtrainee"
 job_listing = "https://nofluffjobs.com/pl"

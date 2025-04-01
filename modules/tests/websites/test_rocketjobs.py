@@ -1,8 +1,7 @@
-import pytest
 from bs4 import BeautifulSoup
 
-from modules.updater.scraper.selenium_utils import setup_webdriver
 from modules.updater.sites.websites.RocketJobs import RocketJobs
+from modules.updater.webdriver import setup_webdriver
 
 empty_listing = "https://rocketjobs.pl/oferty-pracy/wszystkie-lokalizacje?doswiadczenie=staz-junior&tryb-pracy=praca-w-pelni-zdalna&zarobki=50000,500000&orderBy=DESC&sortBy=published"
 job_listing = "https://rocketjobs.pl/oferty-pracy/wszystkie-lokalizacje/bi-data?orderBy=DESC&sortBy=published"

@@ -6,8 +6,8 @@ from selenium.common.exceptions import InvalidSessionIdException, TimeoutExcepti
 from modules.database.backup import backup_db
 from modules.updater.data_processing.sync import sync_records
 from modules.updater.log import updater_log
-from modules.updater.scraper.selenium_utils import setup_webdriver
 from modules.updater.updater import update_site
+from modules.updater.webdriver import setup_webdriver
 from modules.websites import search_links
 
 

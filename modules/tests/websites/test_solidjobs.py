@@ -1,8 +1,7 @@
-import pytest
 from bs4 import BeautifulSoup
 
-from modules.updater.scraper.selenium_utils import setup_webdriver
 from modules.updater.sites.websites.SOLIDJobs import Solidjobs
+from modules.updater.webdriver import setup_webdriver
 
 empty_listing = "https://solid.jobs/offers/it;experiences=Sta%C5%BC;minimumSalary=30000"
 job_listing = "https://solid.jobs/offers/it"

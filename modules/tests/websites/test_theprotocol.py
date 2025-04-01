@@ -1,8 +1,7 @@
-import pytest
 from bs4 import BeautifulSoup
 
-from modules.updater.scraper.selenium_utils import setup_webdriver
 from modules.updater.sites.websites.Theprotocol import Theprotocol
+from modules.updater.webdriver import setup_webdriver
 
 empty_listing = "https://theprotocol.it/filtry/python;t/trainee;p/50000;s"
 job_listing = "https://theprotocol.it/filtry/python;t"

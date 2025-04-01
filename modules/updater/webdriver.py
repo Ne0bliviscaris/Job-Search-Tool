@@ -1,23 +1,6 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 from modules.settings import CHROMEDRIVER_CONTAINER
-from modules.updater.sites.JobSite import JobSite
-
-
-def scrape(web_driver, job_site: JobSite) -> str:
-    """Scrape given link using Selenium."""
-    web_driver.get(job_site.search_link)
-    job_site.perform_additional_action(web_driver)
-    stop_scraping = job_site.stop_scraping(web_driver)
-
-    if stop_scraping is True:
-        return ""
-
-    search_block = web_driver.find_element(By.CSS_SELECTOR, job_site.search_container())
-    return search_block.get_attribute("outerHTML") or ""
 
 
 def setup_webdriver():
