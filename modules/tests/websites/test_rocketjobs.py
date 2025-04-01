@@ -2,45 +2,45 @@ import pytest
 from bs4 import BeautifulSoup
 
 from modules.updater.scraper.selenium_utils import setup_webdriver
-from modules.updater.sites.websites.PracujPL import PracujPL
+from modules.updater.sites.websites.RocketJobs import RocketJobs
 
-empty_listing = "https://it.pracuj.pl/praca?et=1&sal=50000"
-job_listing = "https://it.pracuj.pl/praca"
+empty_listing = "https://rocketjobs.pl/oferty-pracy/wszystkie-lokalizacje?doswiadczenie=staz-junior&tryb-pracy=praca-w-pelni-zdalna&zarobki=50000,500000&orderBy=DESC&sortBy=published"
+job_listing = "https://rocketjobs.pl/oferty-pracy/wszystkie-lokalizacje/bi-data?orderBy=DESC&sortBy=published"
 
 
 def test_search_container():
     """Test the search functionality of Pracuj.pl."""
     # Initialize the PracujPL class with an empty search link
     with setup_webdriver() as web_driver:
-        site = PracujPL(search_link=job_listing)
+        site = RocketJobs(search_link=job_listing)
         search_container = site.scrape(web_driver)
         assert search_container is not None, "Search container is None"
 
 
 def test_scrape_empty_container():
-    """Test the search functionality of Pracuj.pl."""
-    # Initialize the PracujPL class with an empty search link
+    """Test empty search results handling for RocketJobs."""
     with setup_webdriver() as web_driver:
-        site = PracujPL(search_link=empty_listing)
+        site = RocketJobs(search_link=empty_listing)
         empty_search_container = site.scrape(web_driver)
-        assert len(empty_search_container) == 0, "Search container is not empty when it should be"
+        soup = BeautifulSoup(empty_search_container, "html.parser")
+        assert len(empty_search_container) == 0, "Empty search container is not empty"
 
 
 def test_records_list():
-    """Test job records extraction from HTML."""
+    """Test the records list extraction."""
     with setup_webdriver() as web_driver:
-
-        site = PracujPL(search_link=job_listing)
+        site = RocketJobs(search_link=job_listing)
         search_container = site.scrape(web_driver)
         soup = BeautifulSoup(search_container, "html.parser")
         records = site.records_list(html=soup)
-        assert len(records) > 0, "No records found in the search container"
+        assert len(records) > 0
 
 
 def test_empty_records_list():
     """Test the records list extraction."""
     with setup_webdriver() as web_driver:
-        site = PracujPL(search_link=empty_listing)
+        site = RocketJobs(search_link=empty_listing)
         search_container = site.scrape(web_driver)
-        records = site.records_list(html=search_container)
+        soup = BeautifulSoup(search_container, "html.parser")
+        records = site.records_list(html=soup)
         assert records is None or len(records) == 0, "Records found in empty search container"
