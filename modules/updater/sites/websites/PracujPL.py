@@ -12,7 +12,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.error_handler import scraping_error_handler
+from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -33,6 +33,7 @@ class PracujPL(JobSite):
             return [record for record in records]
         except:
             print("Error detecting records: Pracuj.pl")
+            return []
 
     def website(self) -> str:
         """Returns site name as link."""
@@ -127,15 +128,20 @@ class PracujPL(JobSite):
 
         return None, None, None, None
 
-    @staticmethod
-    def perform_additional_action(webdriver):
-        """Performs additional actions needed for scraping the website."""
-        pracujpl_confirm_cookies(webdriver)
-        pracujpl_click_multi_location_offer(webdriver)
+    def scrape(self, webdriver):
+        """Scrape given link using Selenium."""
+        webdriver.get(self.search_link)
+        try:
+            search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
+            return search_block.get_attribute("outerHTML")
+        except:
+            return no_offers_found(self.website, self.search_link)
 
-    @staticmethod
-    def stop_scraping(webdriver):
-        return False
+
+def perform_additional_action(webdriver):
+    """Performs additional actions needed for scraping the website."""
+    pracujpl_confirm_cookies(webdriver)
+    pracujpl_click_multi_location_offer(webdriver)
 
 
 def pracujpl_click_multi_location_offer(webdriver):

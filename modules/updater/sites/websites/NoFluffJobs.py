@@ -1,3 +1,5 @@
+from selenium.webdriver.common.by import By
+
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
     ensure_string,
@@ -8,7 +10,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.error_handler import scraping_error_handler
+from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -115,27 +117,29 @@ class NoFluffJobs(JobSite):
             print(f"Error processing data from record: {self.website} -> Salary range")
             return None, None, salary_details, salary_text
 
-    @staticmethod
-    def perform_additional_action(webdriver):
-        """Performs additional actions needed for scraping the website."""
-        return None
+    def scrape(self, webdriver):
+        """Scrape given link using Selenium."""
+        webdriver.get(self.search_link)
 
-    @staticmethod
-    def stop_scraping(webdriver):
-        return nofluffjobs_no_search_results(webdriver)
+        if stop_scraping(webdriver):
+            return no_offers_found(self.website, self.search_link)
+
+        search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
+        return search_block.get_attribute("outerHTML")
 
 
 def nofluffjobs_no_search_results(webdriver):
     """Check if results exist on No Fluff Jobs."""
-    from selenium.webdriver.common.by import By
-
     empty_search = "nfj-no-offers-found-header"
     try:
         no_offers_block = webdriver.find_element(By.CSS_SELECTOR, empty_search)
         if no_offers_block:
-            no_offers_text = no_offers_block.text
-            if "Brak wyników wyszukiwania" in no_offers_text:
-                print(f"No offers found for NoFluffJobs.com: {webdriver.current_url}")
-                return True
-    except Exception as e:
-        pass
+            return True
+    except:
+        return False
+
+
+def stop_scraping(html):
+    if nofluffjobs_no_search_results(html):
+        return True
+    return False

@@ -10,7 +10,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.error_handler import scraping_error_handler
+from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -108,28 +108,31 @@ class Solidjobs(JobSite):
             print(f"Error processing data from record: {self.website()} -> Salary range")
             return None, None, salary_details, salary_text
 
-    @staticmethod
-    def perform_additional_action(webdriver):
-        """Performs additional actions needed for scraping the website."""
-        return None
+    def scrape(self, webdriver):
+        """Scrape given link using Selenium."""
+        webdriver.get(self.search_link)
 
-    @staticmethod
-    def stop_scraping(webdriver):
-        """Returns stop condition for scraping."""
-        return no_search_block(webdriver)
+        if stop_scraping(webdriver):
+            return no_offers_found(self.website, self.search_link)
+
+        search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
+        return search_block.get_attribute("outerHTML")
+
+
+def stop_scraping(webdriver):
+    """Returns stop condition for scraping."""
+    try:
+        if no_search_block(webdriver):
+            return True
+    except:
+        return False
 
 
 def no_search_block(webdriver):
     """Check if search block exists on page."""
-    from selenium.common.exceptions import NoSuchElementException
-    from selenium.webdriver.common.by import By
-
-    search_block = '[class="scrollable-content"]'
-
+    search_block = Solidjobs.search_container()
     try:
         webdriver.find_element(By.CSS_SELECTOR, search_block)
-        # Element found, search block exists
         return False
-    except NoSuchElementException:
-        # Element not found, no search block
+    except:
         return True

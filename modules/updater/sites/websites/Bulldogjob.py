@@ -1,4 +1,5 @@
-from selenium.webdriver.common.by import By
+import requests
+from bs4 import BeautifulSoup
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -10,7 +11,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.error_handler import scraping_error_handler
+from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -20,7 +21,7 @@ class Bulldogjob(JobSite):
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return '[id="__next"]'
+        return "div#__next"
 
     @staticmethod
     def records_list(html) -> list:
@@ -32,6 +33,7 @@ class Bulldogjob(JobSite):
             return [record for record in records]
         except:
             print("Error detecting records: BULLDOGJOB")
+            return []
 
     def website(self) -> str:
         """Returns site name as link."""
@@ -80,10 +82,16 @@ class Bulldogjob(JobSite):
     @scraping_error_handler
     def location(self):
         """Extract location from record."""
-        loc = self.html.find("h4", {"data-test": "text-region"})
-        if loc and loc.strong:
-            location = loc.strong.text
+        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
+        details_block = self.html.find(attrs={"class": name})
+
+        location_block = details_block.div.div
+        if location_block:
+            spans = location_block.find_all("span")
+            location_texts = [span.text.strip() for span in spans]
+            location = " | ".join(location_texts)
             return remove_remote_status(location)
+        return None
 
     @scraping_error_handler
     def remote_status(self):
@@ -129,12 +137,18 @@ class Bulldogjob(JobSite):
 
         return None, None, None, None
 
-    @staticmethod
-    def perform_additional_action(webdriver):
-        """Performs additional actions needed for scraping the website."""
-        return None
+    def scrape(self, webdriver=None) -> str:
+        """Scrape given link using Selenium."""
+        response = requests.get(self.search_link)
+        soup = BeautifulSoup(response.text, "html.parser")
+        if stop_scrape(soup):
+            return no_offers_found(self.website, self.search_link)
+        search_block = soup.select_one(self.search_container())
+        return search_block if search_block else ""
 
-    @staticmethod
-    def stop_scraping(webdriver):
-        """Returns stop condition for scraping."""
-        return False
+
+def stop_scrape(soup):
+    empty_search = "Brak wyników pasujących do wyszukiwania"
+    if soup and empty_search in soup.text:
+        return True
+    return False

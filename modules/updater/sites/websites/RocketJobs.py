@@ -10,7 +10,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.error_handler import scraping_error_handler
+from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -130,10 +130,25 @@ class RocketJobs(JobSite):
             print(f"Error processing data from record: {self.website()} -> Salary range")
             return None, None, salary_details, salary_text
 
-    @staticmethod
-    def perform_additional_action(webdriver):
-        return None
+    def scrape(self, webdriver):
+        """Scrape given link using Selenium."""
+        webdriver.get(self.search_link)
+        try:
+            search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
+            return search_block.get_attribute("outerHTML")
+        except:
+            return no_offers_found(self.website, self.search_link)
 
-    @staticmethod
-    def stop_scraping(webdriver):
+
+def stop_scraping(webdriver):
+    """Check if search returned no results."""
+    from bs4 import BeautifulSoup
+
+    soup = BeautifulSoup(webdriver.page_source, "html.parser")
+    try:
+        empty_search = "Nie znaleźliśmy ofert pracy dla podanych kryteriów"
+        empty_search_container = soup.find(text=lambda text: empty_search in text)
+        if empty_search_container:
+            return True
+    except:
         return False

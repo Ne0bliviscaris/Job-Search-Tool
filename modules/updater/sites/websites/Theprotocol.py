@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 
 from modules.updater.data_processing.helper_functions import (
@@ -10,7 +11,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.error_handler import scraping_error_handler
+from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -128,12 +129,24 @@ class Theprotocol(JobSite):
 
         return None, None, None, None
 
-    @staticmethod
-    def perform_additional_action(webdriver):
-        """Performs additional actions needed for scraping the website."""
-        return None
+    def scrape(self, webdriver):
+        """Scrape given link using Selenium."""
+        webdriver.get(self.search_link)
 
-    @staticmethod
-    def stop_scraping(webdriver):
-        """Returns stop condition for scraping."""
+        if stop_scraping(webdriver):
+            return no_offers_found(self.website, self.search_link)
+
+        search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
+        return search_block.get_attribute("outerHTML")
+
+
+def stop_scraping(webdriver):
+    """Returns stop condition for scraping."""
+    try:
+
+        soup = BeautifulSoup(webdriver.page_source, "html.parser")
+        no_offers_element = soup.find(attrs={"data-test": "text-emptyList"})
+        if no_offers_element:
+            return True
+    except:
         return False

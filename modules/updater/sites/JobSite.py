@@ -82,16 +82,9 @@ class JobSite(ABC):
         """Fetch salary range and details from job listing."""
         pass
 
-    @staticmethod
     @abstractmethod
-    def stop_scraping(webdriver) -> str:
-        """Returns stop condition for scraping."""
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def perform_additional_action(webdriver) -> str:
-        """Returns additional actions for scraping."""
+    def scrape(self, webdriver) -> str:
+        """Scrape the website using the provided webdriver."""
         pass
 
     def to_dict(self):

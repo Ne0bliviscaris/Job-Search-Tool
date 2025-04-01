@@ -44,3 +44,10 @@ def scraping_error_handler(func):
             return None
 
     return wrapper
+
+
+def no_offers_found(website, link):
+    """Check if the website has no offers."""
+    message = f"No offers found for {website}: {link}"
+    print(message)
+    return ""
