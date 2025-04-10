@@ -127,14 +127,14 @@ class RocketJobs(JobSite):
             min_salary, max_salary = split_salary(processed_salary)
             return min_salary, max_salary, salary_details, salary_text
         except ValueError:
-            print(f"Error processing data from record: {self.website()} -> Salary range")
+            print(f"Error processing data from record: {self.website} -> Salary range")
             return None, None, salary_details, salary_text
 
     def scrape(self, webdriver):
         """Scrape given link using Selenium."""
         webdriver.get(self.search_link)
         try:
-            search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
+            search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container)
             return search_block.get_attribute("outerHTML")
         except:
             return no_offers_found(self.website, self.search_link)
