@@ -12,6 +12,8 @@ from modules.tests.sync.dummy_records import (
 )
 from modules.updater.data_processing.sync import process_new_records
 
+mock_save_records_to_db = patch("modules.updater.data_processing.sync.save_records_to_db")
+
 
 @pytest.fixture
 def empty_new_records():
@@ -31,7 +33,7 @@ def current_db():
     return get_dummy_db_records()
 
 
-@patch("modules.updater.data_processing.sync.save_records_to_db")
+@mock_save_records_to_db
 def test_empty_update(mock_save_records_to_db, empty_new_records):
     """Test process_new_records with empty DataFrames."""
     process_new_records(empty_new_records)
@@ -40,7 +42,7 @@ def test_empty_update(mock_save_records_to_db, empty_new_records):
     mock_save_records_to_db.assert_not_called()
 
 
-@patch("modules.updater.data_processing.sync.save_records_to_db")
+@mock_save_records_to_db
 def test_new_records(mock_save_records_to_db, new_records):
     """Test process_new_records with new_records containing two records."""
     process_new_records(new_records)

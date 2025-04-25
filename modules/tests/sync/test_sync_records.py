@@ -83,10 +83,10 @@ def test_find_record_changes_no_overlap(db_records, scraped_records):
     assert len(new_records) == 3  # Jobs 8,9,10
 
 
-@patch("modules.sync.sync.html_dataframe")
-@patch("modules.sync.sync.load_records_from_db")
-@patch("modules.sync.sync.save_records_to_db")
-@patch("modules.sync.sync.update_record")
+@patch("modules.updater.data_processing.sync.html_dataframe")
+@patch("modules.updater.data_processing.sync.load_records_from_db")
+@patch("modules.updater.data_processing.sync.save_records_to_db")
+@patch("modules.updater.data_processing.sync.update_record")
 def test_sync_records_flow(mock_update, mock_save, mock_load_db, mock_html_df):
     """Test complete sync_records flow."""
     # Setup test data
