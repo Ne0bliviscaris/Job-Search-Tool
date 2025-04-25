@@ -133,6 +133,7 @@ class PracujPL(JobSite):
         webdriver.get(self.search_link)
         try:
             search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
+            perform_additional_action(webdriver)
             return search_block.get_attribute("outerHTML")
         except:
             return no_offers_found(self.website, self.search_link)
@@ -152,7 +153,7 @@ def pracujpl_click_multi_location_offer(webdriver):
         for element in elements:
             element.click()
     except Exception as e:
-        pass
+        print(f"Error clicking multilocation offers: {e}")
 
 
 def pracujpl_confirm_cookies(webdriver):
