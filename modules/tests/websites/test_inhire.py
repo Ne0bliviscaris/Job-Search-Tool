@@ -29,9 +29,7 @@ def test_records_list():
     """Test the records list extraction."""
     with setup_webdriver() as web_driver:
         site = InhireIO(search_link=job_listing)
-        search_container = site.scrape(web_driver)
-        soup = BeautifulSoup(search_container, "html.parser")
-        records = site.records_list(html=soup)
+        records = site.scrape(web_driver)
         assert len(records) > 0
 
 
