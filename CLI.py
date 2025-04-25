@@ -6,8 +6,8 @@ from selenium.common.exceptions import InvalidSessionIdException, TimeoutExcepti
 from modules.database.backup import backup_db
 from modules.updater.data_processing.sync import sync_records
 from modules.updater.log import updater_log
-from modules.updater.scraper.selenium_utils import setup_webdriver
 from modules.updater.updater import update_site
+from modules.updater.webdriver import setup_webdriver
 from modules.websites import search_links
 
 
@@ -18,14 +18,14 @@ def main():
         remaining_links = list(search_links.items())
         updater_log("CLI").info("Starting CLI Update Process.")
         while remaining_links:
-            key, value = remaining_links.pop(0)
+            link_name, site_url = remaining_links.pop(0)
             try:
-                update_site(web_driver, key, value)
-                print(f"Updated {key}.")
+                update_site(web_driver, site_url)
+                print(f"Updated {link_name}.")
             except TimeoutException:
-                print(f"Timeout error on {key}, will retry in 5 minutes.")
-                updater_log("CLI").error(f"Timeout error on {key}, will retry in 5 minutes.")
-                remaining_links.append((key, value))  # Requeue site
+                print(f"Timeout error on {link_name}, will retry in 5 minutes.")
+                updater_log("CLI").error(f"Timeout error on {link_name}, will retry in 5 minutes.")
+                remaining_links.append((link_name, site_url))  # Requeue site
                 sleep(300)  # Wait 5 minutes before retrying
             except InvalidSessionIdException:
                 print("Session lost. Restarting WebDriver...")
@@ -34,9 +34,9 @@ def main():
                 web_driver.quit()
                 # Create new instance
                 with setup_webdriver() as new_driver:
-                    update_site(new_driver, key, value)
-                    print(f"Updated {key} after session restart.")
-                    updater_log("CLI").info(f"Updated {key} after session restart.")
+                    update_site(new_driver, link_name, site_url)
+                    print(f"Updated {link_name} after session restart.")
+                    updater_log("CLI").info(f"Updated {link_name} after session restart.")
         updater_log("CLI").info("Update process complete.")
 
     backup_db()

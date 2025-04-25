@@ -1,8 +1,10 @@
 import os
-import time
 
-from modules.updater.data_processing.data_processor import set_filename
-from modules.updater.scraper.selenium_utils import scrape, setup_webdriver
+from modules.settings import SAVE_HTML
+from modules.updater.data_processing.data_processor import set_filename_from_link
+from modules.updater.error_handler import fancy_error_handler
+from modules.updater.sites.SiteFactory import SiteFactory
+from modules.updater.webdriver import setup_webdriver
 from modules.websites import search_links
 
 
@@ -10,23 +12,20 @@ def update_all_sites():
     """Process all sites using webdriver and yield link names upon successful update."""
     with setup_webdriver() as web_driver:
         for link_name, search_link in search_links.items():
-            if process_single_site(web_driver, link_name, search_link):
+            if process_single_site(web_driver, search_link):
                 yield link_name
 
 
+# @fancy_error_handler
 def update_sites_with_progress_bar(st):
     """Display progress bar while updating sites."""
-    try:
-        progress_bar, status_box = handle_update_progress(st)
-        total_sites = len(search_links)
-        progress = 0
-        # Process each site using the core function that yields link_name
-        for link_name in update_all_sites():
-            progress += 1
-            update_status(progress_bar, status_box, progress, link_name)
-        st.success("All sites updated!")
-    except Exception as e:
-        st.error("Make sure you have properly configured Webdriver (see modules/settings.py)")
+    progress_bar, status_box = handle_update_progress(st)
+    progress = 0
+    # Process each site using the core function that yields link_name
+    for link_name in update_all_sites():
+        progress += 1
+        update_status(progress_bar, status_box, progress, link_name)
+    st.success("All sites updated!")
 
 
 def handle_update_progress(st) -> tuple:
@@ -36,33 +35,25 @@ def handle_update_progress(st) -> tuple:
     return progress_bar, status_box
 
 
-def process_single_site(web_driver, link_name: str, search_link: str) -> None:
+def process_single_site(web_driver, search_link: str) -> None:
     """Process single website update."""
-    try:
-        update_site(web_driver, link_name, search_link)
-        return True
-    except Exception as e:
-        print(f"Error updating {link_name}: {e}")
-        return False
+    update_site(web_driver, search_link)
+    return True
 
 
-def update_site(webdriver, link_name: str, search_link: str) -> str:
-    """
-    Download HTML content from the search link and save it to a file.
-    """
-    search_block = scrape(webdriver, search_link)
+def update_site(webdriver, search_link) -> str:
+    """Download HTML content from the search link and save it to a file."""
+    job_site = SiteFactory.identify_website(search_link)
+    search_block = job_site.scrape(webdriver)
 
-    # Save HTML to file
-    filename = os.path.join(set_filename(link_name))
-    save_html_to_file(search_block, filename)
-
-    return filename
+    if SAVE_HTML:
+        save_html_to_file(search_block, search_link)
+    return search_block
 
 
-def save_html_to_file(html_content: str, filename: str) -> None:
-    """
-    Save HTML content to a file.
-    """
+def save_html_to_file(html_content: str, search_link: str) -> None:
+    """Save HTML content to a file."""
+    filename = os.path.join(set_filename_from_link(search_link))
     with open(filename, "w", encoding="utf-8") as file:
         file.write(str(html_content))
 
@@ -72,5 +63,4 @@ def update_status(progress_bar, status_box, progress: int, link_name: str) -> No
     total = len(search_links)
     progress_bar.progress(progress / total)
     status_box.success(f"Downloaded: {link_name}")
-    time.sleep(3)
     status_box.empty()
