@@ -134,7 +134,7 @@ class RocketJobs(JobSite):
         """Scrape given link using Selenium."""
         webdriver.get(self.search_link)
         try:
-            search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container)
+            search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
             return search_block.get_attribute("outerHTML")
         except:
             return no_offers_found(self.website, self.search_link)
