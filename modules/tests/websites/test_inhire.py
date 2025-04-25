@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup
 
-from modules.updater.sites.websites.SOLIDJobs import Solidjobs
+from modules.updater.sites.websites.InhireIO import InhireIO
 from modules.updater.webdriver import setup_webdriver
 
-empty_listing = "https://solid.jobs/offers/it;experiences=Sta%C5%BC;minimumSalary=30000"
+empty_listing = "https://inhire.io/oferty-pracy?experiences=0_1&locations=1&roles=it,blockchain_engineer&salary=75000&technologies=413"
 job_listing = "https://solid.jobs/offers/it"
 
 
@@ -11,7 +11,7 @@ def test_search_container():
     """Test the search functionality of Pracuj.pl."""
     # Initialize the PracujPL class with an empty search link
     with setup_webdriver() as web_driver:
-        site = Solidjobs(search_link=job_listing)
+        site = InhireIO(search_link=job_listing)
         search_container = site.scrape(web_driver)
         assert search_container is not None, "Search container is None"
 
@@ -19,7 +19,7 @@ def test_search_container():
 def test_scrape_empty_container():
     """Test empty search results handling for RocketJobs."""
     with setup_webdriver() as web_driver:
-        site = Solidjobs(search_link=empty_listing)
+        site = InhireIO(search_link=empty_listing)
         empty_search_container = site.scrape(web_driver)
         soup_empty_search = BeautifulSoup(empty_search_container, "html.parser")
         assert len(soup_empty_search) == 0, "Empty search container is not empty"
@@ -28,7 +28,7 @@ def test_scrape_empty_container():
 def test_records_list():
     """Test the records list extraction."""
     with setup_webdriver() as web_driver:
-        site = Solidjobs(search_link=job_listing)
+        site = InhireIO(search_link=job_listing)
         search_container = site.scrape(web_driver)
         soup = BeautifulSoup(search_container, "html.parser")
         records = site.records_list(html=soup)
@@ -38,7 +38,7 @@ def test_records_list():
 def test_empty_records_list():
     """Test the records list extraction."""
     with setup_webdriver() as web_driver:
-        site = Solidjobs(search_link=empty_listing)
+        site = InhireIO(search_link=empty_listing)
         search_container = site.scrape(web_driver)
         soup = BeautifulSoup(search_container, "html.parser")
         records = site.records_list(html=soup)
