@@ -1,8 +1,6 @@
 import os
 
 from modules.settings import SAVE_HTML
-from modules.updater.data_processing.data_processor import set_filename_from_link
-from modules.updater.error_handler import fancy_error_handler
 from modules.updater.sites.SiteFactory import SiteFactory
 from modules.updater.webdriver import setup_webdriver
 from modules.websites import search_links
@@ -47,15 +45,8 @@ def update_site(webdriver, search_link) -> str:
     search_block = job_site.scrape(webdriver)
 
     if SAVE_HTML:
-        save_html_to_file(search_block, search_link)
+        job_site.save_file(search_block)
     return search_block
-
-
-def save_html_to_file(html_content: str, search_link: str) -> None:
-    """Save HTML content to a file."""
-    filename = os.path.join(set_filename_from_link(search_link))
-    with open(filename, "w", encoding="utf-8") as file:
-        file.write(str(html_content))
 
 
 def update_status(progress_bar, status_box, progress: int, link_name: str) -> None:
