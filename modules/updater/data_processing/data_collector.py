@@ -3,9 +3,7 @@ import streamlit as st
 
 from modules.updater.data_processing.data_processor import (
     build_dataframe,
-    html_to_soup,
     process_records,
-    set_filename_from_link,
 )
 from modules.websites import search_links
 
@@ -26,10 +24,7 @@ def search_all_sites() -> list:
 def search_site(link: str) -> list:
     """Get HTML block containing job search results from a file"""
     try:
-        file = set_filename_from_link(link)
-        soup = html_to_soup(file)
-
-        job_records = process_records(soup, link) if soup is not None else []
+        job_records = process_records(link)
     except FileNotFoundError:
         print(f"Run updater to process link: {link}.")
         job_records = []
