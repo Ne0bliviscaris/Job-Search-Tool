@@ -9,7 +9,7 @@ from modules.updater.sites.SiteFactory import SiteFactory
 def process_records(link: str):
     """Process HTML soup into JobRecord objects"""
     website: JobSite = SiteFactory.identify_website(link)
-    file_name = set_filename_from_link(link, website.data_file_extension)
+    file_name = set_filename_from_link(link, website.file_extension)
     records = website.records_list(html=file_name, link=link)
     return [SiteFactory.single_record(website=website, record=record) for record in records] if records else []
 
