@@ -8,9 +8,10 @@ remote_work_dict = {
         "cała polska (praca zdalna)",
         ", Fully remote",
         "fully remotefully remote",
+        "remote within poland",
     ],
     "Hybrid": ["hybrid", "hybrydowa", "remote hybrid", "hybryd"],
-    "Stationary": ["stationary", "stacjonarna", "full office"],
+    "Stationary": ["stationary", "stacjonarna", "full office", "on-site", "office"],
 }
 DATE_COLUMNS = ["added_date", "application_date", "feedback_date", "archived_date"]
 
