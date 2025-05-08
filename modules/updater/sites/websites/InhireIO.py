@@ -34,10 +34,8 @@ class InhireIO(JobSite):
         ...
 
     @staticmethod
-    def records_list(data, link, test_mode=False) -> list:
+    def records_list(data) -> list:
         """Load records from JSON file."""
-        if test_mode:
-            return data
         return data
 
     def save_file(self, filename, records):
