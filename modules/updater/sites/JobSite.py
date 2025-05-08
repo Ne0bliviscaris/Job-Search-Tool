@@ -29,7 +29,7 @@ class JobSite(ABC):
 
     @staticmethod
     @abstractmethod
-    def records_list(html) -> list:
+    def records_list(data) -> list:
         """Extracts job records from HTML."""
         pass
 
@@ -106,6 +106,11 @@ class JobSite(ABC):
 
     @abstractmethod
     def save_file(self, html) -> str:
+        """Saves data file."""
+        pass
+
+    @abstractmethod
+    def load_file(self, html) -> str:
         """Saves data file."""
         pass
 
