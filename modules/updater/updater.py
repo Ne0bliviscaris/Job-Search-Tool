@@ -11,7 +11,7 @@ def update_all_sites():
     """Process all sites using webdriver and yield link names upon successful update."""
     with setup_webdriver() as web_driver:
         for link_name, search_link in search_links.items():
-            if process_single_site(web_driver, search_link):
+            if update_site(web_driver, search_link):
                 yield link_name
 
 
@@ -34,12 +34,6 @@ def handle_update_progress(st) -> tuple:
     return progress_bar, status_box
 
 
-def process_single_site(web_driver, search_link: str) -> None:
-    """Process single website update."""
-    update_site(web_driver, search_link)
-    return True
-
-
 def update_site(webdriver, search_link) -> str:
     """Download HTML content from the search link and save it to a file."""
     job_site = SiteFactory.identify_website(search_link)
@@ -48,7 +42,7 @@ def update_site(webdriver, search_link) -> str:
     if SAVE_HTML:
         filename = set_filename_from_link(search_link, job_site.file_extension)
         job_site.save_file(filename, search_block)
-    return search_block
+    return search_block if search_block else True
 
 
 def update_status(progress_bar, status_box, progress: int, link_name: str) -> None:
