@@ -34,17 +34,20 @@ class InhireIO(JobSite):
         ...
 
     @staticmethod
-    def records_list(html, link, test_mode=False) -> list:
-        """Parse BeautifulSoup object containing JSON and return job records."""
+    def records_list(data, link, test_mode=False) -> list:
+        """Load records from JSON file."""
         if test_mode:
-            return html
-        file = set_filename_from_link(link, InhireIO.file_extension())
-        data = load_json(file)
+            return data
         return data
 
     def save_file(self, filename, records):
         """Export records to a file."""
         save_json(filename, records)
+
+    def load_file(self, filename):
+        """Load records from a file."""
+        data = load_json(filename)
+        return data
 
     def website(self) -> str:
         """Returns site name."""
