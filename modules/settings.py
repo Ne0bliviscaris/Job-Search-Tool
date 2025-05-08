@@ -1,4 +1,5 @@
 DATE_FORMAT = "%Y-%m-%d"
+FILE_STORAGE_PATH = "modules\\updater\\sites\\HTML"
 
 # Install the following Docker container to run standalone chromedriver
 # https://hub.docker.com/r/selenium/standalone-chrome

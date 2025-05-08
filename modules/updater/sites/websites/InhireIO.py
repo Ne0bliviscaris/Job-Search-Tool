@@ -12,13 +12,21 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.data_processing.site_files import load_json, set_filename_from_link
+from modules.updater.data_processing.site_files import (
+    load_json,
+    save_json,
+    set_filename_from_link,
+)
 from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
 class InhireIO(JobSite):
     """Class to scrape website."""
+
+    @staticmethod
+    def file_extension():
+        return "json"
 
     @staticmethod
     def search_container() -> str:
@@ -36,8 +44,7 @@ class InhireIO(JobSite):
 
     def save_file(self, filename, records):
         """Export records to a file."""
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(records, f, indent=4)
+        save_json(filename, records)
 
     def website(self) -> str:
         """Returns site name."""
@@ -166,10 +173,6 @@ class InhireIO(JobSite):
         if response.status_code == 200:
             return response.json()["response"]
         return []
-
-    @staticmethod
-    def file_extension():
-        return "json"
 
     def _construct_API_request(self, link=None, page_number=1):
         if not link:
