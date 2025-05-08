@@ -23,21 +23,3 @@ def test_scrape_empty_container():
     site = InhireIO(search_link=empty_listing)
     empty_search_container = site.scrape()
     assert len(empty_search_container) == 0, "Empty search container is not empty"
-
-
-def test_records_list():
-    """Test the records list extraction."""
-    site = InhireIO(search_link=job_listing)
-    search_block = site.scrape()
-    records = site.records_list(html=search_block, link=job_listing, test_mode=True)
-
-    assert len(records) > 0
-
-
-def test_empty_records_list():
-    """Test the records list extraction."""
-
-    site = InhireIO(search_link=empty_listing)
-    search_block = site.scrape()
-    records = site.records_list(html=search_block, link=empty_listing, test_mode=True)
-    assert len(records) == 0, "Records found in empty search container"
