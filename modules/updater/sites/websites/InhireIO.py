@@ -1,4 +1,4 @@
-import json
+from urllib.parse import parse_qs, urlparse
 
 import requests
 
@@ -285,6 +285,3 @@ class InhireIO(JobSite):
         payload["include_undisclosed"] = True
         payload["page"] = page_number
         return payload
-
-
-from urllib.parse import parse_qs, urlparse
