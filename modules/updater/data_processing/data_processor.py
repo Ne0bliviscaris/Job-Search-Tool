@@ -1,7 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from modules.updater.data_processing.helper_functions import set_filename_from_link
+from modules.updater.data_processing.site_files import set_filename_from_link
 from modules.updater.sites.JobSite import JobSite
 from modules.updater.sites.SiteFactory import SiteFactory
 

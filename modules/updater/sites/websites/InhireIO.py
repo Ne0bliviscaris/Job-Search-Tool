@@ -10,9 +10,9 @@ from modules.updater.data_processing.helper_functions import (
     process_remote_status,
     remove_remote_status,
     salary_cleanup,
-    set_filename_from_link,
     split_salary,
 )
+from modules.updater.data_processing.site_files import load_json, set_filename_from_link
 from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
@@ -30,20 +30,12 @@ class InhireIO(JobSite):
         """Parse BeautifulSoup object containing JSON and return job records."""
         if test_mode:
             return html
+        file = set_filename_from_link(link, InhireIO.file_extension())
+        data = load_json(file)
+        return data
 
-        def load_file_from_link(link):
-            file = set_filename_from_link(link, InhireIO.file_extension())
-            with open(file, "r", encoding="utf-8") as f:
-                file = f.read()
-                data = json.loads(file)
-            return data
-
-        data = load_file_from_link(link)
-        return data or []
-
-    def save_file(self, records):
+    def save_file(self, filename, records):
         """Export records to a file."""
-        filename = set_filename_from_link(self.search_link, self.file_extension)
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(records, f, indent=4)
 

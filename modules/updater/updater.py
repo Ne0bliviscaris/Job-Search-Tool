@@ -1,6 +1,7 @@
 import os
 
 from modules.settings import SAVE_HTML
+from modules.updater.data_processing.site_files import set_filename_from_link
 from modules.updater.sites.SiteFactory import SiteFactory
 from modules.updater.webdriver import setup_webdriver
 from modules.websites import search_links
@@ -45,7 +46,8 @@ def update_site(webdriver, search_link) -> str:
     search_block = job_site.scrape(webdriver)
 
     if SAVE_HTML:
-        job_site.save_file(search_block)
+        filename = set_filename_from_link(search_link, job_site.file_extension)
+        job_site.save_file(filename, search_block)
     return search_block
 
 

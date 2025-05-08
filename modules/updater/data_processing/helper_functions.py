@@ -1,8 +1,6 @@
-import os
 import re
 
 from modules.dicts import remote_work_dict
-from modules.websites import search_links
 
 # Salary processing for JobRecord class
 
@@ -90,9 +88,3 @@ def process_remote_status(status: str) -> str:
             return key
 
     return "Unknown"
-
-
-def set_filename_from_link(link: str, extension: str = "html") -> str:
-    """Generate filename based on link key in search_links dict"""
-    link_name = next((key for key, value in search_links.items() if value == link), link)
-    return os.path.join("modules\\updater\\sites\\HTML", f"{link_name}.{extension}")
