@@ -42,6 +42,9 @@ def search_site(link: str) -> list:
 def process_records(link: str):
     """Process HTML soup into JobRecord objects"""
     website: JobSite = SiteFactory.identify_website(link)
+
     file_name = set_filename_from_link(link, website.file_extension)
-    records = website.records_list(html=file_name, link=link)
+    file_content = website.load_file(file_name)
+
+    records = website.records_list(data=file_content, link=link)
     return [SiteFactory.single_record(website=website, record=record) for record in records] if records else []
