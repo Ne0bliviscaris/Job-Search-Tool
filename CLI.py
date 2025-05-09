@@ -34,7 +34,7 @@ def main():
                 web_driver.quit()
                 # Create new instance
                 with setup_webdriver() as new_driver:
-                    update_site(new_driver, link_name, site_url)
+                    update_site(new_driver, site_url)
                     print(f"Updated {link_name} after session restart.")
                     updater_log("CLI").info(f"Updated {link_name} after session restart.")
         updater_log("CLI").info("Update process complete.")
@@ -46,6 +46,8 @@ def main():
     print("Records synced.")
     updater_log("CLI").info("Records synced.")
     updater_log("CLI").info("CLI Update Process Complete.")
+
+    sleep(15)
 
 
 main()

@@ -26,8 +26,8 @@ def test_scrape_empty_container(shared_driver):
     """Test empty search results handling for RocketJobs."""
     site = JustJoinIT(search_link=empty_listing)
     empty_search_container = site.scrape(shared_driver)
-    soup = BeautifulSoup(empty_search_container, "html.parser")
-    assert len(empty_search_container) == 0, "Empty search container is not empty"
+    soup_empty_search = BeautifulSoup(empty_search_container, "html.parser")
+    assert len(soup_empty_search) == 0, "Empty search container is not empty"
 
 
 def test_records_list(shared_driver):
@@ -35,7 +35,7 @@ def test_records_list(shared_driver):
     site = JustJoinIT(search_link=job_listing)
     search_container = site.scrape(shared_driver)
     soup = BeautifulSoup(search_container, "html.parser")
-    records = site.records_list(html=soup)
+    records = site.records_list(data=soup)
     assert len(records) > 0
 
 
@@ -44,5 +44,5 @@ def test_empty_records_list(shared_driver):
     site = JustJoinIT(search_link=empty_listing)
     search_container = site.scrape(shared_driver)
     soup = BeautifulSoup(search_container, "html.parser")
-    records = site.records_list(html=soup)
+    records = site.records_list(data=soup)
     assert records is None or len(records) == 0, "Records found in empty search container"

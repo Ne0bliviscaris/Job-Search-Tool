@@ -10,6 +10,7 @@ class JobSite(ABC):
         self.html = html
         self.search_link = search_link
         self.website = self.website()
+        self.file_extension = self.file_extension()
         if html:
             self.url = self.url()
             self.title = self.job_title()
@@ -28,7 +29,7 @@ class JobSite(ABC):
 
     @staticmethod
     @abstractmethod
-    def records_list(html) -> list:
+    def records_list(data) -> list:
         """Extracts job records from HTML."""
         pass
 
@@ -102,3 +103,18 @@ class JobSite(ABC):
             "url": self.url,
             "website": self.website,
         }
+
+    @abstractmethod
+    def save_file(self, html) -> str:
+        """Saves data file."""
+        pass
+
+    @abstractmethod
+    def load_file(self, html) -> str:
+        """Saves data file."""
+        pass
+
+    @abstractmethod
+    def file_extension() -> str:
+        """Returns file extension for the website."""
+        pass

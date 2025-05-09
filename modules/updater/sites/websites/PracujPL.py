@@ -12,6 +12,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
+from modules.updater.data_processing.site_files import load_html_as_soup, save_html
 from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
@@ -20,16 +21,28 @@ class PracujPL(JobSite):
     """Class to scrape website."""
 
     @staticmethod
+    def file_extension():
+        return "html"
+
+    def save_file(self, filename, html):
+        """Save HTML content to a file."""
+        save_html(filename, html)
+
+    def load_file(self, filename):
+        """Load HTML content from a file."""
+        return load_html_as_soup(filename)
+
+    @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
         return '[data-test="section-offers"]'
 
     @staticmethod
-    def records_list(html) -> list:
+    def records_list(data) -> list:
         """Extracts job records from HTML."""
         try:
             record_container = {"data-test": "default-offer"}
-            records = html.find_all(attrs=record_container)
+            records = data.find_all(attrs=record_container)
             return [record for record in records]
         except:
             print("Error detecting records: Pracuj.pl")

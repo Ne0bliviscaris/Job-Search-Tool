@@ -21,8 +21,8 @@ def test_scrape_empty_container():
     with setup_webdriver() as web_driver:
         site = RocketJobs(search_link=empty_listing)
         empty_search_container = site.scrape(web_driver)
-        soup = BeautifulSoup(empty_search_container, "html.parser")
-        assert len(empty_search_container) == 0, "Empty search container is not empty"
+        soup_empty_search = BeautifulSoup(empty_search_container, "html.parser")
+        assert len(soup_empty_search) == 0, "Empty search container is not empty"
 
 
 def test_records_list():
@@ -31,7 +31,7 @@ def test_records_list():
         site = RocketJobs(search_link=job_listing)
         search_container = site.scrape(web_driver)
         soup = BeautifulSoup(search_container, "html.parser")
-        records = site.records_list(html=soup)
+        records = site.records_list(data=soup)
         assert len(records) > 0
 
 
@@ -41,5 +41,5 @@ def test_empty_records_list():
         site = RocketJobs(search_link=empty_listing)
         search_container = site.scrape(web_driver)
         soup = BeautifulSoup(search_container, "html.parser")
-        records = site.records_list(html=soup)
+        records = site.records_list(data=soup)
         assert records is None or len(records) == 0, "Records found in empty search container"
