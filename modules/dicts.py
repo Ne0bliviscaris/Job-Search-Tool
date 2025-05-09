@@ -7,7 +7,7 @@ remote_work_dict = {
         "100% zdalnie",
         "cała polska (praca zdalna)",
         ", Fully remote",
-        "fully remotefully remote",
+        "fully remote",
         "remote within poland",
     ],
     "Hybrid": ["hybrid", "hybrydowa", "remote hybrid", "hybryd"],
