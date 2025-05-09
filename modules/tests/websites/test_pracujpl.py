@@ -34,7 +34,7 @@ def test_records_list():
         site = PracujPL(search_link=job_listing)
         search_container = site.scrape(web_driver)
         soup = BeautifulSoup(search_container, "html.parser")
-        records = site.records_list(html=soup)
+        records = site.records_list(data=soup)
         assert len(records) > 0, "No records found in the search container"
 
 
@@ -43,5 +43,5 @@ def test_empty_records_list():
     with setup_webdriver() as web_driver:
         site = PracujPL(search_link=empty_listing)
         search_container = site.scrape(web_driver)
-        records = site.records_list(html=search_container)
+        records = site.records_list(data=search_container)
         assert records is None or len(records) == 0, "Records found in empty search container"

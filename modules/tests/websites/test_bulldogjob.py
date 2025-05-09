@@ -28,7 +28,7 @@ def test_records_list():
     """Test job records extraction."""
     site = Bulldogjob(search_link=job_listing)
     search_container = site.scrape()
-    records = site.records_list(html=search_container)
+    records = site.records_list(data=search_container)
     assert len(records) > 0
 
 
@@ -37,5 +37,5 @@ def test_empty_records_list():
     site = Bulldogjob(search_link=empty_listing)
     search_container = site.scrape()
     soup = BeautifulSoup(search_container, "html.parser")
-    records = site.records_list(html=soup)
+    records = site.records_list(data=soup)
     assert records is None or len(records) == 0, "Records found in empty search container"
