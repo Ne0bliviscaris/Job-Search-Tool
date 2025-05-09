@@ -28,7 +28,7 @@ def save_json(filename, data) -> None:
 def save_html(filename, data) -> None:
     """Save HTML content to a file."""
     with open(filename, "w", encoding="utf-8") as file:
-        file.write(data)
+        file.write(str(data))
 
 
 def load_html_as_soup(filename: str) -> BeautifulSoup:
