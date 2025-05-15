@@ -33,8 +33,9 @@ def extract_salary_details(cleaned_salary, salary_text):
     index = salary_text.lower().rfind(last_two_chars)
     salary_details = salary_text[index + 2 :].strip() if index != -1 else None
     # Handle Bulldogjobs and NoFluffJobs case
-    if salary_text == "Znamy widełki" or "Sprawdź" in salary_text:
+    if salary_text == "Znamy widełki" or "Sprawdź" or "Undisclosed salary" in salary_text:
         salary_details = salary_text
+
     return salary_details
 
 
@@ -51,7 +52,7 @@ def split_salary(processed_salary):
         min_salary = int(salary_parts[0].strip())
         max_salary = int(salary_parts[1].strip())
     else:
-        min_salary = max_salary = int(processed_salary.strip())
+        min_salary = max_salary = int(processed_salary.strip()) if processed_salary else None
 
     return min_salary, max_salary
 
