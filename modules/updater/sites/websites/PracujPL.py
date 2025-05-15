@@ -155,7 +155,26 @@ class PracujPL(JobSite):
 def perform_additional_action(webdriver):
     """Performs additional actions needed for scraping the website."""
     pracujpl_confirm_cookies(webdriver)
+    confirm_privacy_policy_changes(webdriver)
     pracujpl_click_multi_location_offer(webdriver)
+
+
+def confirm_privacy_policy_changes(webdriver):
+    """Confirm privacy policy changes on Pracuj.pl."""
+    message = "Zmiany w polityce prywatności"
+    confirm_message = "OK, rozumiem"
+
+    try:
+        popup = webdriver.find_element(By.CSS_SELECTOR, "div[role='dialog']")
+        popup_title = popup.find_element(By.CSS_SELECTOR, "[class*='popup_p']")
+
+        if message in popup_title.text:
+            button = popup.find_element(By.CSS_SELECTOR, "button")
+            if confirm_message in button.text:
+                button.click()
+
+    except Exception as e:
+        print(f"Error confirming privacy policy changes:\n{e}")
 
 
 def pracujpl_click_multi_location_offer(webdriver):
@@ -165,8 +184,12 @@ def pracujpl_click_multi_location_offer(webdriver):
         elements = webdriver.find_elements(By.CSS_SELECTOR, css_selector)
         for element in elements:
             element.click()
+
     except Exception as e:
-        print(f"Error clicking multilocation offers: {e}")
+        intercept_message = "element click intercepted"
+        print(f"Error clicking multilocation offers:\n{e}")
+        if intercept_message in str(e):
+            print("Multilocation click intercepted. Open search link manually and handle new popup on pracuj.pl.")
 
 
 def pracujpl_confirm_cookies(webdriver):
