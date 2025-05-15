@@ -2,6 +2,7 @@
 NOFLUFFJOBS = "https://nofluffjobs.com"
 PRACUJPL = "https://it.pracuj.pl"
 BULLDOGJOB = "https://bulldogjob.pl"
+INHIRE = "https://inhire.io"
 # Selenium required
 THEPROTOCOL = "https://theprotocol.it"
 ROCKETJOBS = "https://rocketjobs.pl"
@@ -23,24 +24,3 @@ search_links = {
     "solidjobs_python-junior-remote": "https://solid.jobs/offers/it;cities=Praca%20zdalna;subcategories=Python;experiences=Junior",
     "inhire_data-ai-python-junior-remote": "https://inhire.io/?experiences=1_2,0_1&locations=39&roles=it,big_data,etl_developer,machine_learning_engineer,data_science,backend_developer&technologies=7",
 }
-
-websites = {
-    "nofluffjobs": NOFLUFFJOBS,
-    "bulldogjob": BULLDOGJOB,
-    "theprotocol": THEPROTOCOL,
-    "rocketjobs": ROCKETJOBS,
-    "justjoin": JUSTJOINIT,
-    "solid": SOLIDJOBS,
-    "pracuj": PRACUJPL,
-}
-
-
-def identify_website(search_link: str) -> str:
-    """
-    Set current website based on search link
-    """
-    # Iterate over the website_map to find the matching website
-    for key, website in websites.items():
-        if key in search_link:
-            return website
-    return "Error: Website not recognized"
