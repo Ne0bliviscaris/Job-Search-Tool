@@ -7,18 +7,18 @@ from modules.updater.sites.SiteFactory import SiteFactory
 from modules.websites import search_links
 
 
-def build_dataframe(records):
-    """Convert list of job records to pandas DataFrame"""
-    records_matrix = [item.to_dict() for sublist in records for item in sublist]
-    return pd.DataFrame(records_matrix)
-
-
 def html_dataframe() -> pd.DataFrame:
     """Return a DataFrame containing all job records from all sites."""
     search_results = search_all_sites()
     all_records_frame = build_dataframe(search_results)
     cleaned_frame = all_records_frame.drop_duplicates()
     return cleaned_frame
+
+
+def build_dataframe(records):
+    """Convert list of job records to pandas DataFrame"""
+    records_matrix = [item.to_dict() for sublist in records for item in sublist]
+    return pd.DataFrame(records_matrix)
 
 
 def search_all_sites() -> list:
@@ -47,4 +47,4 @@ def process_records(link: str):
     file_content = website.load_file(file_name)
 
     records = website.records_list(data=file_content)
-    return [SiteFactory.single_record(website=website, record=record) for record in records] if records else []
+    return [website.__class__(html=record) for record in records] if records else []

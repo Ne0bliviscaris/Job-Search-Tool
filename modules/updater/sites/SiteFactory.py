@@ -36,9 +36,3 @@ class SiteFactory:
     @staticmethod
     def process_records(website: JobSite, html):
         return website.records_list(html)
-
-    @staticmethod
-    def single_record(website, record):
-        """Creates site instance for a single record."""
-        site_class = type(website)
-        return site_class(html=record)
