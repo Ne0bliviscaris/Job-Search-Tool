@@ -11,8 +11,7 @@ def html_dataframe() -> pd.DataFrame:
     """Return a DataFrame containing all job records from all sites."""
     search_results = search_all_sites()
     all_records_frame = build_dataframe(search_results)
-    cleaned_frame = all_records_frame.drop_duplicates()
-    return cleaned_frame
+    return all_records_frame.drop_duplicates()
 
 
 def build_dataframe(records):
