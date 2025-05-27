@@ -40,11 +40,16 @@ def search_site(link: str) -> list:
 
 
 def process_records(link: str):
-    """Process HTML soup into JobRecord objects"""
+    """Process job records from a given link. Returns a list of JobSite instances containing separated job offers."""
     website: JobSite = SiteFactory.identify_website(link)
 
     file_name = set_filename_from_link(link, website.file_extension)
     file_content = website.load_file(file_name)
 
     records = website.records_list(data=file_content)
-    return [website.__class__(html=record) for record in records] if records else []
+    return create_offer_instances(website.__class__, records)
+
+
+def create_offer_instances(site_class, records):
+    """Create JobSite instances from job records"""
+    return [site_class(html=record) for record in records] if records else []
