@@ -94,6 +94,7 @@ class Theprotocol(JobSite):
         if locations_list:
             locations = [location.text for location in locations_list]
             return TAG_SEPARATOR.join(locations)
+
         single_location = self.html.find(attrs=single_loc)
         if single_location:
             location = single_location.text
@@ -102,9 +103,6 @@ class Theprotocol(JobSite):
     @scraping_error_handler
     def remote_status(self):
         """Extract remote status from record."""
-        if not self.location:
-            return process_remote_status(self.location)
-
         remote_container = {"data-test": "text-workModes"}
         remote_status = self.html.find(attrs=remote_container)
         if remote_status:
