@@ -1,5 +1,6 @@
 import re
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from modules.updater.data_processing.helper_functions import (
@@ -173,8 +174,10 @@ def confirm_privacy_policy_changes(webdriver):
             if confirm_message in button.text:
                 button.click()
 
+    except NoSuchElementException:
+        pass
     except Exception as e:
-        print(f"Error confirming privacy policy changes:\n{e}")
+        print(f"Pracuj.pl   ->   Error confirming privacy policy changes:\n{e}")
 
 
 def pracujpl_click_multi_location_offer(webdriver):
