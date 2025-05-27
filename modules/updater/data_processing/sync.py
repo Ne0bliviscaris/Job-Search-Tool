@@ -6,7 +6,7 @@ from modules.database.database import (
     save_records_to_db,
     update_record,
 )
-from modules.updater.data_processing.data_collector import update_html_dataframe
+from modules.updater.data_processing.update_processor import update_html_dataframe
 from modules.updater.log import updater_log
 
 ensure_database_exists()

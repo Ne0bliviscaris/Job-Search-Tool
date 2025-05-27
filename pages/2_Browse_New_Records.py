@@ -1,12 +1,12 @@
 import streamlit as st
 
-import modules.updater.data_processing.data_collector as data_collector
 from modules.dataframe_settings import set_column_config
+from modules.updater.data_processing.update_processor import update_html_dataframe
 
 
 def new_records_frame():
     """Display new records."""
-    new_records = data_collector.update_html_dataframe()
+    new_records = update_html_dataframe()
     if not new_records.empty:
         # Potential tweak: dataframe_settings.column_conversions(new_records)
         column_config = set_column_config()
