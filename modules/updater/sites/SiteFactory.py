@@ -32,7 +32,3 @@ class SiteFactory:
             if url in search_link:
                 return site_class(search_link=search_link)
         return "Error: Website not recognized"
-
-    @staticmethod
-    def process_records(website: JobSite, html):
-        return website.records_list(html)
