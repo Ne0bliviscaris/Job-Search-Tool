@@ -84,8 +84,10 @@ def process_remote_status(status: str) -> str:
         return "Unknown"
 
     status = status.lower()
+    matched_keys = []
+
     for key, keywords in remote_work_dict.items():
         if any(keyword in status for keyword in keywords):
-            return key
+            matched_keys.append(key)
 
-    return "Unknown"
+    return " | ".join(matched_keys) if matched_keys else "Not handled"
