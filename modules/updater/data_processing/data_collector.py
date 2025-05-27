@@ -8,37 +8,26 @@ from modules.websites import search_links
 
 
 def html_dataframe() -> pd.DataFrame:
-    """Return a DataFrame containing all job records from all sites."""
-    search_results = search_all_sites()
-    all_records_frame = build_dataframe(search_results)
+    """Return a DataFrame containing all update records from all links."""
+    job_records = process_all_links()
+    all_records_frame = build_dataframe(job_records)
     return all_records_frame.drop_duplicates()
 
 
-def build_dataframe(records):
-    """Convert list of job records to pandas DataFrame"""
-    records_matrix = [item.to_dict() for sublist in records for item in sublist]
-    return pd.DataFrame(records_matrix)
+def process_all_links():
+    """Yields JobSite instances containing separated job offers.
+    Raises FileNotFoundError if update file is not found."""
+    for link in search_links.values():
+        try:
+            yield process_website(link)
+        except FileNotFoundError:
+            print(f"Update file not found. Run updater to process link: {link}.")
+            if "st" in globals():
+                st.toast(f"**Update file not found. Run updater to process link:**\n{link}", icon="⚠️")
+            continue
 
 
-def search_all_sites() -> list:
-    """Search all websites in search_links"""
-    return [search_site(link) for link in search_links.values()]
-
-
-def search_site(link: str) -> list:
-    """Get HTML block containing job search results from a file"""
-    try:
-        job_records = process_records(link)
-    except FileNotFoundError:
-        print(f"Run updater to process link: {link}.")
-        job_records = []
-
-        if "st" in globals():
-            st.toast(f"**Run updater to process link:**\n{link}", icon="⚠️")
-    return job_records
-
-
-def process_records(link: str):
+def process_website(link: str):
     """Process job records from a given link. Returns a list of JobSite instances containing separated job offers."""
     website: JobSite = SiteFactory.identify_website(link)
 
@@ -52,3 +41,9 @@ def process_records(link: str):
 def create_offer_instances(site_class, records):
     """Create JobSite instances from job records"""
     return [site_class(html=record) for record in records] if records else []
+
+
+def build_dataframe(records):
+    """Convert list of job records to pandas DataFrame"""
+    records_matrix = [item.to_dict() for sublist in records for item in sublist]
+    return pd.DataFrame(records_matrix)
