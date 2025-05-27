@@ -6,7 +6,7 @@ from modules.database.database import (
     save_records_to_db,
     update_record,
 )
-from modules.updater.data_processing.data_collector import html_dataframe
+from modules.updater.data_processing.data_collector import update_html_dataframe
 from modules.updater.log import updater_log
 
 ensure_database_exists()
@@ -26,7 +26,7 @@ def sync_records():
     Main function to oversee the synchronisation process
     Extract records from raw, add additional information and return processed data into a new file
     """
-    update = html_dataframe()
+    update = update_html_dataframe()
     db = load_records_from_db()
     missing_records, new_records = find_record_changes(update, db)
     archive_records(missing_records)

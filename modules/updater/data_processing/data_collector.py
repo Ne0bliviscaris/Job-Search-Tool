@@ -7,7 +7,7 @@ from modules.updater.sites.SiteFactory import SiteFactory
 from modules.websites import search_links
 
 
-def html_dataframe() -> pd.DataFrame:
+def update_html_dataframe() -> pd.DataFrame:
     """Return a DataFrame containing all update records from all links."""
     job_records = process_all_links()
     all_records_frame = build_dataframe(job_records)
