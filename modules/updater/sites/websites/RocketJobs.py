@@ -1,4 +1,4 @@
-from selenium.webdriver.common.by import By
+import httpx
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -33,7 +33,7 @@ class RocketJobs(JobSite):
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return '[data-test-id="virtuoso-item-list"]'
+        return {"id": "up-offers-list"}
 
     @staticmethod
     def records_list(data) -> list:
@@ -102,8 +102,7 @@ class RocketJobs(JobSite):
     @scraping_error_handler
     def remote_status(self):
         """Extract remote status from job record."""
-        location_icon = {"style": "display:block"}
-        location = self.html.find("div", location_icon)
+        location = self.html.find("div", {"style": "display:block"})
         if location:
             parent_div = location.find_parent("div")
             if parent_div:
@@ -143,14 +142,17 @@ class RocketJobs(JobSite):
             print(f"Error processing data from record: {self.website} -> Salary range")
             return None, None, salary_details, salary_text
 
-    def scrape(self, webdriver):
-        """Scrape given link using Selenium."""
-        webdriver.get(self.search_link)
-        try:
-            search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
-            return search_block.get_attribute("outerHTML")
-        except:
+    def scrape(self, webdriver=None):
+        """Scrape given link using HTTPX."""
+        response = httpx.get(self.search_link, follow_redirects=True)
+        html = response.text
+        from bs4 import BeautifulSoup
+
+        soup = BeautifulSoup(html, "html.parser")
+        search_block = soup.find(attrs=self.search_container())
+        if not search_block:
             return no_offers_found(self.website, self.search_link)
+        return str(search_block)
 
 
 def stop_scraping(webdriver):
