@@ -33,8 +33,8 @@ def process_website(link: str):
 
     file_name = set_filename_from_link(link, website.file_extension)
     file_content = website.load_file(file_name)
-
     records = website.records_list(data=file_content)
+    print(f"Processing: {file_name}. Found {len(records)} records.")
     return create_offer_instances(website.__class__, records)
 
 
