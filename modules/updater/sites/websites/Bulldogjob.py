@@ -1,4 +1,4 @@
-import requests
+import httpx
 from bs4 import BeautifulSoup
 
 from modules.updater.data_processing.helper_functions import (
@@ -34,7 +34,7 @@ class Bulldogjob(JobSite):
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return "div#__next"
+        ...
 
     @staticmethod
     def records_list(data) -> list:
@@ -150,13 +150,13 @@ class Bulldogjob(JobSite):
 
         return None, None, None, None
 
-    def scrape(self, webdriver=None) -> str:
+    def scrape(self) -> str:
         """Scrape given link using Selenium."""
-        response = requests.get(self.search_link)
+        response = httpx.get(self.search_link)
         soup = BeautifulSoup(response.text, "html.parser")
         if stop_scrape(soup):
             return no_offers_found(self.website, self.search_link)
-        search_block = soup.select_one(self.search_container())
+        search_block = soup.find("div", id="__next")
         return search_block if search_block else ""
 
 

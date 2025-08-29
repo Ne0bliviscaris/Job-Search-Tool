@@ -8,7 +8,6 @@ from modules.updater.data_processing.helper_functions import (
     extract_salary_details,
     get_salary_range,
     process_remote_status,
-    remove_remote_status,
     salary_cleanup,
     split_salary,
 )

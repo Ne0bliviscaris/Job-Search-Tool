@@ -1,4 +1,5 @@
-from selenium.webdriver.common.by import By
+import httpx
+from bs4 import BeautifulSoup
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -33,7 +34,7 @@ class NoFluffJobs(JobSite):
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return '[class="list-container"]'
+        ...
 
     @staticmethod
     def records_list(data) -> list:
@@ -130,22 +131,21 @@ class NoFluffJobs(JobSite):
             print(f"Error processing data from record: {self.website} -> Salary range")
             return None, None, salary_details, salary_text
 
-    def scrape(self, webdriver):
+    def scrape(self):
         """Scrape given link using Selenium."""
-        webdriver.get(self.search_link)
+        request = httpx.get(self.search_link)
+        soup = BeautifulSoup(request.text, "html.parser")
 
-        if stop_scraping(webdriver):
+        if stop_scraping(soup):
             return no_offers_found(self.website, self.search_link)
 
-        search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
-        return search_block.get_attribute("outerHTML")
+        return request.text
 
 
-def nofluffjobs_no_search_results(webdriver):
+def nofluffjobs_no_search_results(soup):
     """Check if results exist on No Fluff Jobs."""
-    empty_search = "nfj-no-offers-found-header"
     try:
-        no_offers_block = webdriver.find_element(By.CSS_SELECTOR, empty_search)
+        no_offers_block = soup.find("nfj-no-offers-found-header")
         if no_offers_block:
             return True
     except:

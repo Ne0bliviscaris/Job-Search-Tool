@@ -1,4 +1,5 @@
 import httpx
+from bs4 import BeautifulSoup
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -33,7 +34,7 @@ class RocketJobs(JobSite):
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return {"id": "up-offers-list"}
+        ...
 
     @staticmethod
     def records_list(data) -> list:
@@ -142,17 +143,10 @@ class RocketJobs(JobSite):
             print(f"Error processing data from record: {self.website} -> Salary range")
             return None, None, salary_details, salary_text
 
-    def scrape(self, webdriver=None):
+    def scrape(self):
         """Scrape given link using HTTPX."""
         response = httpx.get(self.search_link, follow_redirects=True)
-        html = response.text
-        from bs4 import BeautifulSoup
-
-        soup = BeautifulSoup(html, "html.parser")
-        search_block = soup.find(attrs=self.search_container())
-        if not search_block:
-            return no_offers_found(self.website, self.search_link)
-        return str(search_block)
+        return response.text
 
 
 def stop_scraping(webdriver):

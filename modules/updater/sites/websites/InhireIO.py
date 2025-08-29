@@ -1,6 +1,6 @@
 from urllib.parse import parse_qs, urlparse
 
-import requests
+import httpx
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -12,11 +12,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.data_processing.site_files import (
-    load_json,
-    save_json,
-    set_filename_from_link,
-)
+from modules.updater.data_processing.site_files import load_json, save_json
 from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
@@ -44,8 +40,7 @@ class InhireIO(JobSite):
 
     def load_file(self, filename):
         """Load records from a file."""
-        data = load_json(filename)
-        return data
+        return load_json(filename)
 
     def website(self) -> str:
         """Returns site name."""
@@ -117,7 +112,7 @@ class InhireIO(JobSite):
     def salary_container(self):
         """Extract salary container from record."""
         if self.html["undisclosed_salary"]:
-            return None
+            return "Undisclosed"
         default_salary = self.html["salary"]["permanent"]
         salary = self.html["salary"]
         if salary:
@@ -148,7 +143,7 @@ class InhireIO(JobSite):
             print(f"Error processing data from record: {self.website} -> Salary range - data: {salary_text}")
             return None, None, salary_details, salary_text
 
-    def scrape(self, webdriver=None):
+    def scrape(self):  # -> list | Literal['']:
         """Scrape using API request."""
         all_offers = []
         page = 1
@@ -170,7 +165,7 @@ class InhireIO(JobSite):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
-        response = requests.post(base_url, json=payload, headers=headers)
+        response = httpx.post(base_url, json=payload, headers=headers)
         if response.status_code == 200:
             return response.json()["response"]
         return []

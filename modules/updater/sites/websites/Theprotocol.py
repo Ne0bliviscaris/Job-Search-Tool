@@ -1,5 +1,4 @@
 import httpx
-from bs4 import BeautifulSoup
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -34,7 +33,7 @@ class Theprotocol(JobSite):
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return {"data-test": "offersList"}
+        ...
 
     @staticmethod
     def records_list(data) -> list:
@@ -140,7 +139,7 @@ class Theprotocol(JobSite):
 
         return None, None, None, None
 
-    def scrape(self, webdriver):
+    def scrape(self):
         """Scrape given link using Selenium."""
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -148,23 +147,14 @@ class Theprotocol(JobSite):
             "Accept-Language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
         }
         response = httpx.get(self.search_link, headers=headers)
-        soup = BeautifulSoup(response.text, "html.parser")
-        backdrop = soup.find("div", {"data-test": "backdrop"})
-        if backdrop:
-            backdrop.parent.decompose()
-        for script in soup.find_all("script"):
-            script.decompose()
-        search_block = soup.find(attrs=self.search_container())
-        if stop_scraping(soup) or not search_block:
+
+        if stop_scraping(response.text):
             return no_offers_found(self.website, self.search_link)
-        return str(search_block)
+
+        return response.text
 
 
-def stop_scraping(soup):
+def stop_scraping(html):
     """Returns stop condition for scraping."""
-    try:
-        no_offers_element = soup.find(attrs={"data-test": "text-emptyList"})
-        if no_offers_element:
-            return True
-    except:
-        return False
+    if 'data-test="text-emptyList"' in str(html):
+        return True

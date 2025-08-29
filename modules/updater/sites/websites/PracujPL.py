@@ -1,7 +1,5 @@
-import re
-
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.by import By
+import httpx
+from bs4 import BeautifulSoup
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -36,7 +34,7 @@ class PracujPL(JobSite):
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return '[data-test="section-offers"]'
+        ...
 
     @staticmethod
     def records_list(data) -> list:
@@ -95,11 +93,8 @@ class PracujPL(JobSite):
         if not loc:
             return None
 
-        if not multiloc_offer(loc):
-            location = loc.text
-            return remove_remote_status(location)
-        else:
-            return handle_multiloc(self.html)
+        location = loc.text
+        return remove_remote_status(location)
 
     @scraping_error_handler
     def remote_status(self):
@@ -142,82 +137,10 @@ class PracujPL(JobSite):
 
         return None, None, None, None
 
-    def scrape(self, webdriver):
+    def scrape(self):
         """Scrape given link using Selenium."""
-        webdriver.get(self.search_link)
-        try:
-            search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
-            perform_additional_action(webdriver)
-            return search_block.get_attribute("outerHTML")
-        except:
-            return no_offers_found(self.website, self.search_link)
+        request = httpx.get(self.search_link)
 
-
-def perform_additional_action(webdriver):
-    """Performs additional actions needed for scraping the website."""
-    pracujpl_confirm_cookies(webdriver)
-    confirm_privacy_policy_changes(webdriver)
-    pracujpl_click_multi_location_offer(webdriver)
-
-
-def confirm_privacy_policy_changes(webdriver):
-    """Confirm privacy policy changes on Pracuj.pl."""
-    message = "Zmiany w polityce prywatności"
-    confirm_message = "OK, rozumiem"
-
-    try:
-        popup = webdriver.find_element(By.CSS_SELECTOR, "div[role='dialog']")
-        popup_title = popup.find_element(By.CSS_SELECTOR, "[class*='popup_p']")
-
-        if message in popup_title.text:
-            button = popup.find_element(By.CSS_SELECTOR, "button")
-            if confirm_message in button.text:
-                button.click()
-
-    except NoSuchElementException:
-        pass
-    except Exception as e:
-        print(f"Pracuj.pl   ->   Error confirming privacy policy changes:\n{e}")
-
-
-def pracujpl_click_multi_location_offer(webdriver):
-    """Open all multilocation records to get offer link."""
-    css_selector = '[data-test-location="multiple"]'
-    try:
-        elements = webdriver.find_elements(By.CSS_SELECTOR, css_selector)
-        for element in elements:
-            element.click()
-
-    except Exception as e:
-        intercept_message = "element click intercepted"
-        print(f"Error clicking multilocation offers:\n{e}")
-        if intercept_message in str(e):
-            print("Multilocation click intercepted. Open search link manually and handle new popup on pracuj.pl.")
-
-
-def pracujpl_confirm_cookies(webdriver):
-    """Confirm cookies on Pracuj.pl."""
-    css_selector = '[data-test="button-submitCookie"]'
-    try:
-        element = webdriver.find_element(By.CSS_SELECTOR, css_selector)
-        element.click()
-    except Exception as e:
-        pass
-
-
-def multiloc_offer(loc):
-    """Check if the job listing is a multilocation offer."""
-    multiloc_pattern = r"[0-9]+ lokalizacj"
-    multiloc_match = re.findall(multiloc_pattern, loc.text)
-    if multiloc_match:
-        return True
-    return False
-
-
-def handle_multiloc(html):
-    """Handle multilocation records."""
-    wybierz_lokalizacje = html.find("p", text="Wybierz lokalizację")
-    loc_selector = wybierz_lokalizacje.parent
-    multi_loc = loc_selector.find_all("a", {"data-test": "link-offer"})
-    locations = [location.text for location in multi_loc]
-    return TAG_SEPARATOR.join(locations)
+        soup = BeautifulSoup(request.text, "html.parser")
+        search_block = soup.find("div", {"data-test": "section-offers"})
+        return str(search_block) if search_block else no_offers_found(self.website, self.search_link)
