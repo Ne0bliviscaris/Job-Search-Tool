@@ -9,6 +9,7 @@ remote_work_dict = {
         ", Fully remote",
         "fully remote",
         "remote within poland",
+        "W całości",
     ],
     "Hybrid": ["hybrid", "hybrydowa", "remote hybrid", "hybryd"],
     "Stationary": ["stationary", "stacjonarna", "full office", "on-site", "office"],
