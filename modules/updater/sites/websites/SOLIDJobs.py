@@ -1,4 +1,6 @@
-from selenium.webdriver.common.by import By
+import urllib.parse
+
+import httpx
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -10,7 +12,7 @@ from modules.updater.data_processing.helper_functions import (
     salary_cleanup,
     split_salary,
 )
-from modules.updater.data_processing.site_files import load_html_as_soup, save_html
+from modules.updater.data_processing.site_files import load_json, save_json
 from modules.updater.error_handler import no_offers_found, scraping_error_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
@@ -20,27 +22,27 @@ class Solidjobs(JobSite):
 
     @staticmethod
     def file_extension():
-        return "html"
+        return "json"
 
     def save_file(self, filename, html):
         """Save HTML content to a file."""
-        save_html(filename, html)
+        save_json(filename, html)
 
     def load_file(self, filename):
         """Load HTML content from a file."""
-        return load_html_as_soup(filename)
+        return load_json(filename)
 
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return '[class="scrollable-content"]'
+        ...
 
     @staticmethod
     def records_list(data) -> list:
         """Extracts job records from HTML."""
-        block_name = "sj-offer-list-item"  # <sj-offer-list-item> block
-        records = data.find_all(block_name)
-        return [record for record in records]
+        if not data:
+            return []
+        return data
 
     def website(self) -> str:
         """Returns site name as link."""
@@ -49,60 +51,51 @@ class Solidjobs(JobSite):
     @scraping_error_handler
     def url(self) -> str:
         """Extracts URL from job record."""
-        relative_link = self.html.a.get("href")
-        return f"https://{self.website}{relative_link}" if relative_link else None
+        return f"https://{self.website}/offer/{self.html['id']}/{self.html['jobOfferUrl']}"
 
     @scraping_error_handler
     def job_title(self) -> str:
         """Extracts job title."""
-        title = self.html.h2
-        return title.text.strip()
+        return self.html["jobTitle"]
 
     @scraping_error_handler
     def tags(self):
         """Extracts job tags from record."""
-        tags_block = self.html.find_all("solidjobs-skill-display")
-        if tags_block:
-            tags_list = [tag.text.replace("#", "") for tag in tags_block]
-            if tags_list:
-                return TAG_SEPARATOR.join(tags_list)
+        skills = self.html.get("requiredSkills", [])
+        tags_list = [skill.get("name") for skill in skills if skill.get("name")]
+        return TAG_SEPARATOR.join(tags_list)
 
     @scraping_error_handler
     def company(self):
         """Extract company name from record."""
-        company = self.html.find("a", {"mattooltip": "Kliknij, aby zobaczy pozostałe oferty firmy."})
-        return company.text if company else None
+        return self.html["companyName"]
 
     @scraping_error_handler
     def logo(self):
         """Extract company logo from record."""
-        logo = self.html.img
-        return logo.get("src") if logo else None
+        return self.html.get("companyLogoUrl")
 
     @scraping_error_handler
     def location(self):
         """Extract location from job record."""
-        location_container = self.html.find("div", class_="flex-row")
-        if location_container:
-            location_span = location_container.find_all("span")[1]
-            if location_span:
-                location = location_span.text.replace("100% zdalnie ", "").replace("(", "").replace(")", "").strip()
-                return remove_remote_status(location)
+        return self.html.get("companyCity")
 
     @scraping_error_handler
     def remote_status(self):
         """Extract remote status from job record."""
-        location = self.html.find_all("span", {"mattooltip": True})
-        if location:
-            remote_status = location[-1]
-            status = remote_status.text.strip()
-            return process_remote_status(status)
+        status = self.html.get("remotePossible")
+        return process_remote_status(status)
 
     @scraping_error_handler
     def salary_container(self):
         """Extract salary container from record."""
-        salary_container = self.html.find("sj-salary-display")
-        return salary_container.text.strip() if salary_container else None
+        salary = self.html.get("salaryRange", {})
+        if not salary:
+            return None
+        lower = int(salary.get("lowerBound"))
+        upper = int(salary.get("upperBound"))
+        currency = salary.get("currency", "PLN")
+        return f"{lower} - {upper} {currency}"
 
     def fetch_salary_range(self) -> tuple[int, int, str, str]:
         """Fetch salary range and details from job listing."""
@@ -121,31 +114,62 @@ class Solidjobs(JobSite):
             print(f"Error processing data from record: {self.website()} -> Salary range")
             return None, None, salary_details, salary_text
 
-    def scrape(self, webdriver):
+    def scrape(self, webdriver=None):
         """Scrape given link using Selenium."""
-        webdriver.get(self.search_link)
-
-        if stop_scraping(webdriver):
+        all_offers = self._fetch_offers_json()
+        if not all_offers or len(all_offers) == 0:
             return no_offers_found(self.website, self.search_link)
 
-        search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
-        return search_block.get_attribute("outerHTML")
+        params = self._parse_url_params(self.search_link)
+        filtered_offers = self._filter_offers(all_offers, params)
 
+        return filtered_offers
 
-def stop_scraping(webdriver):
-    """Returns stop condition for scraping."""
-    try:
-        if no_search_block(webdriver):
-            return True
-    except:
-        return False
+    def _parse_url_params(self, url):
+        """Parse filter parameters from URL."""
+        params = {}
+        parts = url.split(";")
+        for part in parts:
+            if "=" in part:
+                key, value = part.split("=", 1)
+                decoded_value = urllib.parse.unquote(value)
+                if key == "cities" and "Trójmiasto" in decoded_value:
+                    decoded_value = decoded_value.replace("Trójmiasto", "Gdańsk,Gdynia,Sopot")
+                params[key] = decoded_value
+        return params
 
+    def _filter_offers(self, offers, params):
+        """Filter job offers by URL parameters."""
+        filtered = []
+        for offer in offers:
+            if "cities" in params:
+                city_list = params["cities"].split(",")
+                remote_values = ["W całości", "Możliwa w całości"]
+                is_remote = offer.get("remotePossible") in remote_values
+                city = offer.get("companyCity") in city_list
+                is_fully_remote = "Praca zdalna" in city_list and is_remote
+                if not (is_fully_remote or city):
+                    continue
+            if "categories" in params and offer.get("mainCategory") != params["categories"]:
+                continue
+            if "subcategories" in params and offer.get("subCategory") != params["subcategories"]:
+                continue
+            if "experiences" in params:
+                exp_list = params["experiences"].split(",")
+                if offer.get("experienceLevel") not in exp_list:
+                    continue
+            if "minimumSalary" in params:
+                salary = offer.get("salaryRange", {})
+                if salary and salary.get("upperBound", 0) < float(params["minimumSalary"]):
+                    continue
+            filtered.append(offer)
+        return filtered
 
-def no_search_block(webdriver):
-    """Check if search block exists on page."""
-    search_block = Solidjobs.search_container()
-    try:
-        webdriver.find_element(By.CSS_SELECTOR, search_block)
-        return False
-    except:
-        return True
+    def _fetch_offers_json(self):
+        """Fetch job offers from Solidjobs API as JSON."""
+        url = "https://solid.jobs/api/offers?division=it&sortOrder=default"
+        headers = {
+            "Accept": "application/vnd.solidjobs.jobofferlist+json, application/json, text/plain, */*",
+        }
+        response = httpx.get(url, headers=headers)
+        return response.json()
