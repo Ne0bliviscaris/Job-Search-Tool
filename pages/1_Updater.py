@@ -1,17 +1,24 @@
+import asyncio
+import time
+
 import streamlit as st
 
 from modules.updater.updater import update_all_sites
 from modules.websites import search_links
 
 
-def update_sites_with_progress_bar():
+async def update_sites_with_progress_bar():
     """Display progress bar while updating sites."""
     progress_bar, status_box = handle_update_progress()
     progress = 0
-    # Process each site using the core function that yields link_name
-    for link_name in update_all_sites():
+
+    start = time.time()
+    async for link_name in update_all_sites():
         progress += 1
         update_status(progress_bar, status_box, progress, link_name)
+
+    end = time.time()
+    st.toast(f"**Update completed in {end - start:.2f} seconds!**", icon="✅")
     st.success("All sites updated!")
 
 
@@ -36,4 +43,4 @@ st.write("Please wait until the process is finished.")
 
 if st.button("Update All Sites"):
     with st.spinner("Updating..."):  # Display a spinner while updating
-        update_sites_with_progress_bar()
+        asyncio.run(update_sites_with_progress_bar())
