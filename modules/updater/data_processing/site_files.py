@@ -22,7 +22,7 @@ def load_json(filename) -> dict:
 
 def save_json(filename, data) -> None:
     with open(filename, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 def save_html(filename, data) -> None:
