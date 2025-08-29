@@ -10,15 +10,20 @@ from modules.updater.data_processing.update_processor import update_html_datafra
 from modules.updater.log import updater_log
 
 ensure_database_exists()
-COLUMNS_TO_COMPARE = [
-    "title",
-    "company_name",
-    "website",
-    "remote_status",
-    "salary_details",
-    "tags",
-    "location",
-]
+# COLUMNS_TO_COMPARE = [
+#     "title",
+#     "company_name",
+#     "website",
+#     "remote_status",
+#     "salary_details",
+#     "tags",
+#     "location",
+# ]
+
+# NOWY SYSTEM PORÓWNAWANIA
+# URL + Nazwa firmy - rzeczy niezmienne
+# Jeśli inne kolumny się zmieniły - rekord jest aktualizowany
+COLUMNS_TO_COMPARE = ["company_name", "url"]
 
 
 def sync_records():
