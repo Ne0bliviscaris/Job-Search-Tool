@@ -2,6 +2,9 @@
 modules/database/database.db
 modules/database/db backup/*.db
 
+# Scraped files
+modules/updater/sites/HTML/*
+
 # Test file
 test.ipynb
 test.py
