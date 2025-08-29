@@ -1,5 +1,5 @@
+import httpx
 from bs4 import BeautifulSoup
-from selenium.webdriver.common.by import By
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -34,7 +34,7 @@ class Theprotocol(JobSite):
     @staticmethod
     def search_container() -> str:
         """Returns CSS selector for the container with job listings."""
-        return '[data-test="offersList"]'
+        return {"data-test": "offersList"}
 
     @staticmethod
     def records_list(data) -> list:
@@ -142,20 +142,27 @@ class Theprotocol(JobSite):
 
     def scrape(self, webdriver):
         """Scrape given link using Selenium."""
-        webdriver.get(self.search_link)
-
-        if stop_scraping(webdriver):
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
+        }
+        response = httpx.get(self.search_link, headers=headers)
+        soup = BeautifulSoup(response.text, "html.parser")
+        backdrop = soup.find("div", {"data-test": "backdrop"})
+        if backdrop:
+            backdrop.parent.decompose()
+        for script in soup.find_all("script"):
+            script.decompose()
+        search_block = soup.find(attrs=self.search_container())
+        if stop_scraping(soup) or not search_block:
             return no_offers_found(self.website, self.search_link)
-
-        search_block = webdriver.find_element(By.CSS_SELECTOR, self.search_container())
-        return search_block.get_attribute("outerHTML")
+        return str(search_block)
 
 
-def stop_scraping(webdriver):
+def stop_scraping(soup):
     """Returns stop condition for scraping."""
     try:
-
-        soup = BeautifulSoup(webdriver.page_source, "html.parser")
         no_offers_element = soup.find(attrs={"data-test": "text-emptyList"})
         if no_offers_element:
             return True
