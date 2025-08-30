@@ -147,17 +147,3 @@ class RocketJobs(JobSite):
         """Scrape given link using HTTPX."""
         response = httpx.get(self.search_link, follow_redirects=True)
         return response.text
-
-
-def stop_scraping(webdriver):
-    """Check if search returned no results."""
-    from bs4 import BeautifulSoup
-
-    soup = BeautifulSoup(webdriver.page_source, "html.parser")
-    try:
-        empty_search = "Nie znaleźliśmy ofert pracy dla podanych kryteriów"
-        empty_search_container = soup.find(text=lambda text: empty_search in text)
-        if empty_search_container:
-            return True
-    except:
-        return False

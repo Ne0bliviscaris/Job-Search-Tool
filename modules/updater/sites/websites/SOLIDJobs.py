@@ -113,7 +113,7 @@ class Solidjobs(JobSite):
             print(f"Error processing data from record: {self.website()} -> Salary range")
             return None, None, salary_details, salary_text
 
-    def scrape(self, webdriver=None):
+    def scrape(self):
         """Scrape given link using Selenium."""
         all_offers = self._fetch_offers_json()
         if not all_offers or len(all_offers) == 0:

@@ -84,8 +84,8 @@ class JobSite(ABC):
         pass
 
     @abstractmethod
-    def scrape(self, webdriver) -> str:
-        """Scrape the website using the provided webdriver."""
+    def scrape(self) -> str:
+        """Scrape the website using httpx."""
         pass
 
     def to_dict(self):
