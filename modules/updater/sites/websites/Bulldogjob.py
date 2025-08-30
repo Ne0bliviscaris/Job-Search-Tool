@@ -121,7 +121,6 @@ class Bulldogjob(JobSite):
 
             if len(spans) > 1:
                 location_texts = [span.text.strip() for span in spans]
-                print(location_texts)
                 locations = " | ".join(location_texts)
                 return remove_remote_status(locations)
         return None
