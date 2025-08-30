@@ -13,11 +13,9 @@ class SiteFactory:
     """A factory class for creating site instances."""
 
     site_classes = {
-        # Requests.get viable
         "https://nofluffjobs.com": NoFluffJobs,
         "https://bulldogjob.pl": Bulldogjob,
         "https://inhire.io": InhireIO,
-        # Selenium required
         "https://it.pracuj.pl": PracujPL,
         "https://theprotocol.it": Theprotocol,
         "https://rocketjobs.pl": RocketJobs,
