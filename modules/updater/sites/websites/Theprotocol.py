@@ -11,7 +11,7 @@ from modules.updater.data_processing.helper_functions import (
     split_salary,
 )
 from modules.updater.data_processing.site_files import load_html_as_soup, save_html
-from modules.updater.error_handler import no_offers_found, scraping_error_handler
+from modules.updater.error_handler import missing_container_handler, no_offers_found
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -49,19 +49,19 @@ class Theprotocol(JobSite):
         """Returns site name as link."""
         return "Theprotocol.it"
 
-    @scraping_error_handler
+    @missing_container_handler
     def url(self) -> str:
         """Extracts URL from job record."""
         relative_url = self.html.get("href")
         return f"https://theprotocol.it{relative_url}"
 
-    @scraping_error_handler
+    @missing_container_handler
     def job_title(self) -> str:
         """Extracts job title."""
         container = {"data-test": "text-jobTitle"}
         return self.html.find(attrs=container).text.strip()
 
-    @scraping_error_handler
+    @missing_container_handler
     def tags(self):
         """Extracts job tags from record."""
         tags_container = {"data-test": "chip-expectedTechnology"}
@@ -69,13 +69,13 @@ class Theprotocol(JobSite):
         tags_list = [tag.text for tag in tags]
         return TAG_SEPARATOR.join(tags_list)
 
-    @scraping_error_handler
+    @missing_container_handler
     def company(self):
         """Extract company name from record."""
         company_container = {"data-test": "text-employerName"}
         return self.html.find(attrs=company_container).text.strip()
 
-    @scraping_error_handler
+    @missing_container_handler
     def logo(self):
         """Extract company logo from record."""
         logo_container = {"data-test": "icon-companyLogo"}
@@ -83,7 +83,7 @@ class Theprotocol(JobSite):
         if logo:
             return logo.get("src")
 
-    @scraping_error_handler
+    @missing_container_handler
     def location(self):
         """Extract location from record."""
         single_loc = {"data-test": "text-workplaces"}
@@ -99,7 +99,7 @@ class Theprotocol(JobSite):
             location = single_location.text
             return remove_remote_status(location)
 
-    @scraping_error_handler
+    @missing_container_handler
     def remote_status(self):
         """Extract remote status from record."""
         remote_container = {"data-test": "text-workModes"}
@@ -108,7 +108,7 @@ class Theprotocol(JobSite):
             status = remote_status.text.lower()
         return process_remote_status(status)
 
-    @scraping_error_handler
+    @missing_container_handler
     def salary_container(self):
         """Extract salary container from record."""
         salary_container = {"data-test": "text-salary"}

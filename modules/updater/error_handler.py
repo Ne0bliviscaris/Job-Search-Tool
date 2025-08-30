@@ -28,8 +28,9 @@ def fancy_error_handler(func):
     return wrapper
 
 
-def scraping_error_handler(func):
-    """Decorator for scraping methods that handles errors gracefully."""
+def missing_container_handler(func):
+    """Decorator for scraping methods that handles errors gracefully. \\
+    If an error occurs, it **prints a message** and returns **None**."""
 
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):

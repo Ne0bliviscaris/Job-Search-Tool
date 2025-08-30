@@ -1,5 +1,5 @@
 from modules.updater.data_processing.helper_functions import process_remote_status
-from modules.updater.error_handler import scraping_error_handler
+from modules.updater.error_handler import missing_container_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR
 from modules.updater.sites.websites.RocketJobs import RocketJobs
 
@@ -12,7 +12,7 @@ class JustJoinIT(RocketJobs):
         """Returns site name as link."""
         return "JustJoin.it"
 
-    @scraping_error_handler
+    @missing_container_handler
     def remote_status(self):
         """Extract remote status from job record."""
         remote_icon = self.html.find("svg", {"data-testid": "ShareLocationRoundedIcon"})
@@ -21,7 +21,7 @@ class JustJoinIT(RocketJobs):
             return process_remote_status(status)
         return process_remote_status(False)
 
-    @scraping_error_handler
+    @missing_container_handler
     def salary_container(self):
         """Extract salary container from record."""
         salary_block = self.html.h6
@@ -29,7 +29,7 @@ class JustJoinIT(RocketJobs):
             salary = salary_block.text
             return salary
 
-    @scraping_error_handler
+    @missing_container_handler
     def tags(self):
         """Extracts job tags from record."""
         # Starting from company SVG icon

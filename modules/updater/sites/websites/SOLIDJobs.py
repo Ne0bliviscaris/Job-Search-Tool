@@ -12,7 +12,7 @@ from modules.updater.data_processing.helper_functions import (
     split_salary,
 )
 from modules.updater.data_processing.site_files import load_json, save_json
-from modules.updater.error_handler import no_offers_found, scraping_error_handler
+from modules.updater.error_handler import missing_container_handler, no_offers_found
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -47,45 +47,45 @@ class Solidjobs(JobSite):
         """Returns site name as link."""
         return "solid.jobs"
 
-    @scraping_error_handler
+    @missing_container_handler
     def url(self) -> str:
         """Extracts URL from job record."""
         return f"https://{self.website}/offer/{self.html['id']}/{self.html['jobOfferUrl']}"
 
-    @scraping_error_handler
+    @missing_container_handler
     def job_title(self) -> str:
         """Extracts job title."""
         return self.html["jobTitle"]
 
-    @scraping_error_handler
+    @missing_container_handler
     def tags(self):
         """Extracts job tags from record."""
         skills = self.html.get("requiredSkills", [])
         tags_list = [skill.get("name") for skill in skills if skill.get("name")]
         return TAG_SEPARATOR.join(tags_list)
 
-    @scraping_error_handler
+    @missing_container_handler
     def company(self):
         """Extract company name from record."""
         return self.html["companyName"]
 
-    @scraping_error_handler
+    @missing_container_handler
     def logo(self):
         """Extract company logo from record."""
         return self.html.get("companyLogoUrl")
 
-    @scraping_error_handler
+    @missing_container_handler
     def location(self):
         """Extract location from job record."""
         return self.html.get("companyCity")
 
-    @scraping_error_handler
+    @missing_container_handler
     def remote_status(self):
         """Extract remote status from job record."""
         status = self.html.get("remotePossible")
         return process_remote_status(status)
 
-    @scraping_error_handler
+    @missing_container_handler
     def salary_container(self):
         """Extract salary container from record."""
         salary = self.html.get("salaryRange", {})

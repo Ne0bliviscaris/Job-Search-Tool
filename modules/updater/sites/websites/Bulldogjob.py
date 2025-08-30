@@ -12,7 +12,7 @@ from modules.updater.data_processing.helper_functions import (
     split_salary,
 )
 from modules.updater.data_processing.site_files import load_html_as_soup, save_html
-from modules.updater.error_handler import no_offers_found, scraping_error_handler
+from modules.updater.error_handler import missing_container_handler, no_offers_found
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -52,12 +52,12 @@ class Bulldogjob(JobSite):
         """Returns site name as link."""
         return "Bulldogjob.pl"
 
-    @scraping_error_handler
+    @missing_container_handler
     def url(self) -> str:
         """Extracts URL from job record."""
         return self.html.get("href")
 
-    @scraping_error_handler
+    @missing_container_handler
     def job_title(self) -> str:
         """Extracts job title."""
         block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
@@ -65,7 +65,7 @@ class Bulldogjob(JobSite):
         title_block = self.html.find(attrs=container).h3
         return title_block.text.strip()
 
-    @scraping_error_handler
+    @missing_container_handler
     def tags(self):
         """Extracts job tags from record."""
         name = lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")
@@ -75,7 +75,7 @@ class Bulldogjob(JobSite):
             tags_list = [span.text.strip() for span in tags_block.find_all("span")]
             return TAG_SEPARATOR.join(tags_list)
 
-    @scraping_error_handler
+    @missing_container_handler
     def company(self):
         """Extract company name from record."""
         name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
@@ -85,14 +85,14 @@ class Bulldogjob(JobSite):
         title_container = title_company_block.h3
         return title_container.find_next_sibling("div").text.strip()
 
-    @scraping_error_handler
+    @missing_container_handler
     def logo(self):
         """Extract company logo from record."""
         logo_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__logo")}
         if logo_container:
             return self.html.find(attrs=logo_container).img["src"]
 
-    @scraping_error_handler
+    @missing_container_handler
     def location(self):
         """Extract location from record."""
         name = lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
@@ -106,7 +106,7 @@ class Bulldogjob(JobSite):
             return remove_remote_status(location)
         return None
 
-    @scraping_error_handler
+    @missing_container_handler
     def remote_status(self):
         """Extract remote status from record."""
         container_name = "JobListItem_item__details"
@@ -118,7 +118,7 @@ class Bulldogjob(JobSite):
                 status = first_block.text
         return process_remote_status(status)
 
-    @scraping_error_handler
+    @missing_container_handler
     def salary_container(self):
         """Extract salary container from record."""
         container_name = "JobListItem_item__salary"

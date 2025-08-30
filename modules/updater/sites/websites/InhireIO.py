@@ -13,7 +13,7 @@ from modules.updater.data_processing.helper_functions import (
     split_salary,
 )
 from modules.updater.data_processing.site_files import load_json, save_json
-from modules.updater.error_handler import no_offers_found, scraping_error_handler
+from modules.updater.error_handler import missing_container_handler, no_offers_found
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -46,7 +46,7 @@ class InhireIO(JobSite):
         """Returns site name."""
         return "Inhire.io"
 
-    @scraping_error_handler
+    @missing_container_handler
     def url(self) -> str:
         """Extracts URL from job record."""
         main_url = self.html["offerAdditionalFields"].get("rp_url")
@@ -56,13 +56,13 @@ class InhireIO(JobSite):
             url = self.html["offerAdditionalFields"]["external_offer_url"]
             return f"{url}"
 
-    @scraping_error_handler
+    @missing_container_handler
     def job_title(self) -> str:
         """Extracts job title."""
         title = self.html["process_title"]
         return title or None
 
-    @scraping_error_handler
+    @missing_container_handler
     def tags(self):
         """Extracts job tags from record."""
         tags = self.html["skills"]
@@ -70,26 +70,26 @@ class InhireIO(JobSite):
         if tags_list:
             return TAG_SEPARATOR.join(tags_list)
 
-    @scraping_error_handler
+    @missing_container_handler
     def company(self):
         """Extract company name from record."""
         return self.html["company_name"] or None
 
-    @scraping_error_handler
+    @missing_container_handler
     def logo(self):
         """Extract company logo from record."""
         company_id = self.html["company_id"]
         img_src = f"https://inhire.io/img/companies/logos/{company_id}_logo.png"
         return img_src or None
 
-    @scraping_error_handler
+    @missing_container_handler
     def location(self):
         """Extract location from job record."""
         cities = self.html["cities"]
         location = cities.replace(",", TAG_SEPARATOR)
         return remove_remote_status(location)
 
-    @scraping_error_handler
+    @missing_container_handler
     def remote_status(self):
         """Extract remote status from job record."""
         status = None
@@ -108,7 +108,7 @@ class InhireIO(JobSite):
 
         return process_remote_status(status)
 
-    @scraping_error_handler
+    @missing_container_handler
     def salary_container(self):
         """Extract salary container from record."""
         if self.html["undisclosed_salary"]:

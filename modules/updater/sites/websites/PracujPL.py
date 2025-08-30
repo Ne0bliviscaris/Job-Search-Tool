@@ -12,7 +12,7 @@ from modules.updater.data_processing.helper_functions import (
     split_salary,
 )
 from modules.updater.data_processing.site_files import load_html_as_soup, save_html
-from modules.updater.error_handler import no_offers_found, scraping_error_handler
+from modules.updater.error_handler import missing_container_handler, no_offers_found
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -51,7 +51,7 @@ class PracujPL(JobSite):
         """Returns site name as link."""
         return "Pracuj.pl"
 
-    @scraping_error_handler
+    @missing_container_handler
     def url(self) -> str:
         """Extracts URL from job record."""
         container = {"data-test": "link-offer"}
@@ -59,13 +59,13 @@ class PracujPL(JobSite):
         if url_a:
             return url_a.get("href")
 
-    @scraping_error_handler
+    @missing_container_handler
     def job_title(self) -> str:
         """Extracts job title."""
         container = {"data-test": "offer-title"}
         return self.html.find("h2", container).text.strip()
 
-    @scraping_error_handler
+    @missing_container_handler
     def tags(self):
         """Extracts job tags from record."""
         container = {"data-test": "technologies-item"}
@@ -74,18 +74,18 @@ class PracujPL(JobSite):
         if tags_list:
             return TAG_SEPARATOR.join(tags_list)
 
-    @scraping_error_handler
+    @missing_container_handler
     def company(self):
         """Extract company name from record."""
         return self.html.find("h3", {"data-test": "text-company-name"}).text.strip()
 
-    @scraping_error_handler
+    @missing_container_handler
     def logo(self):
         """Extract company logo from record."""
         logo = self.html.find("img", {"data-test": "image-responsive"})
         return logo["src"] if logo else None
 
-    @scraping_error_handler
+    @missing_container_handler
     def location(self):
         """Extract location from record."""
         loc = self.html.find("h4", {"data-test": "text-region"})
@@ -96,7 +96,7 @@ class PracujPL(JobSite):
         location = loc.text
         return remove_remote_status(location)
 
-    @scraping_error_handler
+    @missing_container_handler
     def remote_status(self):
         """Extract remote status from record."""
         tag_name = "offer-additional-info"
@@ -105,7 +105,7 @@ class PracujPL(JobSite):
         status = additional_info[-1].text
         return process_remote_status(status)
 
-    @scraping_error_handler
+    @missing_container_handler
     def salary_container(self):
         """Extract salary information."""
         salary_container = self.html.find("span", {"data-test": "offer-salary"})
