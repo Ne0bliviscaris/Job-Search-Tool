@@ -1,6 +1,5 @@
 # Automatic update + sync using CLI
 import asyncio
-from time import sleep
 
 from modules.database.backup import backup_db
 from modules.updater.data_processing.sync import sync_records

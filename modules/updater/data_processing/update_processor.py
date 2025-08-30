@@ -23,12 +23,16 @@ def process_all_links():
         except FileNotFoundError:
             print(f"Update file not found. Run updater to process link: {link}.")
             if "st" in globals():
-                st.toast(f"**Update file not found. Run updater to process link:**\n{link}", icon="⚠️")
+                st.toast(
+                    f"**Update file not found. Run updater to process link:**\n{link}",
+                    icon="⚠️",
+                )
             continue
 
 
 def process_website(link: str):
-    """Process job records from a given link. Returns a list of JobSite instances containing separated job offers."""
+    """Process job records from a given link.
+    Returns a list of JobSite instances containing separated job offers."""
     website: JobSite = SiteFactory.identify_website(link)
 
     file_name = set_filename_from_link(link, website.file_extension)

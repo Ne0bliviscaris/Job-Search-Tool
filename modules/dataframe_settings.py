@@ -98,15 +98,19 @@ def column_conversions(frame, archive=False, key=None):
     frame = check_application_status(frame)
     frame = check_feedback_status(frame)
 
-    edited_df = st.data_editor(frame[columns], disabled=archive, column_config=set_column_config(archive), key=key)
+    edited_df = st.data_editor(
+        frame[columns],
+        disabled=archive,
+        column_config=set_column_config(archive),
+        key=key,
+    )
     return edited_df
 
 
 def set_column_config(archive=False):
     """Return column configuration for the data editor."""
-    date_column = lambda name: st.column_config.DateColumn(name, format="DD-MM-YYYY")
     application_statuses = ["Not applied", "Applied", "Interview", "Hired"]
-
+    date_format = "DD-MM-YYYY"
     static_columns = {
         "id": st.column_config.TextColumn("ID", disabled=True),
         "title": st.column_config.TextColumn("Title", disabled=True),
@@ -119,31 +123,57 @@ def set_column_config(archive=False):
         "logo": st.column_config.ImageColumn("Logo", width=100),
         "min_salary": st.column_config.NumberColumn("Min Salary", disabled=True),
         "max_salary": st.column_config.NumberColumn("Max Salary", disabled=True),
-        "elapsed_days": st.column_config.NumberColumn("Elapsed Days", disabled=True, format="%d"),
+        "elapsed_days": st.column_config.NumberColumn(
+            "Elapsed Days", disabled=True, format="%d"
+        ),
         "website": st.column_config.LinkColumn("Website", disabled=True),
-        "added_date": date_column("Added date"),
-        "archived_date": date_column("Archived date"),
+        "added_date": st.column_config.DateColumn(
+            "Added date", format=date_format, disabled=True
+        ),
+        "archived_date": st.column_config.DateColumn(
+            "Archived date", format=date_format, disabled=True
+        ),
     }
 
     conditionally_editable_columns = {
-        "time_until_feedback": st.column_config.NumberColumn("Time Until Feedback", disabled=archive),
+        "time_until_feedback": st.column_config.NumberColumn(
+            "Time Until Feedback", disabled=archive
+        ),
         "url": st.column_config.LinkColumn("URL", width=100, disabled=archive),
     }
     editable_columns = {
         "application_status": st.column_config.SelectboxColumn(
-            "Application Status", options=application_statuses, default="Not applied", disabled=False
+            "Application Status",
+            options=application_statuses,
+            default="Not applied",
+            disabled=False,
         ),
         "notes": st.column_config.TextColumn("Notes", disabled=False),
         "personal_rating": st.column_config.NumberColumn(
-            "Personal Rating", disabled=False, format="%d", min_value=0, max_value=5, step=1
+            "Personal Rating",
+            disabled=False,
+            format="%d",
+            min_value=0,
+            max_value=5,
+            step=1,
         ),
-        "feedback_received": st.column_config.CheckboxColumn("Feedback received", disabled=False),
-        "application_date": date_column("Application date"),
-        "feedback_date": date_column("Feedback date"),
+        "feedback_received": st.column_config.CheckboxColumn(
+            "Feedback received", disabled=False
+        ),
+        "application_date": st.column_config.DateColumn(
+            "Application date", format=date_format
+        ),
+        "feedback_date": st.column_config.DateColumn(
+            "Feedback date", format=date_format
+        ),
     }
 
     # Combine both dictionaries
-    column_config = {**static_columns, **conditionally_editable_columns, **editable_columns}
+    column_config = {
+        **static_columns,
+        **conditionally_editable_columns,
+        **editable_columns,
+    }
     return column_config
 
 
@@ -159,7 +189,9 @@ def fill_missing_values(frame):
     """Fill missing values and convert types."""
     frame["notes"] = frame["notes"].fillna("").astype(str)
     frame["feedback_received"] = frame["feedback_received"].fillna(False).astype(bool)
-    frame["application_status"] = frame["application_status"].fillna("Not applied").astype(str)
+    frame["application_status"] = (
+        frame["application_status"].fillna("Not applied").astype(str)
+    )
     return frame
 
 
@@ -168,7 +200,11 @@ def calculate_elapsed_days(frame, archive=False):
     today = pd.Timestamp.now()
     if not archive:
         frame["elapsed_days"] = frame.apply(
-            lambda row: ((today - row["added_date"]).days if pd.notnull(row["added_date"]) else None),
+            lambda row: (
+                (today - row["added_date"]).days
+                if pd.notnull(row["added_date"])
+                else None
+            ),
             axis=1,
         )
     else:
@@ -201,19 +237,25 @@ def check_application_status(frame):
     """Tick unticked application status if applied."""
     not_applied = frame["application_status"] == "Not applied"
     has_application_date = frame["application_date"].notna()
-    manually_marked = frame["application_status"].isin(["Applied", "Rejected", "Interview", "Hired"])
+    manually_marked = frame["application_status"].isin(
+        ["Applied", "Rejected", "Interview", "Hired"]
+    )
 
     # Update application status only if not manually marked
-    frame.loc[not_applied & has_application_date & ~manually_marked, "application_status"] = "Applied"
+    frame.loc[
+        not_applied & has_application_date & ~manually_marked, "application_status"
+    ] = "Applied"
     return frame
 
 
 def check_feedback_status(frame):
     """Tick unticked feedback status if received."""
-    no_feedback = frame["feedback_received"] == False
+    no_feedback = frame["feedback_received"] is False
     has_feedback_date = frame["feedback_date"].notna()
     manually_marked = frame["feedback_received"].isin([True])
 
     # Update feedback status only if not manually marked
-    frame.loc[no_feedback & has_feedback_date & ~manually_marked, "feedback_received"] = True
+    frame.loc[
+        no_feedback & has_feedback_date & ~manually_marked, "feedback_received"
+    ] = True
     return frame

@@ -43,7 +43,7 @@ class PracujPL(JobSite):
             record_container = {"data-test": "default-offer"}
             records = data.find_all(attrs=record_container)
             return [record for record in records]
-        except:
+        except Exception:
             print("Error detecting records: Pracuj.pl")
             return []
 
@@ -100,8 +100,11 @@ class PracujPL(JobSite):
     def remote_status(self):
         """Extract remote status from record."""
         tag_name = "offer-additional-info"
-        additional_info_containers = lambda tag: tag.has_attr("data-test") and tag["data-test"].startswith(tag_name)
-        additional_info = self.html.find_all(additional_info_containers)
+
+        def additional_info_container(tag):
+            return tag.has_attr("data-test") and tag["data-test"].startswith(tag_name)
+
+        additional_info = self.html.find_all(additional_info_container)
         status = additional_info[-1].text
         return process_remote_status(status)
 

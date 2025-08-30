@@ -39,12 +39,14 @@ class Bulldogjob(JobSite):
     @staticmethod
     def records_list(data) -> list:
         """Extracts job records from HTML."""
+
+        def record_container(class_name):
+            return class_name and class_name.startswith("JobListItem_item")
+
         try:
-            block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item")
-            record_container = {"class": block_name}
-            records = data.find_all("a", attrs=record_container)
+            records = data.find_all("a", {"class": record_container})
             return [record for record in records]
-        except:
+        except Exception:
             print("Error detecting records: BULLDOGJOB")
             return []
 
@@ -60,17 +62,21 @@ class Bulldogjob(JobSite):
     @missing_container_handler
     def job_title(self) -> str:
         """Extracts job title."""
-        block_name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
-        container = {"class": block_name}
-        title_block = self.html.find(attrs=container).h3
+
+        def block_name(class_name):
+            return class_name and class_name.startswith("JobListItem_item__title")
+
+        title_block = self.html.find(attrs={"class": block_name}).h3
         return title_block.text.strip()
 
     @missing_container_handler
     def tags(self):
         """Extracts job tags from record."""
-        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__tags")
-        tags_container = {"class": name}
-        tags_block = self.html.find(attrs=tags_container)
+
+        def JobListItem_item__tags(class_name):
+            return class_name and class_name.startswith("JobListItem_item__tags")
+
+        tags_block = self.html.find(attrs={"class": JobListItem_item__tags})
         if tags_block:
             tags_list = [span.text.strip() for span in tags_block.find_all("span")]
             return TAG_SEPARATOR.join(tags_list)
@@ -78,9 +84,11 @@ class Bulldogjob(JobSite):
     @missing_container_handler
     def company(self):
         """Extract company name from record."""
-        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__title")
-        title_company_container = {"class": name}
-        title_company_block = self.html.find(attrs=title_company_container)
+
+        def JobListItem_item__title(class_name):
+            return class_name and class_name.startswith("JobListItem_item__title")
+
+        title_company_block = self.html.find(attrs={"class": JobListItem_item__title})
         # Find the <h3> tag with offer title and get the <div> sibling
         title_container = title_company_block.h3
         return title_container.find_next_sibling("div").text.strip()
@@ -88,42 +96,58 @@ class Bulldogjob(JobSite):
     @missing_container_handler
     def logo(self):
         """Extract company logo from record."""
-        logo_container = {"class": lambda class_name: class_name and class_name.startswith("JobListItem_item__logo")}
+        logo_container = {
+            "class": lambda class_name: class_name and class_name.startswith("JobListItem_item__logo")
+        }
         if logo_container:
             return self.html.find(attrs=logo_container).img["src"]
 
     @missing_container_handler
     def location(self):
         """Extract location from record."""
-        name = lambda class_name: class_name and class_name.startswith("JobListItem_item__details")
-        details_block = self.html.find(attrs={"class": name})
 
-        location_block = details_block.div.div
+        def JobListItem_item__details(class_name):
+            return class_name and class_name.startswith("JobListItem_item__details")
+
+        details_block = self.html.find(attrs={"class": JobListItem_item__details})
+
+        location_block = details_block.div
         if location_block:
             spans = location_block.find_all("span")
-            location_texts = [span.text.strip() for span in spans]
-            location = " | ".join(location_texts)
-            return remove_remote_status(location)
+            if len(spans) == 1:
+                locations_list = spans[0].text.split(",")
+                merged_locations = " | ".join(locations_list)
+                return remove_remote_status(merged_locations)
+
+            if len(spans) > 1:
+                location_texts = [span.text.strip() for span in spans]
+                print(location_texts)
+                locations = " | ".join(location_texts)
+                return remove_remote_status(locations)
         return None
 
     @missing_container_handler
     def remote_status(self):
         """Extract remote status from record."""
-        container_name = "JobListItem_item__details"
-        remote_container = lambda class_name: class_name and class_name.startswith(container_name)
-        details_block = self.html.find(attrs={"class": remote_container})
+
+        def JobListItem_item__details(class_name):
+            return class_name and class_name.startswith("JobListItem_item__details")
+
+        details_block = self.html.find(attrs={"class": JobListItem_item__details})
         if details_block:
             first_block = details_block.div
             if first_block:
                 status = first_block.text
-        return process_remote_status(status)
+            return process_remote_status(status)
 
     @missing_container_handler
     def salary_container(self):
         """Extract salary container from record."""
-        container_name = "JobListItem_item__salary"
-        salary_container = lambda class_name: class_name and class_name.startswith(container_name)
-        container = self.html.find(attrs={"class": salary_container})
+
+        def JobListItem_item__salary(class_name):
+            return class_name and class_name.startswith("JobListItem_item__salary")
+
+        container = self.html.find(attrs={"class": JobListItem_item__salary})
         if container:
             return container.text
 

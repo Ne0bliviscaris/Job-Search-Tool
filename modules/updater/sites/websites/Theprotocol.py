@@ -42,7 +42,7 @@ class Theprotocol(JobSite):
             record_container = {"data-test": "list-item-offer"}
             records = data.find_all(attrs=record_container)
             return [record for record in records]
-        except:
+        except Exception:
             print("Error detecting records: Theprotocol")
 
     def website(self) -> str:
@@ -142,7 +142,7 @@ class Theprotocol(JobSite):
     def scrape(self):
         """Scrape given link using Selenium."""
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",  # noqa
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
             "Accept-Language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
         }

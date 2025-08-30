@@ -1,5 +1,4 @@
 import httpx
-from bs4 import BeautifulSoup
 
 from modules.updater.data_processing.helper_functions import (
     convert_k_notation,
@@ -12,7 +11,7 @@ from modules.updater.data_processing.helper_functions import (
     split_salary,
 )
 from modules.updater.data_processing.site_files import load_html_as_soup, save_html
-from modules.updater.error_handler import missing_container_handler, no_offers_found
+from modules.updater.error_handler import missing_container_handler
 from modules.updater.sites.JobSite import TAG_SEPARATOR, JobSite
 
 
@@ -43,7 +42,7 @@ class RocketJobs(JobSite):
             record_container = {"data-index": True}
             records = data.find_all(attrs=record_container)
             return [record for record in records]
-        except:
+        except Exception:
             print("Error detecting records: RocketJobs.pl")
 
     def website(self) -> str:
@@ -65,8 +64,9 @@ class RocketJobs(JobSite):
     @missing_container_handler
     def tags(self):
         """Extracts job tags from record."""
-        name = lambda class_name: class_name and class_name.startswith("skill-tag")
-        tags = self.html.find_all(class_=name)
+        tags = self.html.find_all(
+            class_=lambda class_name: class_name and class_name.startswith("skill-tag")
+        )
         tags_list = [tag.text for tag in tags]
         if tags_list:
             return TAG_SEPARATOR.join(tags_list)
@@ -77,8 +77,9 @@ class RocketJobs(JobSite):
         company_icon = {"data-testid": "ApartmentRoundedIcon"}
         svg_icon = self.html.find("svg", company_icon)
         if svg_icon:
-            parent_name = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-            parent_div = svg_icon.find_parent("div", class_=parent_name)
+            parent_div = svg_icon.find_parent(
+                "div", class_=lambda class_name: class_name and class_name.startswith("MuiBox-root")
+            )
             company = parent_div.span
             return company.text if company else None
 
@@ -94,8 +95,9 @@ class RocketJobs(JobSite):
         company_icon = {"data-testid": "PlaceOutlinedIcon"}
         svg_icon = self.html.find("svg", company_icon)
         if svg_icon:
-            parent_block_class = lambda class_name: class_name and class_name.startswith("MuiBox-root")
-            parent_div = svg_icon.find_parent("div", class_=parent_block_class)
+            parent_div = svg_icon.find_parent(
+                "div", class_=lambda class_name: class_name and class_name.startswith("MuiBox-root")
+            )
             if parent_div and parent_div.span:
                 location = parent_div.span.text
                 return remove_remote_status(location)
@@ -113,13 +115,16 @@ class RocketJobs(JobSite):
     @missing_container_handler
     def salary_container(self):
         """Extract salary container from record."""
-        # All containers on site are MuiBox-root. Need to find the right one
-        MuiBox_block = lambda class_name: class_name and class_name.startswith("MuiBox-root")
+
+        def mui_box_block(class_name):
+            """All containers on site are MuiBox-root. Need to find the right one"""
+            return class_name and class_name.startswith("MuiBox-root")
+
         # Salary is in sibling div to the one containing title (h3)
         h3_container = self.html.h3
         if h3_container:
-            parent_div = h3_container.find_parent("div", class_=MuiBox_block)
-            salary_block = parent_div.find_next_sibling("div", class_=MuiBox_block)
+            parent_div = h3_container.find_parent("div", class_=mui_box_block)
+            salary_block = parent_div.find_next_sibling("div", class_=mui_box_block)
             # Salary is in <span> inside the parent div of <h3>
             if salary_block:
                 salary = salary_block.text.replace("New", "")

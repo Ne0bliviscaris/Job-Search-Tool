@@ -40,12 +40,12 @@ class NoFluffJobs(JobSite):
     def records_list(data) -> list:
         """Extracts job records from HTML."""
         try:
-            block_name = lambda id_name: id_name and id_name.startswith("nfjPostingListItem")
-            record_container = {"id": block_name}
+            record_container = {
+                "id": lambda id_name: id_name and id_name.startswith("nfjPostingListItem")
+            }
             records = data.find_all(attrs=record_container)
             return [record for record in records]
-
-        except:
+        except Exception:
             print("Error detecting records: NoFluffJobs.com")
 
     def website(self) -> str:
@@ -79,8 +79,7 @@ class NoFluffJobs(JobSite):
     @missing_container_handler
     def company(self):
         """Extract company name from record."""
-        name = lambda x: x and x.startswith("company-name")
-        company_container = {"class": name}
+        company_container = {"class": lambda x: x and x.startswith("company-name")}
         return self.html.find(attrs=company_container).text.strip()
 
     @missing_container_handler
@@ -148,7 +147,7 @@ def nofluffjobs_no_search_results(soup):
         no_offers_block = soup.find("nfj-no-offers-found-header")
         if no_offers_block:
             return True
-    except:
+    except Exception:
         return False
 
 

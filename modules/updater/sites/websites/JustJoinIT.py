@@ -37,7 +37,7 @@ class JustJoinIT(RocketJobs):
         company_location_bar = company_icon.parent.parent
         # Tags bar contains tags and posting remaining duration
         tags_bar = company_location_bar.find_next_sibling("div")
-        posting_remaining_duration = tags_bar.div.decompose()
+        tags_bar.div.decompose()  # posting_remaining_duration
         tags = tags_bar.find_all("div")
         tags_list = [tag.text for tag in tags]
         if tags_list:

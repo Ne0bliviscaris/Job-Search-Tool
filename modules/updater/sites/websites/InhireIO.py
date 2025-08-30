@@ -139,8 +139,10 @@ class InhireIO(JobSite):
         try:
             min_salary, max_salary = split_salary(processed_salary)
             return min_salary, max_salary, salary_details, salary_text
-        except ValueError as e:
-            print(f"Error processing data from record: {self.website} -> Salary range - data: {salary_text}")
+        except ValueError:
+            print(
+                f"Error processing data from record: {self.website} -> Salary range - data: {salary_text}"  # noqa
+            )
             return None, None, salary_details, salary_text
 
     def scrape(self):  # -> list | Literal['']:
@@ -163,7 +165,7 @@ class InhireIO(JobSite):
         payload = self._construct_API_request(link=self.search_link, page_number=page)
 
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"  # noqa
         }
         response = httpx.post(base_url, json=payload, headers=headers)
         if response.status_code == 200:

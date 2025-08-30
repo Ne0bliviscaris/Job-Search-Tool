@@ -66,13 +66,17 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
             # Convert NaT to None and strings to Timestamp for date columns
             for col in DATE_COLUMNS:
                 if col in dataframe.columns:
-                    dataframe.loc[:, col] = dataframe[col].apply(lambda x: None if pd.isna(x) else pd.Timestamp(x))
+                    dataframe.loc[:, col] = dataframe[col].apply(
+                        lambda x: None if pd.isna(x) else pd.Timestamp(x)
+                    )
             # Convert numeric columns to integers
             numeric_cols = ["min_salary", "max_salary", "personal_rating", "users_id"]
             for col in numeric_cols:
                 if col in dataframe.columns:
                     if col is not None:
-                        dataframe.loc[:, col] = pd.to_numeric(dataframe[col], errors="coerce").fillna(0).astype(int)
+                        dataframe.loc[:, col] = (
+                            pd.to_numeric(dataframe[col], errors="coerce").fillna(0).astype(int)
+                        )
 
             for row in dataframe.itertuples():
                 record = JobOfferRecord(
@@ -93,7 +97,9 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
                     url=row.url,
                     website=row.website,
                     notes=row.notes if hasattr(row, "notes") else None,
-                    application_status=row.application_status if hasattr(row, "application_status") else "Not applied",
+                    application_status=(
+                        row.application_status if hasattr(row, "application_status") else "Not applied"
+                    ),
                     offer_status=row.offer_status if hasattr(row, "offer_status") else "active",
                     # Date columns
                     added_date=row.added_date if hasattr(row, "added_date") else None,
@@ -101,7 +107,9 @@ def save_records_to_db(dataframe: pd.DataFrame) -> None:
                     feedback_date=row.feedback_date if hasattr(row, "feedback_date") else None,
                     archived_date=row.archived_date if hasattr(row, "archived_date") else None,
                     # Other columns
-                    feedback_received=row.feedback_received if hasattr(row, "feedback_received") else False,
+                    feedback_received=(
+                        row.feedback_received if hasattr(row, "feedback_received") else False
+                    ),
                 )
                 db.add(record)
             db.commit()
@@ -162,9 +170,13 @@ def load_records_from_db(archive=False, all_records=False) -> pd.DataFrame:
         try:
             if not all_records:
                 if not archive:
-                    records = db.query(JobOfferRecord).where(JobOfferRecord.offer_status == "active").all()
+                    records = (
+                        db.query(JobOfferRecord).where(JobOfferRecord.offer_status == "active").all()
+                    )
                 else:
-                    records = db.query(JobOfferRecord).filter(JobOfferRecord.offer_status == "archived").all()
+                    records = (
+                        db.query(JobOfferRecord).filter(JobOfferRecord.offer_status == "archived").all()
+                    )
             else:
                 records = db.query(JobOfferRecord).all()
             data = [

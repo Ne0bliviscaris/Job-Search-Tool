@@ -12,7 +12,7 @@ from modules.updater.sites.websites.Theprotocol import Theprotocol
 class SiteFactory:
     """A factory class for creating site instances."""
 
-    site_classes = {
+    scrapers = {
         "https://nofluffjobs.com": NoFluffJobs,
         "https://bulldogjob.pl": Bulldogjob,
         "https://inhire.io": InhireIO,
@@ -24,9 +24,9 @@ class SiteFactory:
     }
 
     @staticmethod
-    def identify_website(search_link):
+    def identify_website(search_link) -> JobSite:
         """Creates site instance based on search link."""
-        for url, site_class in SiteFactory.site_classes.items():
+        for url, site_class in SiteFactory.scrapers.items():
             if url in search_link:
                 return site_class(search_link=search_link)
         return "Error: Website not recognized"

@@ -1,9 +1,8 @@
-# Requests.get viable
+# flake8: noqa
 NOFLUFFJOBS = "https://nofluffjobs.com"
 PRACUJPL = "https://it.pracuj.pl"
 BULLDOGJOB = "https://bulldogjob.pl"
 INHIRE = "https://inhire.io"
-# Selenium required
 THEPROTOCOL = "https://theprotocol.it"
 ROCKETJOBS = "https://rocketjobs.pl"
 JUSTJOINIT = "https://justjoin.it"

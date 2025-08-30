@@ -36,9 +36,10 @@ def sync_records():
     missing_records, new_records = find_record_changes(update, db)
     archive_records(missing_records)
     process_new_records(new_records)
-    updater_log("Sync").info(
-        f"Synchronization completed. Added {new_records.shape[0]} new records, archived {missing_records.shape[0]}."
-    )
+
+    new = new_records.shape[0]
+    missing = missing_records.shape[0]
+    updater_log("Sync").info(f"Synchronization completed. Added {new} new records, archived {missing}.")
 
 
 def prepare_set_for_comparison(frame: pd.DataFrame):

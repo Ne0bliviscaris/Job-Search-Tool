@@ -19,7 +19,9 @@ class JobSite(ABC):
             self.logo = self.logo()
             self.location = self.location()
             self.remote_status = self.remote_status()
-            self.salary_min, self.salary_max, self.salary_details, self.salary_text = self.fetch_salary_range()
+            self.salary_min, self.salary_max, self.salary_details, self.salary_text = (
+                self.fetch_salary_range()
+            )
 
     @staticmethod
     @abstractmethod

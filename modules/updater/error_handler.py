@@ -4,7 +4,7 @@ import os
 
 
 def fancy_error_handler(func):
-    """Decorator that wraps function in try-except and handles errors with file info and Streamlit support."""
+    """Wraps function in try-except and handles errors with file info and Streamlit support."""
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):

@@ -12,11 +12,11 @@ def main():
         """
         #### Job searching is inconvenient.
         Not only are there multiple websites, but it's also hard to keep track of all the job offers you have applied to.
-        
+
 
         I have built this tool to spare myself the pain of browsing through 7 major polish job boards every day.
-        
-        ---        
+
+        ---
         #### The idea is simple:
         For each job board, I have pasted a link with applied filters that I want to check every day.
 
@@ -30,7 +30,7 @@ def main():
         - Extract and unify data into a single database
         - Track application and feedback status, add notes and personal ratings
         - Serve it all in a convenient way
-        """
+        """  # noqa
     )
 
 

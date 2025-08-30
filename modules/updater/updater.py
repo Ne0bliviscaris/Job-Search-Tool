@@ -20,6 +20,6 @@ async def update_site(search_link):
 async def update_all_sites():
     """Run all site updates concurrently and yield link names."""
     tasks = [update_site(search_link) for link_name, search_link in search_links.items()]
-    results = await asyncio.gather(*tasks)
+    await asyncio.gather(*tasks)
     for i, link_name in enumerate(search_links.keys()):
         yield link_name
