@@ -3,7 +3,7 @@ import streamlit as st
 
 from modules.updater.data_processing.site_files import set_filename_from_link
 from modules.updater.sites.JobSite import JobSite
-from modules.updater.sites.SiteFactory import SiteFactory
+from modules.updater.sites.scraper_factory import scraper_factory
 from modules.websites import search_links
 
 
@@ -33,7 +33,7 @@ def process_all_links():
 def process_website(link: str):
     """Process job records from a given link.
     Returns a list of JobSite instances containing separated job offers."""
-    website: JobSite = SiteFactory.identify_website(link)
+    website: JobSite = scraper_factory(link)
 
     file_name = set_filename_from_link(link, website.file_extension)
     file_content = website.load_file(file_name)

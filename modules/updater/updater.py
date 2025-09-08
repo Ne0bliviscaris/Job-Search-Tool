@@ -2,13 +2,13 @@ import asyncio
 
 from modules.settings import SAVE_HTML
 from modules.updater.data_processing.site_files import set_filename_from_link
-from modules.updater.sites.SiteFactory import SiteFactory
+from modules.updater.sites.scraper_factory import scraper_factory
 from modules.websites import search_links
 
 
 async def update_site(search_link):
     """Run scraper in executor for async update."""
-    job_site = SiteFactory.identify_website(search_link)
+    job_site = scraper_factory(search_link)
     loop = asyncio.get_event_loop()
     search_block = await loop.run_in_executor(None, job_site.scrape)
     if SAVE_HTML:
