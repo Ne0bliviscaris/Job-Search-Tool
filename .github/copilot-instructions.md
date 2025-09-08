@@ -8,13 +8,13 @@
 - Answer concisely and clearly.
 
 # Coding Principles
-- Follow clean code principles and single responsibility.
+- Follow clean code principles and single responsibility rule.
 - Use clearly named variables to hide complexity. This includes extracting complex expressions into well-named variables.
 - Avoid unnecessary complexity.
 - Avoid redundant code.
 - Do not overengineer solutions.
 - Focus on solving root causes of problems rather than creating workarounds.
-- Never generate procedural code.
+- Never generate procedural code and long functions.
 
 # Code Generation
 - Use existing variables in examples.
@@ -22,11 +22,10 @@
 - Only modify relevant parts.
 - Do not introduce new solutions unless explicitly asked.
 - Do not assume multiple input types if not specified.
-- Never generate more than 15 lines of code at a time.
+- Avoid generating functions longer than 20 lines.
 - Break code into smaller parts and explain modifications in between.
 - Do not output entire files.
 - Generate short responses.
-- Perform one step at a time.
 - Do not generate inline comments.
 - Explain changes briefly before modifying code.
 
