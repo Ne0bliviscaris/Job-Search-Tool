@@ -1,4 +1,8 @@
-# Job-Search-Tool
+# Currently working non-publicly on Job-Search-Tool v2
+Discovered v1 was fundamentally flawed - served as a solid base.
+New version scrapes entire websites, allows searching via categories, experience levels etc
+
+# Job-Search-Tool - discontinued
 Organizer for job searching across multiple sites. Fetch offers, measure recruitment progress, collect info about potential employer
 <br><br>
 
